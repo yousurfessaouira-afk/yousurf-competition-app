@@ -2,126 +2,166 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <title>YouSurf Competition OS</title>
+  <title>YouSurf Judge Mode · GKA 2025</title>
   <style>
-    :root {
-      --bg:#040914; --panel:#0d1b2d; --panel2:#132640; --ink:#f8fbff; --muted:#a9bdd6;
-      --line:rgba(255,255,255,.18); --blue:#1db7ff; --green:#38e49b; --amber:#ffbf47; --red:#ff5263;
-      --white:#f8fbff; --black:#06101d; --radius:18px; --shadow:0 16px 50px rgba(0,0,0,.38);
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-    }
-    *{box-sizing:border-box} html{background:var(--bg);min-width:320px} body{margin:0;min-height:100vh;color:var(--ink);background:radial-gradient(circle at 10% -10%,rgba(29,183,255,.38),transparent 20rem),linear-gradient(140deg,#040914,#09172a 55%,#03060d)}
-    button,input,select,textarea{font:inherit} button{min-height:54px;border:0;border-radius:16px;font-weight:950;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent} input,select,textarea{width:100%;border:2px solid var(--line);border-radius:14px;padding:13px;color:var(--ink);background:rgba(255,255,255,.08);outline-color:var(--blue)} textarea{min-height:108px;resize:vertical} label{display:block;margin:0 0 6px;color:var(--muted);font-size:.78rem;font-weight:950;letter-spacing:.08em;text-transform:uppercase} h1,h2,h3,p{margin-top:0} h1{font-size:clamp(2.45rem,12vw,6rem);line-height:.88;letter-spacing:-.08em;margin-bottom:10px} h2{font-size:clamp(1.55rem,6vw,2.7rem);line-height:1;letter-spacing:-.05em;margin-bottom:8px} h3{margin-bottom:8px}.small{color:var(--muted);font-size:.92rem;font-weight:750}.eyebrow{color:#8fe0ff;font-size:.76rem;font-weight:1000;letter-spacing:.14em;text-transform:uppercase;margin-bottom:7px}.app{width:min(100%,1220px);margin:0 auto;padding:max(14px,env(safe-area-inset-top)) 12px max(18px,env(safe-area-inset-bottom))}.top{display:grid;gap:12px;margin-bottom:12px}.hero,.panel,.notice,.toast{border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(14px)}.hero{padding:18px;border-radius:28px;background:rgba(255,255,255,.08)}.panel{padding:14px;border-radius:24px;background:rgba(13,27,45,.95)}.panel.light{color:var(--black);background:var(--white)}.panel.light input,.panel.light select,.panel.light textarea{color:var(--black);background:white;border-color:rgba(6,16,29,.18)}.panel.light label{color:#52657c}.nav{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;position:sticky;top:0;z-index:10;padding:8px 0;background:linear-gradient(180deg,rgba(4,9,20,.98),rgba(4,9,20,.75))}.nav button,.home-actions button{color:var(--ink);background:rgba(255,255,255,.1);border:1px solid var(--line);box-shadow:0 8px 28px rgba(0,0,0,.22)}.nav button.active,.home-actions button.primary{color:var(--black);background:var(--white);box-shadow:inset 0 0 0 4px var(--blue),0 8px 28px rgba(0,0,0,.22)}.screen{display:none}.screen.active{display:grid;gap:12px}.grid,.form-grid,.list,.stack{display:grid;gap:10px}.two,.three{display:grid;gap:12px}.home-actions{display:grid;grid-template-columns:1fr;gap:10px}.primary{color:var(--black);background:linear-gradient(135deg,#e9fbff,var(--blue))}.secondary{color:var(--black);background:#e8eef7}.danger{color:white;background:var(--red)}.ghost{color:var(--ink);background:rgba(255,255,255,.1);border:1px solid var(--line)}.button-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pill{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:7px 10px;border-radius:999px;color:var(--black);background:var(--blue);font-size:.78rem;font-weight:1000;white-space:nowrap}.pill.green{background:var(--green)}.pill.amber{background:var(--amber)}.pill.red{color:white;background:var(--red)}.pill.gray{color:var(--ink);background:rgba(255,255,255,.12)}.panel-head,.item-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.item{padding:12px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.08)}.light .item{background:#edf4fb;border-color:rgba(6,16,29,.1)}.rider-line{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center}.lycra{display:grid;place-items:center;width:48px;height:48px;border:3px solid rgba(255,255,255,.55);border-radius:14px;color:#07111f;font-weight:1000;text-shadow:0 1px rgba(255,255,255,.45)}.lycra.Red{background:#ff364c;color:white}.lycra.Blue{background:#1b78ff;color:white}.lycra.Yellow{background:#ffe14a}.lycra.White{background:#fff}.lycra.Green{background:#37e28d}.lycra.Black{background:#111;color:white}.heat-button,.rider-button,.rank-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;width:100%;padding:12px;border:1px solid var(--line);border-radius:18px;color:var(--ink);background:rgba(255,255,255,.08);text-align:left}.heat-button.active,.rider-button.active{outline:4px solid var(--blue);background:rgba(29,183,255,.18)}.timer{font-size:clamp(3rem,17vw,7rem);font-weight:1000;line-height:.9;letter-spacing:-.08em;text-align:center;padding:12px;border-radius:22px;background:#07111f}.score-card{padding:0;overflow:hidden;background:var(--white);color:var(--black)}.score-top{display:grid;gap:10px;padding:14px}.score-readout{display:grid;place-items:center;padding:12px;border-radius:20px;background:#06101d;color:white}.score-readout strong{font-size:clamp(3rem,14vw,5.2rem);line-height:.82;letter-spacing:-.08em}.tabs,.quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 12px 12px}.tabs button,.quick-grid button{background:#e8eef7;color:var(--black)}.tabs button.active{background:var(--blue);box-shadow:inset 0 0 0 4px #06101d}.score-entry{display:grid;grid-template-columns:72px 1fr 72px;gap:8px;padding:0 12px 12px}.stepper{min-height:110px;color:white;background:#06101d;font-size:2.4rem}.score-display{display:grid;place-items:center;border:3px solid rgba(6,16,29,.12);border-radius:20px}.score-display strong{font-size:clamp(3.4rem,18vw,6rem);line-height:.82;letter-spacing:-.08em}.public .top,.public .nav,.public .hide-public{display:none}.public .app{width:100%;max-width:none}.public .screen{display:none}.public #rankingScreen{display:grid}.public .rank-row{font-size:1.35rem}.public .rank-row .total{font-size:clamp(2.4rem,8vw,6rem)}.notice{padding:12px;border-radius:18px;background:rgba(255,191,71,.14)}.toast{position:fixed;right:12px;bottom:12px;z-index:20;max-width:calc(100vw - 24px);padding:12px 14px;border-radius:18px;color:var(--black);background:var(--green);font-weight:950;transform:translateY(140%);transition:.2s}.toast.show{transform:translateY(0)}
-    @media(min-width:760px){.app{padding:22px}.top{grid-template-columns:1fr auto;align-items:stretch}.nav{grid-template-columns:repeat(5,1fr)}.home-actions{grid-template-columns:repeat(4,1fr)}.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}.form-grid{grid-template-columns:repeat(2,1fr)}.score-top{grid-template-columns:1fr 220px}.tabs{grid-template-columns:repeat(6,1fr)}.quick-grid{grid-template-columns:repeat(5,1fr)}.score-entry{grid-template-columns:96px 1fr 96px}}
+    :root{--bg:#030815;--panel:#0d1b2d;--panel2:#132843;--ink:#f8fbff;--muted:#a9bad1;--line:rgba(255,255,255,.16);--blue:#29b9ff;--green:#37e69b;--amber:#ffc24d;--red:#ff5263;--black:#06101d;--white:#f8fbff;--shadow:0 18px 60px rgba(0,0,0,.38);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);background:radial-gradient(circle at 10% -10%,rgba(41,185,255,.35),transparent 24rem),linear-gradient(145deg,#030815,#09172a 55%,#02050b)}button,input,select,textarea{font:inherit}button{min-height:48px;border:0;border-radius:14px;font-weight:950;cursor:pointer;touch-action:manipulation}input,select,textarea{width:100%;border:2px solid var(--line);border-radius:13px;padding:11px 12px;color:var(--ink);background:rgba(255,255,255,.08);outline-color:var(--blue)}textarea{min-height:88px;resize:vertical}label{display:block;margin:0 0 6px;color:var(--muted);font-size:.74rem;font-weight:950;letter-spacing:.1em;text-transform:uppercase}h1,h2,h3,p{margin-top:0}h1{margin-bottom:8px;font-size:clamp(2.3rem,8vw,5.2rem);line-height:.88;letter-spacing:-.075em}h2{margin-bottom:8px;font-size:clamp(1.45rem,4vw,2.4rem);line-height:1;letter-spacing:-.045em}h3{margin-bottom:8px}.app{width:min(100%,1280px);margin:0 auto;padding:14px}.hero,.panel,.toast{border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(14px)}.hero{display:grid;gap:12px;margin-bottom:12px;padding:18px;border-radius:28px;background:rgba(255,255,255,.08)}.panel{padding:14px;border-radius:22px;background:rgba(13,27,45,.94)}.panel.light{color:var(--black);background:var(--white)}.panel.light input,.panel.light select,.panel.light textarea{color:var(--black);background:#fff;border-color:rgba(6,16,29,.18)}.panel.light label{color:#52657c}.grid,.stack{display:grid;gap:10px}.two,.three,.four{display:grid;gap:10px}.small{color:var(--muted);font-size:.9rem;font-weight:720}.light .small{color:#53677f}.eyebrow{color:#8fe0ff;font-size:.75rem;font-weight:1000;letter-spacing:.14em;text-transform:uppercase}.pill{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:6px 10px;border-radius:999px;color:var(--black);background:var(--blue);font-size:.76rem;font-weight:1000;white-space:nowrap}.pill.green{background:var(--green)}.pill.amber{background:var(--amber)}.pill.red{color:white;background:var(--red)}.pill.gray{color:var(--ink);background:rgba(255,255,255,.13)}.light .pill.gray{color:var(--black);background:#e8eef7}.primary{color:var(--black);background:linear-gradient(135deg,#e9fbff,var(--blue))}.secondary{color:var(--black);background:#e8eef7}.ghost{color:var(--ink);background:rgba(255,255,255,.1);border:1px solid var(--line)}.danger{color:white;background:var(--red)}.button-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.rider-card,.attempt-card,.rank-row,.call-row{display:grid;gap:8px;padding:12px;border:1px solid var(--line);border-radius:17px;background:rgba(255,255,255,.08)}.rider-card{grid-template-columns:auto 1fr auto;align-items:center;text-align:left;color:var(--ink)}.rider-card.active,.attempt-card.active{outline:4px solid var(--blue);background:rgba(41,185,255,.18)}.lycra{display:grid;place-items:center;width:48px;height:48px;border:3px solid rgba(255,255,255,.55);border-radius:14px;color:#07111f;font-weight:1000;text-shadow:0 1px rgba(255,255,255,.4)}.Red{background:#ff364c!important;color:white}.Blue{background:#1b78ff!important;color:white}.Yellow{background:#ffe14a!important}.White{background:#fff!important}.Green{background:#37e28d!important}.Black{background:#111!important;color:white}.score-readout{display:grid;place-items:center;min-height:148px;border-radius:22px;background:#06101d;color:#fff}.score-readout strong{font-size:clamp(4rem,18vw,7rem);line-height:.8;letter-spacing:-.08em}.score-pad{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.score-pad button{color:var(--black);background:#e8eef7}.score-pad button.mark-m{color:#fff;background:#29384e}.attempt-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(142px,1fr));gap:8px}.attempt-card{color:var(--ink);text-align:left}.attempt-card.locked{border-color:rgba(55,230,155,.65)}.attempt-card.missed{border-color:rgba(255,194,77,.65)}.rank-row{grid-template-columns:auto 1fr auto;align-items:center}.total{font-size:1.55rem;font-weight:1000}.notice{border-left:5px solid var(--amber);padding:10px 12px;border-radius:14px;background:rgba(255,194,77,.12)}.source-list{margin:8px 0 0;padding-left:18px;color:var(--muted)}.toast{position:fixed;right:14px;bottom:14px;z-index:20;max-width:min(420px,calc(100% - 28px));padding:12px 14px;border-radius:18px;background:#06101d;color:#fff;display:none}.toast.show{display:block}.hide{display:none!important}@media(min-width:760px){.hero{grid-template-columns:1.3fr .7fr;align-items:end}.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}.four{grid-template-columns:repeat(4,1fr)}.layout{display:grid;grid-template-columns:310px 1fr;gap:12px}.judge-main{display:grid;grid-template-columns:1fr 370px;gap:12px}.score-tools{position:sticky;top:12px}}@media(max-width:520px){.score-pad{grid-template-columns:repeat(3,1fr)}.button-row{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <main class="app" id="app">
-    <div class="top">
-      <header class="hero">
-        <p class="eyebrow">YouSurf Competition OS</p>
-        <h1>Field-ready event control</h1>
-        <p class="small" id="heroSummary">Offline-first judging, race control and live ranking for watersports heats.</p>
-      </header>
-      <section class="panel" aria-label="Offline status">
-        <div class="panel-head"><div><p class="eyebrow">Browser storage</p><h3 id="saveStatus">Saved offline</h3><p class="small">GitHub Pages ready · no backend</p></div><span class="pill green">Local</span></div>
-      </section>
+<div class="app">
+  <header class="hero">
+    <div>
+      <div class="eyebrow">Judge Mode only · GKA Rulebook 2025 reference</div>
+      <h1>Judge Mode</h1>
+      <p class="small">Offline browser judging workflow for Wave, Trick, and Mixed formats. Scores are local to this device and confirmed scores stay locked unless the Head Judge correction workflow is used.</p>
     </div>
-    <nav class="nav" id="nav" aria-label="App screens"></nav>
+    <div class="panel light">
+      <strong id="heatStatus">Heat ready</strong>
+      <p class="small" id="ruleSummary">Score range 0.1–10.0 · missed attempt M · highest points wins.</p>
+    </div>
+  </header>
 
-    <section class="screen active" id="homeScreen" data-screen="home">
-      <article class="panel light">
-        <p class="eyebrow">Tarfaya MVP</p><h2>Choose your role</h2><p class="small">Large controls, high contrast and offline localStorage persistence for a real beach test event.</p>
-        <div class="home-actions">
-          <button class="primary" data-go="judge">Judge Mode</button><button data-go="admin">Admin / Race Control</button><button data-go="ranking">Live Ranking</button><button data-go="setup">Event Setup</button>
+  <main class="layout">
+    <aside class="stack">
+      <section class="panel">
+        <div class="eyebrow">Heat configuration</div>
+        <div class="two">
+          <div><label>Format</label><select id="format"><option value="wave">Wave</option><option value="trick">Trick / Strapless Freestyle</option><option value="mixed">Mixed Wave + Trick</option></select></div>
+          <div><label>Discipline note</label><select id="discipline"><option>Kite-Surf</option><option>Freestyle</option><option>Hydrofoil Big Air</option><option>Big Air</option><option>Other / Head Judge decision required</option></select></div>
         </div>
-      </article>
-      <article class="notice"><strong>Official results stay provisional until Head Judge validation.</strong><div class="small" id="homeNotice">No official notice posted.</div></article>
-    </section>
+        <div class="three">
+          <div><label>Judges on panel</label><input id="judgeCount" type="number" min="3" step="2" value="5"></div>
+          <div><label>Counting waves</label><input id="countWaves" type="number" min="0" max="8" value="2"></div>
+          <div><label>Counting tricks</label><input id="countTricks" type="number" min="0" max="8" value="3"></div>
+        </div>
+        <div class="three">
+          <div><label>Wave weight</label><input id="waveWeight" type="number" min="0" step="0.1" value="1"></div>
+          <div><label>Trick weight</label><input id="trickWeight" type="number" min="0" step="0.1" value="1"></div>
+          <div><label>Interference penalty table</label><select id="penaltyMode"><option value="gka">GKA table: 50% / 100% deduction</option><option value="hj">Head Judge decision required</option></select></div>
+        </div>
+        <p class="notice small">Per GKA, maximum counting wave/trick attempts and category weights are announced by the Head Judge and posted on the Official Notice Board. Configure them here for this heat.</p>
+      </section>
 
-    <section class="screen" id="setupScreen" data-screen="setup">
-      <article class="panel light"><div class="panel-head"><div><p class="eyebrow">Event setup</p><h2>Local rulebook settings</h2><p class="small">Configures scoring labels, counted scores and heat size for future rulebook changes.</p></div><span class="pill green">Auto-save</span></div>
-        <form class="form-grid" id="setupForm">
-          <div><label for="eventName">Event name</label><input id="eventName" required></div>
-          <div><label for="discipline">Discipline</label><select id="discipline"><option>Kite-Surf</option><option>Wave</option><option>Big Air</option><option>Freestyle</option></select></div>
-          <div><label for="division">Division</label><select id="division"><option>Men</option><option>Women</option><option>Youth</option></select></div>
-          <div><label for="heatDuration">Heat duration minutes</label><input id="heatDuration" type="number" min="1" max="60"></div>
-          <div><label for="countingScores">Number of counting scores</label><input id="countingScores" type="number" min="1" max="10"></div>
-          <div><label for="ridersPerHeat">Number of riders per heat</label><input id="ridersPerHeat" type="number" min="1" max="8"></div>
-          <div><label for="judgeName">Judge name</label><input id="judgeName"></div>
-          <button class="primary" type="submit">Save settings</button><button class="secondary" type="button" id="resetDemo">Reset sample event</button>
-        </form>
-      </article>
-    </section>
+      <section class="panel">
+        <div class="eyebrow">Riders</div>
+        <div id="riderList" class="grid"></div>
+        <div class="three">
+          <input id="newRiderName" placeholder="Rider name">
+          <select id="newRiderLycra"><option>Red</option><option>Blue</option><option>Yellow</option><option>White</option><option>Green</option><option>Black</option></select>
+          <button id="addRider" class="secondary">Add rider</button>
+        </div>
+      </section>
+    </aside>
 
-    <section class="screen" id="adminScreen" data-screen="admin">
-      <div class="two">
-        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Riders list editor</p><h2>Riders</h2></div><span class="pill gray" id="riderCount">0 riders</span></div>
-          <form class="form-grid" id="riderForm"><div><label for="riderName">Name</label><input id="riderName" placeholder="Rider name"></div><div><label for="riderCountry">Country</label><input id="riderCountry" maxlength="3" placeholder="MAR"></div><div><label for="riderLycra">Lycra color</label><select id="riderLycra"><option>Red</option><option>Blue</option><option>Yellow</option><option>White</option><option>Green</option><option>Black</option></select></div><button class="primary" type="submit">Add rider</button></form>
-          <div class="list" id="riderList"></div>
-        </article>
-        <article class="panel light"><div class="panel-head"><div><p class="eyebrow">Race control</p><h2>Active heat</h2><p class="small" id="activeHeatMeta">No heat selected</p></div><span class="pill" id="heatStatePill">Ready</span></div>
-          <div class="timer" id="timer">00:00</div><div class="button-row"><button class="primary" id="timerToggle">Start</button><button class="secondary" id="timerReset">Reset</button></div><div class="button-row" style="margin-top:8px"><button class="secondary" id="completeHeat">Mark completed</button><button class="primary" id="validateHeat">Head Judge validation</button></div>
-          <label for="noticeBoard" style="margin-top:12px">Official notice board</label><textarea id="noticeBoard" placeholder="Post schedule changes, safety notices or result status..."></textarea>
-        </article>
+    <section class="judge-main">
+      <div class="stack">
+        <section class="panel light">
+          <div class="eyebrow">Selected rider</div>
+          <h2 id="selectedName">Select a rider</h2>
+          <p class="small" id="selectedMeta">Confirmed score cards are locked. Corrections require a Head Judge reason.</p>
+          <div class="attempt-list" id="attemptList"></div>
+          <div class="button-row">
+            <button id="addWave" class="secondary">Add wave attempt</button>
+            <button id="addTrick" class="secondary">Add trick attempt</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="eyebrow">Live ranking and tie-break guidance</div>
+          <div id="leaderboard" class="grid"></div>
+        </section>
+
+        <section class="panel">
+          <div class="eyebrow">Interference call workflow</div>
+          <p class="small">Judges record calls. Only a majority of judges supports a Head Judge interference call. Discipline penalty details remain configurable where the rulebook points to discipline subsections.</p>
+          <div id="interferenceList" class="grid"></div>
+        </section>
+
+        <section class="panel">
+          <div class="eyebrow">Rulebook sections used</div>
+          <ul class="source-list">
+            <li>GKA Rulebook 2025 §20.1–20.2: general interference rules and majority / Head Judge call workflow.</li>
+            <li>§21.2–21.3: odd judge panels of at least three, five-judge high/low discard averaging, highest points wins, Head Judge announced counts/weights, no judge score discussions, judge score corrections made through the Head Judge.</li>
+            <li>§26.2, §32.1, §37.1, §43.1: interference penalty tables; shown as configurable by discipline.</li>
+            <li>§27.1, §33.1, §38.1, §44.2: tie-break visual guidance by format.</li>
+            <li>§27.2, §33.5–33.6, §44.1: trick category / counting-score concepts, left configurable for Head Judge notice-board settings.</li>
+          </ul>
+        </section>
       </div>
-      <div class="two">
-        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Manual heat builder</p><h2>Create heat</h2></div><span class="pill amber">Manual</span></div><form class="grid" id="heatForm"><div><label for="heatNumber">Heat number</label><input id="heatNumber" type="number" min="1"></div><div><label for="heatRiders">Select riders</label><select id="heatRiders" multiple size="6"></select></div><button class="primary" type="submit">Create heat manually</button></form></article>
-        <article class="panel"><div class="panel-head"><div><p class="eyebrow">Select active heat</p><h2>Heat list</h2></div><span class="pill gray" id="heatCount">0 heats</span></div><div class="list" id="heatList"></div></article>
-      </div>
-    </section>
 
-    <section class="screen" id="judgeScreen" data-screen="judge">
-      <div class="two">
-        <aside class="grid"><article class="panel"><div class="panel-head"><div><p class="eyebrow">Judge mode</p><h2 id="judgeHeatTitle">Active heat</h2><p class="small" id="judgeHeatInfo">Use Race Control to select a heat.</p></div><span class="pill green" id="judgeSaved">Saved</span></div></article><div class="list" id="judgeRiders"></div></aside>
-        <article class="score-card panel"><div class="score-top"><div><p class="eyebrow" id="attemptLabel">Wave scoring</p><h2 id="activeRiderName">Select rider</h2><p class="small" id="activeRiderMeta">0.1 to 10.0 points · highest points win</p></div><div class="score-readout"><span class="small">Final score</span><strong id="totalScore">0.00</strong><span id="bestSummary">Best scores</span></div></div><nav class="tabs" id="attemptTabs"></nav><section class="score-entry"><button class="stepper" id="scoreDown">−</button><div class="score-display"><span id="currentAttemptLabel">Attempt 1</span><strong id="currentScore">0.0</strong></div><button class="stepper" id="scoreUp">+</button></section><section class="quick-grid" id="quickScores"></section><div class="button-row" style="padding:0 12px 12px"><button class="secondary" id="addAttempt">Add attempt</button><button class="secondary" id="penaltyToggle">Interference penalty</button></div><section class="panel light" style="margin:0 12px 12px;box-shadow:none"><label for="comments">Judge comments</label><textarea id="comments"></textarea><button class="primary" id="saveScore" style="margin-top:8px;width:100%">Confirm / save score</button></section></article>
-      </div>
+      <aside class="score-tools stack">
+        <section class="panel light">
+          <div class="eyebrow">Score entry</div>
+          <h2 id="attemptTitle">No attempt</h2>
+          <div><label>Judge mark slot</label><select id="judgeSlot"></select></div>
+          <div class="score-readout"><strong id="scoreReadout">—</strong></div>
+          <div class="score-pad" id="scorePad"></div>
+          <div class="button-row">
+            <button id="scoreDown" class="secondary">− 0.1</button>
+            <button id="scoreUp" class="secondary">+ 0.1</button>
+          </div>
+          <button id="confirmScore" class="primary">Confirm score and lock</button>
+          <button id="requestCorrection" class="ghost">Head Judge correction</button>
+          <div id="correctionBox" class="grid hide">
+            <textarea id="correctionReason" placeholder="Head Judge correction reason (required)"></textarea>
+            <button id="unlockScore" class="danger">Unlock with Head Judge reason</button>
+          </div>
+          <p class="small" id="lockStatus">Select or create an attempt to score.</p>
+        </section>
+      </aside>
     </section>
-
-    <section class="screen" id="rankingScreen" data-screen="ranking">
-      <article class="panel"><div class="panel-head"><div><p class="eyebrow">Live ranking</p><h2 id="rankingTitle">Active heat leaderboard</h2><p class="small" id="rankingMeta">Provisional until Head Judge validation.</p></div><button class="secondary hide-public" id="publicMode">Public display mode</button></div><div class="list" id="leaderboard"></div></article>
-    </section>
-  </main><div class="toast" id="toast">Saved offline</div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
 <script>
-(function(){
-  const KEY='yousurfCompetitionMvp';
-  const sample={settings:{eventName:'Tarfaya Test Event',discipline:'Kite-Surf',division:'Men',heatDuration:20,countingScores:2,ridersPerHeat:4,judgeName:'Head Judge'},riders:[{id:'r1',name:'Yassine El Bakkali',lycra:'Red',country:'MAR'},{id:'r2',name:'Leo Martins',lycra:'Blue',country:'BRA'},{id:'r3',name:'Amine Kouidri',lycra:'Yellow',country:'MAR'},{id:'r4',name:'Noa Leclerc',lycra:'White',country:'FRA'}],heats:[{id:'h1',number:1,riderIds:['r1','r2','r3','r4'],status:'ready',remainingSeconds:1200,validated:false,completed:false}],activeHeatId:'h1',selectedRiderId:'r1',activeAttempt:0,scores:{},notice:''};
-  let state=load(),timerId=null,lastTick=0;
-  const screens=[['home','Home'],['judge','Judge Mode'],['admin','Admin / Race Control'],['ranking','Live Ranking'],['setup','Event Setup']];
-  const $=(s,root=document)=>root.querySelector(s), $$=(s,root=document)=>Array.from(root.querySelectorAll(s));
-  const attemptName=()=>['Kite-Surf','Wave'].includes(state.settings.discipline)?'Wave':'Trick';
-  function load(){try{return {...structuredClone(sample),...(JSON.parse(localStorage.getItem(KEY))||{})}}catch(e){return structuredClone(sample)}}
-  function save(msg='Saved offline'){localStorage.setItem(KEY,JSON.stringify(state));$('#saveStatus').textContent=msg;$('#judgeSaved').textContent='Saved';toast(msg);render()}
-  function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1200)}
-  function heat(){return state.heats.find(h=>h.id===state.activeHeatId)||state.heats[0]}
-  function rider(id){return state.riders.find(r=>r.id===id)}
-  function sheet(hid=state.activeHeatId,rid=state.selectedRiderId){const key=hid+'_'+rid;if(!state.scores[key])state.scores[key]={attempts:[0],penalty:false,comments:''};return state.scores[key]}
-  function finalFor(hid,rid){const s=sheet(hid,rid);const best=[...s.attempts].sort((a,b)=>b-a).slice(0,Number(state.settings.countingScores)||2);const raw=best.reduce((a,b)=>a+b,0);return {total:Math.max(0,raw-(s.penalty?1:0)),best,penalty:s.penalty,comments:s.comments}}
-  function ranking(h=heat()){if(!h)return[];return h.riderIds.map(id=>({rider:rider(id),...finalFor(h.id,id)})).filter(x=>x.rider).sort((a,b)=>b.total-a.total).map((x,i)=>({...x,place:i+1}))}
-  function format(sec){sec=Math.max(0,sec||0);return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0')}
-  function heatLabel(h=heat()){return h?`${state.settings.eventName} · ${state.settings.discipline} · ${state.settings.division} · Heat ${h.number}`:'No active heat'}
-  function show(screen){$$('.screen').forEach(s=>s.classList.toggle('active',s.dataset.screen===screen));$$('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.go===screen));document.body.classList.remove('public');window.scrollTo(0,0);render()}
-  function renderNav(){ $('#nav').innerHTML=screens.map(([id,label])=>`<button data-go="${id}" class="${$('.screen.active')?.dataset.screen===id?'active':''}">${label}</button>`).join('');$$('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));}
-  function renderSetup(){const s=state.settings;['eventName','discipline','division','heatDuration','countingScores','ridersPerHeat','judgeName'].forEach(id=>{$('#'+id).value=s[id]})}
-  function renderAdmin(){const h=heat();$('#riderCount').textContent=state.riders.length+' riders';$('#heatCount').textContent=state.heats.length+' heats';$('#activeHeatMeta').textContent=heatLabel(h);$('#heatStatePill').textContent=h?.validated?'Official':(h?.status||'Ready');$('#heatStatePill').className='pill '+(h?.validated?'green':h?.status==='running'?'amber':'gray');$('#timer').textContent=format(h?.remainingSeconds);$('#timerToggle').textContent=h?.status==='running'?'Pause':'Start';$('#noticeBoard').value=state.notice||'';$('#riderList').innerHTML=state.riders.map(r=>`<div class="item"><div class="rider-line"><span class="lycra ${r.lycra}">${r.lycra[0]}</span><div><input data-rider-name="${r.id}" value="${r.name}" aria-label="Edit ${r.name}"><div class="form-grid" style="margin-top:8px"><select data-rider-lycra="${r.id}">${['Red','Blue','Yellow','White','Green','Black'].map(c=>`<option ${c===r.lycra?'selected':''}>${c}</option>`).join('')}</select><input data-rider-country="${r.id}" value="${r.country}" maxlength="3"></div></div></div></div>`).join('');$('#heatRiders').innerHTML=state.riders.map(r=>`<option value="${r.id}">${r.lycra} · ${r.name} · ${r.country}</option>`).join('');$('#heatList').innerHTML=state.heats.map(h=>`<button class="heat-button ${h.id===state.activeHeatId?'active':''}" data-heat="${h.id}"><span class="pill ${h.validated?'green':h.status==='running'?'amber':'gray'}">H${h.number}</span><span><strong>Heat ${h.number}</strong><span class="small">${h.riderIds.map(id=>rider(id)?.name).join(', ')}</span></span><span>${format(h.remainingSeconds)}</span></button>`).join('');$$('[data-heat]').forEach(b=>b.onclick=()=>{state.activeHeatId=b.dataset.heat;state.selectedRiderId=heat().riderIds[0];save('Active heat selected')});$$('[data-rider-name]').forEach(i=>i.onchange=()=>{rider(i.dataset.riderName).name=i.value;save('Rider updated')});$$('[data-rider-lycra]').forEach(i=>i.onchange=()=>{rider(i.dataset.riderLycra).lycra=i.value;save('Lycra updated')});$$('[data-rider-country]').forEach(i=>i.onchange=()=>{rider(i.dataset.riderCountry).country=i.value.toUpperCase();save('Country updated')})}
-  function renderJudge(){const h=heat();$('#judgeHeatTitle').textContent=h?`Heat ${h.number} scoring`:'No active heat';$('#judgeHeatInfo').textContent=h?heatLabel(h):'Use Race Control to create a heat';$('#attemptLabel').textContent=attemptName()+' scoring';if(h&&!h.riderIds.includes(state.selectedRiderId))state.selectedRiderId=h.riderIds[0];$('#judgeRiders').innerHTML=h?h.riderIds.map(id=>{const r=rider(id),f=finalFor(h.id,id);return `<button class="rider-button ${id===state.selectedRiderId?'active':''}" data-judge-rider="${id}"><span class="lycra ${r.lycra}">${r.lycra[0]}</span><span><strong>${r.name}</strong><span class="small">${r.country} · ${f.penalty?'Penalty · ':''}${f.total.toFixed(2)}</span></span><span class="pill gray">${r.lycra}</span></button>`}).join(''):'<p class="small">No active heat.</p>';$$('[data-judge-rider]').forEach(b=>b.onclick=()=>{state.selectedRiderId=b.dataset.judgeRider;state.activeAttempt=0;save()});const r=rider(state.selectedRiderId),s=sheet(),f=finalFor(h?.id,state.selectedRiderId);if(!r)return;$('#activeRiderName').textContent=r.name;$('#activeRiderMeta').textContent=`${r.country} · ${r.lycra} lycra · ${state.settings.judgeName}`;$('#totalScore').textContent=f.total.toFixed(2);$('#bestSummary').textContent=`Best ${state.settings.countingScores}: ${f.best.map(x=>x.toFixed(1)).join(' + ')||'none'}${f.penalty?' · -1 penalty':''}`;$('#attemptTabs').innerHTML=s.attempts.map((v,i)=>`<button class="${i===state.activeAttempt?'active':''}" data-attempt="${i}">${attemptName()} ${i+1}<br>${v.toFixed(1)}</button>`).join('');$$('[data-attempt]').forEach(b=>b.onclick=()=>{state.activeAttempt=Number(b.dataset.attempt);save()});$('#currentAttemptLabel').textContent=`${attemptName()} ${state.activeAttempt+1}`;$('#currentScore').textContent=(s.attempts[state.activeAttempt]||0).toFixed(1);$('#penaltyToggle').textContent=s.penalty?'Remove interference penalty':'Add interference penalty';$('#comments').value=s.comments||'';$('#quickScores').innerHTML=[1,2,3,4,5,6,7,8,9,10].map(n=>`<button data-quick="${n}">${n.toFixed(1)}</button>`).join('');$$('[data-quick]').forEach(b=>b.onclick=()=>setScore(Number(b.dataset.quick)))}
-  function renderRanking(){const h=heat();$('#rankingTitle').textContent=h?`Heat ${h.number} leaderboard`:'No active heat';$('#rankingMeta').textContent=h?`${state.settings.eventName} · ${state.settings.discipline} · ${state.settings.division} · ${h.validated?'VALIDATED / OFFICIAL':'PROVISIONAL'}`:'Create a heat first';$('#leaderboard').innerHTML=ranking(h).map(e=>`<div class="rank-row"><span class="pill ${e.place===1?'green':'gray'}">#${e.place}</span><span><strong>${e.rider.name}</strong><span class="small">${e.rider.lycra} · ${e.rider.country} · best ${e.best.map(x=>x.toFixed(1)).join(' / ')||'none'} ${e.penalty?'· INTERFERENCE -1':''}</span></span><strong class="total">${e.total.toFixed(2)}</strong></div>`).join('')||'<p class="small">No scores yet.</p>'}
-  function render(){renderNav();$('#heroSummary').textContent=heatLabel(heat());$('#homeNotice').textContent=state.notice||'No official notice posted.';renderSetup();renderAdmin();renderJudge();renderRanking()}
-  function setScore(v){const s=sheet();s.attempts[state.activeAttempt]=Math.max(.1,Math.min(10,Math.round(v*10)/10));$('#judgeSaved').textContent='Saving…';save('Score saved')}
-  $('#setupForm').onsubmit=e=>{e.preventDefault();['eventName','discipline','division','judgeName'].forEach(id=>state.settings[id]=$('#'+id).value);['heatDuration','countingScores','ridersPerHeat'].forEach(id=>state.settings[id]=Number($('#'+id).value));state.heats.forEach(h=>{if(!h.remainingSeconds||h.remainingSeconds>state.settings.heatDuration*60)h.remainingSeconds=state.settings.heatDuration*60});save('Settings saved')};
-  $('#resetDemo').onclick=()=>{state=structuredClone(sample);save('Sample event reset')};
-  $('#riderForm').onsubmit=e=>{e.preventDefault();state.riders.push({id:'r'+Date.now(),name:$('#riderName').value||'New rider',country:($('#riderCountry').value||'').toUpperCase()||'---',lycra:$('#riderLycra').value});e.target.reset();save('Rider added')};
-  $('#heatForm').onsubmit=e=>{e.preventDefault();const ids=Array.from($('#heatRiders').selectedOptions).map(o=>o.value);if(!ids.length)return toast('Select riders first');const id='h'+Date.now();state.heats.push({id,number:Number($('#heatNumber').value)||state.heats.length+1,riderIds:ids,status:'ready',remainingSeconds:state.settings.heatDuration*60,validated:false,completed:false});state.activeHeatId=id;state.selectedRiderId=ids[0];save('Heat created')};
-  $('#timerToggle').onclick=()=>{const h=heat();if(!h)return;h.status=h.status==='running'?'paused':'running';lastTick=Date.now();save(h.status==='running'?'Heat running':'Heat paused')};
-  $('#timerReset').onclick=()=>{const h=heat();if(h){h.status='ready';h.remainingSeconds=state.settings.heatDuration*60;h.completed=false;h.validated=false;save('Timer reset')}};
-  $('#completeHeat').onclick=()=>{const h=heat();if(h){h.status='completed';h.completed=true;save('Heat completed - provisional')}};
-  $('#validateHeat').onclick=()=>{const h=heat();if(h){h.status='validated';h.completed=true;h.validated=true;save('Head Judge validated official result')}};
-  $('#noticeBoard').onchange=()=>{state.notice=$('#noticeBoard').value;save('Notice posted')};
-  $('#scoreDown').onclick=()=>setScore((sheet().attempts[state.activeAttempt]||0)-.1);$('#scoreUp').onclick=()=>setScore((sheet().attempts[state.activeAttempt]||0)+.1);$('#addAttempt').onclick=()=>{sheet().attempts.push(0);state.activeAttempt=sheet().attempts.length-1;save('Attempt added')};$('#penaltyToggle').onclick=()=>{const s=sheet();s.penalty=!s.penalty;save(s.penalty?'Penalty applied':'Penalty removed')};$('#comments').onchange=()=>{sheet().comments=$('#comments').value;save('Comments saved')};$('#saveScore').onclick=()=>save('Score confirmed offline');$('#publicMode').onclick=()=>document.body.classList.add('public');
-  setInterval(()=>{const h=heat();if(h?.status==='running'){const now=Date.now(),delta=Math.max(1,Math.floor((now-lastTick)/1000));lastTick=now;h.remainingSeconds=Math.max(0,h.remainingSeconds-delta);if(h.remainingSeconds===0){h.status='completed';h.completed=true}localStorage.setItem(KEY,JSON.stringify(state));render()}},1000);
-  render();
+(() => {
+  const KEY='yousurf_gka_judge_mode_v1';
+  const $=s=>document.querySelector(s);
+  const $$=s=>Array.from(document.querySelectorAll(s));
+  const baseRiders=[{id:'r1',name:'Mika Sol',lycra:'Red'},{id:'r2',name:'Kai Rivera',lycra:'Blue'},{id:'r3',name:'Noa Cruz',lycra:'Yellow'},{id:'r4',name:'Lena Vale',lycra:'White'}];
+  const fresh=()=>({settings:{format:'mixed',discipline:'Kite-Surf',judgeCount:5,countWaves:2,countTricks:3,waveWeight:1,trickWeight:1,penaltyMode:'gka'},riders:baseRiders,selectedRiderId:'r1',selectedAttemptId:null,selectedJudgeIndex:0,attempts:[],interference:{},audit:[]});
+  let state=load();
+  function load(){try{const saved=JSON.parse(localStorage.getItem(KEY));return saved&&saved.settings?saved:fresh()}catch{return fresh()}}
+  function save(msg){localStorage.setItem(KEY,JSON.stringify(state));render();if(msg)toast(msg)}
+  function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),2100)}
+  function rider(id=state.selectedRiderId){return state.riders.find(r=>r.id===id)}
+  function selectedAttempt(){return state.attempts.find(a=>a.id===state.selectedAttemptId)}
+  function syncSettingsFromDom(){['format','discipline','penaltyMode'].forEach(id=>state.settings[id]=$('#'+id).value);['judgeCount','countWaves','countTricks','waveWeight','trickWeight'].forEach(id=>state.settings[id]=Number($('#'+id).value)||0);if(state.settings.judgeCount%2===0)state.settings.judgeCount+=1;if(state.settings.judgeCount<3)state.settings.judgeCount=3}
+  function scoreLabel(v){return v==='M'?'M':Number.isFinite(v)?v.toFixed(1):'—'}
+  function attemptNumber(a){return state.attempts.filter(x=>x.riderId===a.riderId&&x.type===a.type&&x.created<=a.created).length}
+  function valuesForAverage(a){return a.judgeScores.filter(Number.isFinite)}
+  function panelAverage(a){const values=valuesForAverage(a).sort((x,y)=>x-y);if(a.confirmedScore==='M')return 'M';if(!values.length)return 0;let counted=values;if(state.settings.judgeCount>=5&&values.length>=5)counted=values.slice(1,-1);const avg=counted.reduce((s,v)=>s+v,0)/counted.length;return Math.round(avg*100)/100}
+  function attemptScore(a){return a.confirmedScore!==null&&a.confirmedScore!==undefined?a.confirmedScore:panelAverage(a)}
+  function validScores(riderId,type){return state.attempts.filter(a=>a.riderId===riderId&&a.type===type).map(attemptScore).filter(Number.isFinite).sort((a,b)=>b-a)}
+  function countingScores(riderId,type){const count=type==='wave'?state.settings.countWaves:state.settings.countTricks;return validScores(riderId,type).slice(0,count)}
+  function rawTotal(riderId){const waves=countingScores(riderId,'wave'),tricks=countingScores(riderId,'trick');return waves.reduce((s,v)=>s+v*state.settings.waveWeight,0)+tricks.reduce((s,v)=>s+v*state.settings.trickWeight,0)}
+  function penaltyDeduction(riderId,totalBefore){const rec=state.interference[riderId];if(!rec||!rec.headJudgeConfirmed||state.settings.penaltyMode!=='gka')return 0;const all=[...countingScores(riderId,'wave'),...countingScores(riderId,'trick')].sort((a,b)=>b-a);const n=all.length,call=rec.count>=2?2:1;if(!n)return 0;const base=n>=4?all[0]:(all[1]??all[0]);return call===1?base*.5:base}
+  function finalFor(riderId){const totalBefore=rawTotal(riderId),deduction=penaltyDeduction(riderId,totalBefore);return {waves:countingScores(riderId,'wave'),tricks:countingScores(riderId,'trick'),totalBefore,deduction,total:Math.max(0,totalBefore-deduction)}}
+  function compareTie(a,b){const fmt=state.settings.format;const aw=finalFor(a.id),bw=finalFor(b.id);const compareList=(x,y)=>{const len=Math.max(x.length,y.length);for(let i=0;i<len;i++){const d=(x[i]??-1)-(y[i]??-1);if(d)return d}return 0};if(fmt==='mixed'){let d=compareList(aw.waves,bw.waves);if(d)return d;return compareList(aw.tricks,bw.tricks)}return compareList(fmt==='wave'?aw.waves:aw.tricks,fmt==='wave'?bw.waves:bw.tricks)}
+  function rankings(){return state.riders.map(r=>({r,...finalFor(r.id)})).sort((a,b)=>(b.total-a.total)||-compareTie(a.r,b.r)).map((e,i,arr)=>{const tied=arr.some((x,j)=>j!==i&&Math.abs(x.total-e.total)<.001);return {...e,place:i+1,tied}})}
+  function majorityNeeded(){return Math.floor(state.settings.judgeCount/2)+1}
+  function ensureInterference(id){state.interference[id]??={judgeCalls:0,count:0,headJudgeConfirmed:false,note:''};return state.interference[id]}
+  function render(){renderSettings();renderRiders();renderAttempts();renderScoreTool();renderLeaderboard();renderInterference();$('#heatStatus').textContent=`${state.settings.discipline} · ${state.settings.format.toUpperCase()} · ${state.settings.judgeCount}-judge panel`;$('#ruleSummary').textContent=`Best ${state.settings.countWaves} waves / ${state.settings.countTricks} tricks · weights ${state.settings.waveWeight}:${state.settings.trickWeight} · majority ${majorityNeeded()} calls`;}
+  function renderSettings(){Object.entries(state.settings).forEach(([k,v])=>{const el=$('#'+k);if(el)el.value=v})}
+  function renderRiders(){const selected=state.selectedRiderId;$('#riderList').innerHTML=state.riders.map(r=>`<button class="rider-card ${r.id===selected?'active':''}" data-rider="${r.id}"><span class="lycra ${r.lycra}">${r.lycra[0]}</span><span><strong>${r.name}</strong><span class="small">${r.lycra} lycra · ${finalFor(r.id).total.toFixed(2)} pts</span></span><span class="pill gray">Select</span></button>`).join('');$$('[data-rider]').forEach(b=>b.onclick=()=>{state.selectedRiderId=b.dataset.rider;const first=state.attempts.find(a=>a.riderId===state.selectedRiderId);state.selectedAttemptId=first?.id||null;save()})}
+  function renderAttempts(){const r=rider();$('#selectedName').textContent=r?r.name:'Select a rider';$('#selectedMeta').textContent=r?`${r.lycra} lycra · ${state.settings.format} format · M = missed attempt`:'No rider selected';const attempts=state.attempts.filter(a=>a.riderId===state.selectedRiderId);$('#attemptList').innerHTML=attempts.map(a=>{const score=attemptScore(a);return `<button class="attempt-card ${a.id===state.selectedAttemptId?'active':''} ${a.confirmed?'locked':''} ${score==='M'?'missed':''}" data-attempt="${a.id}"><strong>${a.type.toUpperCase()} ${attemptNumber(a)}</strong><span class="small">${a.confirmed?'Locked':'Draft'} · ${a.judgeScores.length} judge mark(s)</span><span class="pill ${a.confirmed?'green':score==='M'?'amber':'gray'}">${scoreLabel(score)}</span></button>`}).join('')||'<p class="small">No attempts yet. Add a wave or trick attempt.</p>';$$('[data-attempt]').forEach(b=>b.onclick=()=>{state.selectedAttemptId=b.dataset.attempt;save()})}
+  function renderScoreTool(){const a=selectedAttempt();const score=a?attemptScore(a):null;state.selectedJudgeIndex=Math.min(state.selectedJudgeIndex||0,state.settings.judgeCount-1);$('#judgeSlot').innerHTML=Array.from({length:state.settings.judgeCount},(_,i)=>`<option value="${i}" ${i===state.selectedJudgeIndex?'selected':''}>Judge ${i+1}</option>`).join('');$('#attemptTitle').textContent=a?`${a.type.toUpperCase()} ${attemptNumber(a)}`:'No attempt';$('#scoreReadout').textContent=a?scoreLabel(score):'—';$('#lockStatus').textContent=!a?'Select or create an attempt to score.':a.confirmed?`Confirmed score locked${a.correctionReason?' · corrected by Head Judge':''}.`:'Draft score. Confirm to lock.';$('#confirmScore').disabled=!a||a.confirmed;$('#requestCorrection').disabled=!a||!a.confirmed;$('#scorePad').innerHTML=[.1,1,2,3,4,5,6,7,8,9,10].map(v=>`<button data-score="${v}">${v.toFixed(1)}</button>`).join('')+'<button class="mark-m" data-score="M">Missed M</button>';$$('[data-score]').forEach(b=>b.onclick=()=>setScore(b.dataset.score==='M'?'M':Number(b.dataset.score)));$('#correctionBox').classList.add('hide')}
+  function renderLeaderboard(){const rows=rankings();$('#leaderboard').innerHTML=rows.map(e=>{const tie=e.tied?tieText(e.r.id):'Tie guide: no equal total at current scores.';return `<div class="rank-row"><span class="pill ${e.place===1?'green':e.tied?'amber':'gray'}">#${e.place}</span><span><strong>${e.r.name}</strong><span class="small">W ${e.waves.map(v=>v.toFixed(2)).join(' / ')||'—'} · T ${e.tricks.map(v=>v.toFixed(2)).join(' / ')||'—'}${e.deduction?` · interference −${e.deduction.toFixed(2)}`:''}<br>${tie}</span></span><strong class="total">${e.total.toFixed(2)}</strong></div>`}).join('')}
+  function tieText(riderId){const fmt=state.settings.format;if(fmt==='mixed')return 'Tie guide: compare counting wave scores best-to-worst first, then counting trick scores. If still unclear: Head Judge decision required.';if(fmt==='wave')return 'Tie guide: compare wave scores best-to-worst, including excluded waves where needed. If still unclear: Head Judge decision required.';return 'Tie guide: highest single trick score first, then counting trick scores best-to-worst. If still unclear: Head Judge decision required.'}
+  function renderInterference(){const need=majorityNeeded();$('#interferenceList').innerHTML=state.riders.map(r=>{const rec=ensureInterference(r.id),major=rec.judgeCalls>=need;return `<div class="call-row"><div><strong>${r.name}</strong> <span class="pill ${rec.headJudgeConfirmed?'red':major?'amber':'gray'}">${rec.judgeCalls}/${state.settings.judgeCount} judge calls</span></div><p class="small">${major?'Majority reached: Head Judge may confirm interference.':'No majority: Head Judge decision required before any penalty is applied.'} ${rec.headJudgeConfirmed?'Penalty applied from configured table.':''}</p><div class="button-row"><button class="secondary" data-call="${r.id}">Record judge call</button><button class="${rec.headJudgeConfirmed?'ghost':'danger'}" data-hj-call="${r.id}" ${major?'':'disabled'}>${rec.headJudgeConfirmed?'Remove HJ call':'Head Judge confirm'}</button></div></div>`}).join('');$$('[data-call]').forEach(b=>b.onclick=()=>{ensureInterference(b.dataset.call).judgeCalls=Math.min(state.settings.judgeCount,ensureInterference(b.dataset.call).judgeCalls+1);save('Judge interference call recorded')});$$('[data-hj-call]').forEach(b=>b.onclick=()=>{const rec=ensureInterference(b.dataset.hjCall);rec.headJudgeConfirmed=!rec.headJudgeConfirmed;rec.count=rec.headJudgeConfirmed?rec.count+1:Math.max(0,rec.count-1);save(rec.headJudgeConfirmed?'Head Judge interference confirmed':'Head Judge interference removed')})}
+  function setScore(v){const a=selectedAttempt();if(!a)return toast('Create an attempt first');if(a.confirmed)return toast('Score locked. Use Head Judge correction workflow.');if(v==='M'){a.judgeScores=['M'];a.confirmedScore='M';return save('Missed attempt marked M')}const mark=Math.max(.1,Math.min(10,Math.round(v*10)/10));a.judgeScores[state.selectedJudgeIndex||0]=mark;a.confirmedScore=null;save(`Judge ${Number(state.selectedJudgeIndex||0)+1} mark saved`)}
+  function addAttempt(type){if(!rider())return;const allowed=state.settings.format==='mixed'||state.settings.format===type||(state.settings.format==='trick'&&type==='trick');if(!allowed)return toast(`${type} attempts are not part of this format`);const id='a'+Date.now()+Math.random().toString(16).slice(2);state.attempts.push({id,riderId:state.selectedRiderId,type,created:Date.now(),judgeScores:[],confirmedScore:null,confirmed:false,correctionReason:''});state.selectedAttemptId=id;save(`${type} attempt added`)}
+  ['format','discipline','judgeCount','countWaves','countTricks','waveWeight','trickWeight','penaltyMode'].forEach(id=>$('#'+id).onchange=()=>{syncSettingsFromDom();save('Heat configuration updated')});
+  $('#judgeSlot').onchange=()=>{state.selectedJudgeIndex=Number($('#judgeSlot').value)||0;save()};
+  $('#addRider').onclick=()=>{const name=$('#newRiderName').value.trim();if(!name)return toast('Enter rider name');state.riders.push({id:'r'+Date.now(),name,lycra:$('#newRiderLycra').value});$('#newRiderName').value='';save('Rider added')};
+  $('#addWave').onclick=()=>addAttempt('wave');$('#addTrick').onclick=()=>addAttempt('trick');
+  $('#scoreDown').onclick=()=>{const a=selectedAttempt(),s=attemptScore(a||{});if(Number.isFinite(s))setScore(s-.1)};$('#scoreUp').onclick=()=>{const a=selectedAttempt(),s=attemptScore(a||{});setScore(Number.isFinite(s)?s+.1:.1)};
+  $('#confirmScore').onclick=()=>{const a=selectedAttempt();if(!a)return;if(a.confirmedScore===null||a.confirmedScore===undefined)return toast('Enter score or M first');a.confirmed=true;state.audit.push({time:new Date().toISOString(),action:'confirm',attempt:a.id,score:a.confirmedScore});save('Score confirmed and locked')};
+  $('#requestCorrection').onclick=()=>{$('#correctionBox').classList.toggle('hide')};
+  $('#unlockScore').onclick=()=>{const a=selectedAttempt(),reason=$('#correctionReason').value.trim();if(!a||!reason)return toast('Head Judge correction reason required');a.confirmed=false;a.correctionReason=reason;state.audit.push({time:new Date().toISOString(),action:'head_judge_correction',attempt:a.id,reason});$('#correctionReason').value='';save('Unlocked for Head Judge correction')};
+  syncSettingsFromDom();render();
 })();
 </script>
 </body>
