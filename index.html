@@ -63,6 +63,135 @@
       padding: max(14px, env(safe-area-inset-top)) 12px max(18px, env(safe-area-inset-bottom));
     }
 
+    .screen[hidden] { display: none; }
+
+    .home-screen {
+      display: grid;
+      min-height: calc(100vh - max(32px, env(safe-area-inset-top)) - max(36px, env(safe-area-inset-bottom)));
+      align-content: center;
+      gap: 16px;
+    }
+
+    .home-hero,
+    .ranking-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      background: rgba(255, 255, 255, 0.09);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .home-hero {
+      display: grid;
+      gap: 22px;
+      padding: clamp(22px, 6vw, 44px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .home-hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -110px auto;
+      width: 250px;
+      height: 250px;
+      border-radius: 999px;
+      background: rgba(53, 226, 157, 0.16);
+      filter: blur(4px);
+      pointer-events: none;
+    }
+
+    .home-copy { position: relative; z-index: 1; }
+
+    .home-title {
+      max-width: 820px;
+      margin-bottom: 14px;
+      font-size: clamp(3.2rem, 17vw, 8.4rem);
+    }
+
+    .home-actions {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .home-button,
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--ink-dark);
+      background: var(--card-bright);
+      font-weight: 1000;
+      text-align: left;
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
+    }
+
+    .home-button {
+      min-height: 86px;
+      padding: 18px 20px;
+      font-size: clamp(1.25rem, 6vw, 2.1rem);
+      letter-spacing: -0.04em;
+    }
+
+    .home-button.primary {
+      color: white;
+      background: linear-gradient(135deg, var(--blue-2), var(--blue));
+    }
+
+    .home-button span:last-child,
+    .back-button span:last-child { font-size: 1.4em; line-height: 1; }
+
+    .back-button {
+      min-height: 48px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: none;
+    }
+
+    .ranking-screen { display: grid; gap: 12px; }
+
+    .ranking-card {
+      padding: 14px;
+      background: var(--card-bright);
+      color: var(--ink-dark);
+    }
+
+    .ranking-list { display: grid; gap: 10px; }
+
+    .ranking-row {
+      display: grid;
+      grid-template-columns: auto auto 1fr auto;
+      align-items: center;
+      gap: 10px;
+      min-height: 72px;
+      padding: 10px;
+      border: 1px solid rgba(9, 19, 33, 0.08);
+      border-radius: var(--radius-lg);
+      background: white;
+      font-weight: 900;
+    }
+
+    .ranking-position {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      color: white;
+      background: #07111f;
+      font-weight: 1000;
+    }
+
+    .ranking-name { display: block; font-size: 1rem; font-weight: 1000; }
+    .ranking-meta { color: var(--muted-dark); font-size: 0.8rem; }
+    .ranking-total { font-size: clamp(1.45rem, 7vw, 2.3rem); font-weight: 1000; letter-spacing: -0.06em; }
+
     .topbar {
       display: grid;
       grid-template-columns: 1fr;
@@ -497,6 +626,10 @@
 
     @media (min-width: 720px) {
       .app { padding: 22px; }
+      .home-actions { grid-template-columns: 1fr 1fr; }
+      .home-button { min-height: 124px; }
+      .ranking-card { padding: 20px; }
+      .ranking-row { grid-template-columns: auto auto 1fr auto; min-height: 86px; padding: 14px; }
       .topbar { grid-template-columns: 1.25fr 0.75fr; align-items: stretch; }
       .brand-card,
       .judge-card,
@@ -522,25 +655,50 @@
   </style>
 </head>
 <body>
-  <main class="app" aria-label="Competition OS Tarfaya judge scoring demo">
-    <header class="topbar">
-      <section class="brand-card">
-        <p class="eyebrow">Competition OS · Tarfaya</p>
-        <h1>Judge Scoring</h1>
-        <p class="subtitle">Mobile-first live judging console for a professional international watersports heat.</p>
-      </section>
-
-      <section class="judge-card" aria-label="Judge identity">
-        <div class="judge-avatar">J2</div>
-        <div>
-          <div class="judge-name" id="judgeName">Nadia El Idrissi</div>
-          <span class="judge-role">Panel Judge · Kite Surf</span>
+  <main class="app" aria-label="Competition OS Tarfaya demo">
+    <section class="screen home-screen" id="homeScreen" aria-label="Competition OS home screen">
+      <article class="home-hero">
+        <div class="home-copy">
+          <p class="eyebrow">Competition OS · Tarfaya</p>
+          <h1 class="home-title">Competition OS</h1>
+          <p class="subtitle">Choose the demo workspace for live heat operations.</p>
         </div>
-        <div class="sync-pill">Saved<br>offline</div>
-      </section>
-    </header>
+        <div class="home-actions" aria-label="Competition OS demo navigation">
+          <button type="button" class="home-button primary" data-view="scoring">
+            <span>Judge Scoring</span>
+            <span aria-hidden="true">→</span>
+          </button>
+          <button type="button" class="home-button" data-view="ranking">
+            <span>Live Ranking</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </article>
+    </section>
 
-    <section class="dashboard">
+    <section class="screen scoring-screen" id="scoringScreen" aria-label="Judge scoring screen" hidden>
+      <header class="topbar">
+        <section class="brand-card">
+          <p class="eyebrow">Competition OS · Tarfaya</p>
+          <h1>Judge Scoring</h1>
+          <p class="subtitle">Mobile-first live judging console for a professional international watersports heat.</p>
+          <button type="button" class="back-button" data-view="home">
+            <span>Back to home</span>
+            <span aria-hidden="true">⌂</span>
+          </button>
+        </section>
+
+        <section class="judge-card" aria-label="Judge identity">
+          <div class="judge-avatar">J2</div>
+          <div>
+            <div class="judge-name" id="judgeName">Nadia El Idrissi</div>
+            <span class="judge-role">Panel Judge · Kite Surf</span>
+          </div>
+          <div class="sync-pill">Saved<br>offline</div>
+        </section>
+      </header>
+
+      <section class="dashboard">
       <div class="left-column">
         <section class="timer-card" aria-label="Heat timer">
           <div class="heat-meta">
@@ -606,6 +764,38 @@
           </section>
         </article>
       </section>
+      </section>
+    </section>
+
+    <section class="screen ranking-screen" id="rankingScreen" aria-label="Live ranking screen" hidden>
+      <header class="topbar">
+        <section class="brand-card">
+          <p class="eyebrow">Competition OS · Tarfaya</p>
+          <h1>Live Ranking</h1>
+          <p class="subtitle">Heat 12 standings update automatically from the demo scoring data.</p>
+          <button type="button" class="back-button" data-view="home">
+            <span>Back to home</span>
+            <span aria-hidden="true">⌂</span>
+          </button>
+        </section>
+
+        <section class="judge-card" aria-label="Ranking status">
+          <div class="judge-avatar">LR</div>
+          <div>
+            <div class="judge-name">Main Zone Rankings</div>
+            <span class="judge-role">Best 2 waves · penalties applied</span>
+          </div>
+          <div class="sync-pill">Live<br>demo</div>
+        </section>
+      </header>
+
+      <article class="ranking-card">
+        <div class="heat-meta">
+          <span class="heat-pill">Heat 12 · Quarter Final</span>
+          <strong>Pro Men · Tarfaya Main Zone</strong>
+        </div>
+        <div class="ranking-list" id="rankingList" aria-label="Live heat rankings"></div>
+      </article>
     </section>
   </main>
 
@@ -625,6 +815,7 @@
     let timerInterval;
 
     const $ = (selector) => document.querySelector(selector);
+    let currentView = 'home';
 
     function activeRider() {
       return riders.find((rider) => rider.id === activeRiderId);
@@ -732,6 +923,39 @@
       }).join('');
     }
 
+    function renderRankings() {
+      const standings = [...riders]
+        .sort((a, b) => getTotal(b) - getTotal(a));
+
+      $('#rankingList').innerHTML = standings.map((rider, index) => {
+        const bestScores = getBestScores(rider).map((score) => formatScore(score)).join(' + ');
+        return `
+          <div class="ranking-row">
+            <span class="ranking-position">${index + 1}</span>
+            <span class="jersey ${rider.jersey}">${rider.jersey.toUpperCase()}</span>
+            <span>
+              <span class="ranking-name">${rider.name}</span>
+              <span class="ranking-meta">${rider.country} · Best waves ${bestScores}${rider.penalty ? ' · -1.0 penalty' : ''}</span>
+            </span>
+            <span class="ranking-total">${getTotal(rider).toFixed(2)}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function showView(view) {
+      currentView = view;
+      $('#homeScreen').hidden = view !== 'home';
+      $('#scoringScreen').hidden = view !== 'scoring';
+      $('#rankingScreen').hidden = view !== 'ranking';
+      document.title = view === 'ranking'
+        ? 'Competition OS — Tarfaya Live Ranking Demo'
+        : view === 'scoring'
+          ? 'Competition OS — Tarfaya Judge Scoring Demo'
+          : 'Competition OS — Tarfaya Demo';
+      if (view === 'ranking') renderRankings();
+    }
+
     function renderScorePanel() {
       const rider = activeRider();
       $('#activeRiderName').textContent = rider.name;
@@ -753,11 +977,16 @@
       renderRiders();
       renderQuickScores();
       renderScorePanel();
+      if (currentView === 'ranking') renderRankings();
       if (resetSaveState) return;
       $('#saveScore').classList.remove('saved');
       $('#saveScore').textContent = 'Save score';
       $('#saveStatus').textContent = 'Unsaved changes · confirm when ready';
     }
+
+    document.querySelectorAll('[data-view]').forEach((button) => {
+      button.addEventListener('click', () => showView(button.dataset.view));
+    });
 
     $('#scoreDown').addEventListener('click', () => {
       const rider = activeRider();
@@ -812,6 +1041,7 @@
     });
 
     renderAll();
+    showView('home');
     startTimer();
   </script>
 </body>
