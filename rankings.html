@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <title>Competition OS — Rankings Manager</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --bg-2: #0d2036;
+      --card: rgba(13, 27, 48, 0.96);
+      --card-soft: rgba(255, 255, 255, 0.08);
+      --card-bright: #f8fbff;
+      --ink: #f7fbff;
+      --ink-dark: #091321;
+      --muted: #9db0c9;
+      --muted-dark: #53637a;
+      --line: rgba(255, 255, 255, 0.14);
+      --blue: #16a9ff;
+      --blue-2: #0066ff;
+      --green: #35e29d;
+      --amber: #ffb547;
+      --red: #ff4d5e;
+      --purple: #a78bfa;
+      --shadow: 0 28px 80px rgba(0, 0, 0, 0.42);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { min-width: 320px; background: var(--bg); }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% -10%, rgba(22, 169, 255, 0.42), transparent 26rem),
+        radial-gradient(circle at 100% 0%, rgba(255, 181, 71, 0.18), transparent 24rem),
+        linear-gradient(145deg, var(--bg), var(--bg-2) 52%, #06101d);
+    }
+
+    button,
+    textarea,
+    input,
+    select { font: inherit; }
+
+    button,
+    .button-link {
+      display: inline-grid;
+      min-height: 52px;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: var(--radius-md);
+      padding: 0 16px;
+      color: var(--ink-dark);
+      background: linear-gradient(135deg, #e9fbff, var(--blue));
+      font-weight: 1000;
+      text-decoration: none;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button.secondary,
+    .button-link.secondary { background: #e8eef7; }
+
+    button.ghost,
+    .button-link.ghost {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--line);
+    }
+
+    button.danger { color: white; background: var(--red); }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.08);
+      outline-color: var(--blue);
+    }
+
+    textarea { min-height: 170px; resize: vertical; }
+
+    label {
+      display: block;
+      margin: 0 0 7px;
+      color: var(--muted);
+      font-size: 0.73rem;
+      font-weight: 950;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: clamp(2.2rem, 11vw, 5.25rem);
+      line-height: 0.88;
+      letter-spacing: -0.075em;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      font-size: clamp(1.35rem, 6vw, 2.35rem);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+    }
+
+    .app {
+      width: min(100%, 1220px);
+      margin: 0 auto;
+      padding: max(14px, env(safe-area-inset-top)) 12px max(18px, env(safe-area-inset-bottom));
+    }
+
+    .hero,
+    .panel,
+    .stat-card,
+    .toast {
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .hero {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 12px;
+      padding: 18px;
+      border-radius: var(--radius-xl);
+      background: rgba(255, 255, 255, 0.09);
+    }
+
+    .panel {
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      background: var(--card);
+    }
+
+    .panel.light {
+      color: var(--ink-dark);
+      background: var(--card-bright);
+    }
+
+    .panel.light input,
+    .panel.light select,
+    .panel.light textarea {
+      color: var(--ink-dark);
+      background: white;
+      border-color: rgba(9, 19, 33, 0.18);
+    }
+
+    .panel.light label { color: var(--muted-dark); }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      color: #89d7ff;
+      font-size: 0.72rem;
+      font-weight: 950;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .light .eyebrow { color: #0066aa; }
+
+    .subtitle,
+    .small {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-weight: 750;
+    }
+
+    .light .small { color: var(--muted-dark); }
+
+    .stack,
+    .grid,
+    .stats,
+    .actions,
+    .heat-grid { display: grid; gap: 10px; }
+
+    .actions { grid-template-columns: 1fr; }
+
+    .pill {
+      display: inline-flex;
+      min-height: 32px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 99px;
+      padding: 7px 10px;
+      color: var(--ink-dark);
+      background: var(--green);
+      font-size: 0.76rem;
+      font-weight: 1000;
+      white-space: nowrap;
+    }
+
+    .pill.blue { color: white; background: linear-gradient(135deg, var(--blue-2), var(--blue)); }
+    .pill.amber { background: var(--amber); }
+    .pill.gray { color: var(--ink); background: rgba(255, 255, 255, 0.13); }
+    .light .pill.gray { color: var(--ink-dark); background: #e8eef7; }
+
+    .stat-card {
+      display: grid;
+      gap: 4px;
+      min-height: 104px;
+      align-content: center;
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .stat-card strong {
+      font-size: 2.2rem;
+      line-height: 0.9;
+      letter-spacing: -0.06em;
+    }
+
+    .ranking-list { display: grid; gap: 10px; }
+
+    .ranking-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .row-head {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .row-fields { display: grid; gap: 8px; }
+
+    .heat-card {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .heat-athlete {
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 8px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .seed-badge {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 15px;
+      color: var(--ink-dark);
+      background: linear-gradient(135deg, #ffffff, #d9f0ff);
+      font-weight: 1000;
+    }
+
+    .code {
+      overflow: auto;
+      min-height: 260px;
+      margin: 0;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      color: #c8f7df;
+      background: #06101d;
+      font-size: 0.82rem;
+      white-space: pre-wrap;
+    }
+
+    .notice {
+      border-left: 5px solid var(--amber);
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 181, 71, 0.12);
+    }
+
+    .toast {
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 20;
+      display: none;
+      max-width: min(420px, calc(100% - 28px));
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: #06101d;
+      color: white;
+    }
+
+    .toast.show { display: block; }
+
+    @media (min-width: 720px) {
+      .hero { grid-template-columns: 1.4fr 0.6fr; align-items: end; }
+      .actions { grid-template-columns: repeat(4, 1fr); }
+      .stats { grid-template-columns: repeat(4, 1fr); }
+      .row-fields { grid-template-columns: 74px minmax(170px, 1.4fr) 110px 140px 110px 90px; }
+      .heat-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (min-width: 980px) {
+      .workspace { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 12px; align-items: start; }
+      .side { position: sticky; top: 12px; }
+      .heat-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <div>
+        <div class="eyebrow">Competition OS · Rankings Database</div>
+        <h1>Rankings Manager</h1>
+        <p class="subtitle">Mobile-first admin for importing, editing, auto-seeding, and previewing heats from a local JSON athlete ranking database.</p>
+        <div class="actions" style="margin-top:14px">
+          <a class="button-link ghost" href="index.html">Back to Competition OS</a>
+          <button id="addAthlete" class="secondary">Add athlete</button>
+          <button id="loadSample">Load sample</button>
+          <button id="resetData" class="danger">Reset</button>
+        </div>
+      </div>
+      <div class="panel light">
+        <div class="eyebrow">Status</div>
+        <strong id="statusTitle">Local rankings ready</strong>
+        <p class="small" id="statusDetail">Auto-seeds follow the current rank order.</p>
+      </div>
+    </header>
+
+    <section class="stats" aria-label="Ranking summary">
+      <div class="stat-card"><span class="small">Athletes</span><strong id="athleteCount">0</strong></div>
+      <div class="stat-card"><span class="small">Divisions</span><strong id="divisionCount">0</strong></div>
+      <div class="stat-card"><span class="small">Nations</span><strong id="nationCount">0</strong></div>
+      <div class="stat-card"><span class="small">Next seed</span><strong id="nextSeed">1</strong></div>
+    </section>
+
+    <main class="workspace" style="margin-top:12px">
+      <section class="stack">
+        <section class="panel light">
+          <div class="eyebrow">Editable ranking table</div>
+          <h2>Athlete rankings</h2>
+          <p class="small notice">Change rank, points, division, or nationality and seeds regenerate automatically. Lower rank numbers receive lower seed numbers.</p>
+          <div id="rankingList" class="ranking-list" style="margin-top:12px"></div>
+        </section>
+
+        <section class="panel">
+          <div class="eyebrow">Heat generation preview</div>
+          <h2>Seeded heat preview</h2>
+          <div class="actions">
+            <div>
+              <label for="heatSize">Athletes per heat</label>
+              <select id="heatSize"><option>2</option><option selected>4</option><option>6</option><option>8</option></select>
+            </div>
+            <div>
+              <label for="divisionFilter">Division</label>
+              <select id="divisionFilter"></select>
+            </div>
+            <div>
+              <label for="heatMethod">Method</label>
+              <select id="heatMethod"><option value="snake">Snake seed distribution</option><option value="straight">Straight seed order</option></select>
+            </div>
+            <button id="copyHeats" class="secondary">Copy heats JSON</button>
+          </div>
+          <div id="heatPreview" class="heat-grid" style="margin-top:12px"></div>
+        </section>
+      </section>
+
+      <aside class="side stack">
+        <section class="panel">
+          <div class="eyebrow">Manual import</div>
+          <h2>Paste rankings JSON</h2>
+          <p class="small">Import either an array of athletes or a federation-ready object with <code>athletes</code> and <code>source</code> metadata.</p>
+          <textarea id="importBox" spellcheck="false"></textarea>
+          <div class="actions" style="margin-top:10px">
+            <button id="importJson">Import JSON</button>
+            <button id="formatJson" class="secondary">Format current JSON</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="eyebrow">Local data structure</div>
+          <h2>Export JSON</h2>
+          <pre id="jsonOut" class="code"></pre>
+          <button id="copyJson" class="secondary" style="margin-top:10px;width:100%">Copy rankings JSON</button>
+        </section>
+
+        <section class="panel">
+          <div class="eyebrow">Federation ready</div>
+          <p class="small notice">The data model keeps athlete rows separate from source metadata, generated seeds, and heat previews so future federation APIs can map into the same JSON without changing the admin UI.</p>
+        </section>
+      </aside>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (() => {
+      const KEY = 'competition_os_rankings_v1';
+      const $ = selector => document.querySelector(selector);
+      const sampleAthletes = [
+        { rank: 1, athleteName: 'Salma El Idrissi', nationality: 'MAR', division: 'Women Kite-Surf', points: 9850 },
+        { rank: 2, athleteName: 'Mika Sol', nationality: 'ESP', division: 'Women Kite-Surf', points: 9320 },
+        { rank: 3, athleteName: 'Noa Cruz', nationality: 'POR', division: 'Women Kite-Surf', points: 9105 },
+        { rank: 4, athleteName: 'Lena Vale', nationality: 'FRA', division: 'Women Kite-Surf', points: 8775 },
+        { rank: 5, athleteName: 'Amira Benali', nationality: 'MAR', division: 'Women Kite-Surf', points: 8420 },
+        { rank: 6, athleteName: 'Kai Rivera', nationality: 'BRA', division: 'Women Kite-Surf', points: 8190 },
+        { rank: 7, athleteName: 'Tomás Costa', nationality: 'CPV', division: 'Men Kite-Surf', points: 9915 },
+        { rank: 8, athleteName: 'Yanis Haddad', nationality: 'MAR', division: 'Men Kite-Surf', points: 9640 }
+      ];
+      const freshDatabase = () => ({
+        schema: 'competition-os.rankings.v1',
+        updatedAt: new Date().toISOString(),
+        source: {
+          type: 'manual',
+          name: 'Competition OS Rankings Manager',
+          federation: null,
+          externalId: null
+        },
+        athletes: sampleAthletes.map((athlete, index) => normalizeAthlete(athlete, index))
+      });
+
+      let database = load();
+      let heats = [];
+
+      function load() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(KEY));
+          return saved && Array.isArray(saved.athletes) ? migrate(saved) : freshDatabase();
+        } catch (error) {
+          return freshDatabase();
+        }
+      }
+
+      function migrate(value) {
+        return {
+          schema: value.schema || 'competition-os.rankings.v1',
+          updatedAt: value.updatedAt || new Date().toISOString(),
+          source: value.source || freshDatabase().source,
+          athletes: value.athletes.map((athlete, index) => normalizeAthlete(athlete, index))
+        };
+      }
+
+      function normalizeAthlete(athlete, index) {
+        return {
+          id: athlete.id || `athlete-${Date.now()}-${index}-${Math.random().toString(16).slice(2)}`,
+          rank: clampNumber(athlete.rank, index + 1),
+          athleteName: athlete.athleteName || athlete.name || '',
+          nationality: String(athlete.nationality || '').toUpperCase(),
+          division: athlete.division || 'Open',
+          points: clampNumber(athlete.points, 0),
+          seed: clampNumber(athlete.seed, index + 1)
+        };
+      }
+
+      function clampNumber(value, fallback) {
+        const number = Number(value);
+        return Number.isFinite(number) && number >= 0 ? number : fallback;
+      }
+
+      function save(message) {
+        database.updatedAt = new Date().toISOString();
+        database.athletes = seededAthletes();
+        localStorage.setItem(KEY, JSON.stringify(database));
+        render();
+        if (message) toast(message);
+      }
+
+      function seededAthletes() {
+        return [...database.athletes]
+          .sort((a, b) => a.rank - b.rank || b.points - a.points || a.athleteName.localeCompare(b.athleteName))
+          .map((athlete, index) => ({ ...athlete, seed: index + 1 }));
+      }
+
+      function divisions() {
+        return [...new Set(database.athletes.map(athlete => athlete.division || 'Open'))].sort();
+      }
+
+      function athletesForPreview() {
+        const division = $('#divisionFilter').value;
+        return seededAthletes().filter(athlete => division === 'all' || athlete.division === division);
+      }
+
+      function generateHeats() {
+        const heatSize = Number($('#heatSize').value) || 4;
+        const method = $('#heatMethod').value;
+        const athletes = athletesForPreview();
+        const heatCount = Math.max(1, Math.ceil(athletes.length / heatSize));
+        const buckets = Array.from({ length: heatCount }, (_, index) => ({
+          id: `heat-${index + 1}`,
+          name: `Heat ${index + 1}`,
+          athletes: []
+        }));
+
+        athletes.forEach((athlete, index) => {
+          const heatIndex = method === 'snake'
+            ? snakeIndex(index, heatCount)
+            : Math.floor(index / heatSize);
+          buckets[Math.min(heatIndex, buckets.length - 1)].athletes.push(athlete);
+        });
+
+        heats = buckets;
+      }
+
+      function snakeIndex(index, heatCount) {
+        const round = Math.floor(index / heatCount);
+        const position = index % heatCount;
+        return round % 2 === 0 ? position : heatCount - position - 1;
+      }
+
+      function render() {
+        database.athletes = seededAthletes();
+        renderStats();
+        renderDivisionFilter();
+        renderRankingRows();
+        generateHeats();
+        renderHeats();
+        renderJson();
+      }
+
+      function renderStats() {
+        $('#athleteCount').textContent = database.athletes.length;
+        $('#divisionCount').textContent = divisions().length;
+        $('#nationCount').textContent = new Set(database.athletes.map(athlete => athlete.nationality).filter(Boolean)).size;
+        $('#nextSeed').textContent = database.athletes.length + 1;
+        $('#statusDetail').textContent = `${database.athletes.length} athletes · updated ${new Date(database.updatedAt).toLocaleString()}`;
+      }
+
+      function renderDivisionFilter() {
+        const current = $('#divisionFilter').value || 'all';
+        $('#divisionFilter').innerHTML = '<option value="all">All divisions</option>' + divisions().map(division => `<option value="${escapeHtml(division)}">${escapeHtml(division)}</option>`).join('');
+        $('#divisionFilter').value = [...divisions(), 'all'].includes(current) ? current : 'all';
+      }
+
+      function renderRankingRows() {
+        $('#rankingList').innerHTML = database.athletes.map(athlete => `
+          <article class="ranking-row" data-id="${athlete.id}">
+            <div class="row-head">
+              <span class="pill blue">Seed ${athlete.seed}</span>
+              <button class="danger" data-remove="${athlete.id}" aria-label="Remove ${escapeHtml(athlete.athleteName || 'athlete')}">Remove</button>
+            </div>
+            <div class="row-fields">
+              ${field('rank', 'Rank', athlete.rank, 'number')}
+              ${field('athleteName', 'Athlete name', athlete.athleteName)}
+              ${field('nationality', 'Nationality', athlete.nationality)}
+              ${field('division', 'Division', athlete.division)}
+              ${field('points', 'Points', athlete.points, 'number')}
+              ${field('seed', 'Seed', athlete.seed, 'number', true)}
+            </div>
+          </article>
+        `).join('') || '<p class="small">No athletes yet. Add one or import JSON to begin.</p>';
+
+        document.querySelectorAll('[data-field]').forEach(input => {
+          input.addEventListener('change', event => updateAthlete(event.target));
+          input.addEventListener('blur', event => updateAthlete(event.target));
+        });
+        document.querySelectorAll('[data-remove]').forEach(button => {
+          button.addEventListener('click', () => removeAthlete(button.dataset.remove));
+        });
+      }
+
+      function field(name, label, value, type = 'text', readonly = false) {
+        return `<div><label>${label}</label><input ${readonly ? 'readonly' : ''} type="${type}" data-field="${name}" value="${escapeHtml(value)}"></div>`;
+      }
+
+      function updateAthlete(input) {
+        const row = input.closest('[data-id]');
+        const athlete = database.athletes.find(item => item.id === row.dataset.id);
+        if (!athlete) return;
+        const fieldName = input.dataset.field;
+        athlete[fieldName] = ['rank', 'points'].includes(fieldName) ? clampNumber(input.value, 0) : input.value.trim();
+        if (fieldName === 'nationality') athlete.nationality = athlete.nationality.toUpperCase();
+        save('Ranking updated');
+      }
+
+      function renderHeats() {
+        $('#heatPreview').innerHTML = heats.map(heat => `
+          <article class="heat-card">
+            <div class="row-head"><strong>${heat.name}</strong><span class="pill amber">${heat.athletes.length} athletes</span></div>
+            ${heat.athletes.map(athlete => `
+              <div class="heat-athlete">
+                <span class="seed-badge">${athlete.seed}</span>
+                <span><strong>${escapeHtml(athlete.athleteName || 'Unnamed athlete')}</strong><br><span class="small">#${athlete.rank} · ${escapeHtml(athlete.nationality || '—')} · ${escapeHtml(athlete.division)}</span></span>
+                <span class="pill gray">${athlete.points}</span>
+              </div>
+            `).join('') || '<p class="small">No athletes in this heat.</p>'}
+          </article>
+        `).join('');
+      }
+
+      function renderJson() {
+        const payload = {
+          ...database,
+          generated: {
+            seedsGeneratedBy: 'rank asc, points desc, athleteName asc',
+            heatPreview: heats
+          }
+        };
+        $('#jsonOut').textContent = JSON.stringify(payload, null, 2);
+        $('#importBox').placeholder = JSON.stringify({ athletes: sampleAthletes.slice(0, 2), source: { type: 'federation-api', federation: 'future' } }, null, 2);
+      }
+
+      function addAthlete() {
+        database.athletes.push(normalizeAthlete({
+          rank: database.athletes.length + 1,
+          athleteName: 'New Athlete',
+          nationality: '',
+          division: divisions()[0] || 'Open',
+          points: 0
+        }, database.athletes.length));
+        save('Athlete added');
+      }
+
+      function removeAthlete(id) {
+        database.athletes = database.athletes.filter(athlete => athlete.id !== id);
+        save('Athlete removed');
+      }
+
+      function importJson() {
+        try {
+          const parsed = JSON.parse($('#importBox').value);
+          const athletes = Array.isArray(parsed) ? parsed : parsed.athletes;
+          if (!Array.isArray(athletes)) throw new Error('Missing athletes array');
+          database = {
+            schema: parsed.schema || 'competition-os.rankings.v1',
+            updatedAt: new Date().toISOString(),
+            source: parsed.source || { type: 'manual', name: 'Manual JSON import', federation: null, externalId: null },
+            athletes: athletes.map((athlete, index) => normalizeAthlete(athlete, index))
+          };
+          save('Rankings imported');
+        } catch (error) {
+          toast(`Import failed: ${error.message}`);
+        }
+      }
+
+      function formatImportJson() {
+        try {
+          $('#importBox').value = JSON.stringify(JSON.parse($('#importBox').value), null, 2);
+          toast('Import JSON formatted');
+        } catch (error) {
+          toast(`Format failed: ${error.message}`);
+        }
+      }
+
+      async function copyText(text, message) {
+        try {
+          await navigator.clipboard.writeText(text);
+          toast(message);
+        } catch (error) {
+          toast('Copy failed. Select the JSON and copy manually.');
+        }
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, character => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[character]));
+      }
+
+      function toast(message) {
+        const element = $('#toast');
+        element.textContent = message;
+        element.classList.add('show');
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => element.classList.remove('show'), 2300);
+      }
+
+      $('#addAthlete').addEventListener('click', addAthlete);
+      $('#loadSample').addEventListener('click', () => { database = freshDatabase(); save('Sample rankings loaded'); });
+      $('#resetData').addEventListener('click', () => { database = { ...freshDatabase(), athletes: [] }; save('Rankings reset'); });
+      $('#importJson').addEventListener('click', importJson);
+      $('#formatJson').addEventListener('click', formatImportJson);
+      $('#copyJson').addEventListener('click', () => copyText($('#jsonOut').textContent, 'Rankings JSON copied'));
+      $('#copyHeats').addEventListener('click', () => copyText(JSON.stringify(heats, null, 2), 'Heat preview copied'));
+      $('#heatSize').addEventListener('change', render);
+      $('#divisionFilter').addEventListener('change', render);
+      $('#heatMethod').addEventListener('change', render);
+
+      render();
+    })();
+  </script>
+</body>
+</html>
