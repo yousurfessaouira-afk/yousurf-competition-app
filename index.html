@@ -547,12 +547,64 @@
       .tour-rank-card { align-items: start; grid-template-columns: auto 1fr auto; }
       .audit-meta { font-variant-numeric: tabular-nums; }
       @media (min-width: 880px) { .wide-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+      .demo-access {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        background: rgba(3, 8, 21, 0.94);
+      }
+      .demo-access.hide { display: none !important; }
+      .demo-card {
+        width: min(100%, 880px);
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        padding: 20px;
+        background: rgba(13, 27, 45, 0.98);
+        box-shadow: var(--shadow);
+      }
+      .profile-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+      .profile-button { display: grid; gap: 6px; min-height: 92px; padding: 12px; text-align: left; }
+      .top-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+      .language-switcher { display: inline-flex; gap: 6px; padding: 4px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.08); }
+      .language-switcher button { min-height: 34px; padding: 6px 12px; border-radius: 999px; }
+      .language-switcher button.active { color: var(--black); background: var(--green); }
+      .access-warning { border-left: 5px solid var(--red); }
+      .guide-list { margin: 0; padding-left: 1.25rem; color: var(--muted); font-weight: 720; }
+      .guide-list li { margin: 6px 0; }
+      .mini-table { display: grid; gap: 8px; }
     </style>
   </head>
   <body>
+    <div id="demoAccess" class="demo-access">
+      <section class="demo-card stack">
+        <div class="top-actions">
+          <div>
+            <div class="eyebrow" data-i18n="Competition OS · Demo access">Competition OS · Demo access</div>
+            <h2 data-i18n="Select profile / Sélectionner un profil">Select profile / Sélectionner un profil</h2>
+          </div>
+          <div class="language-switcher" aria-label="Language">
+            <button class="langBtn active" data-lang="en">English</button>
+            <button class="langBtn ghost" data-lang="fr">Français</button>
+          </div>
+        </div>
+        <p class="notice small" data-i18n="Demo access mode — real login will be added later.">Demo access mode — real login will be added later.</p>
+        <div id="profileButtons" class="profile-grid"></div>
+      </section>
+    </div>
     <div class="app">
       <header class="hero">
         <div>
+          <div class="top-actions">
+            <div class="language-switcher" aria-label="Language">
+              <button class="langBtn active" data-lang="en">English</button>
+              <button class="langBtn ghost" data-lang="fr">Français</button>
+            </div>
+            <button id="changeProfile" class="ghost" data-i18n="Change profile">Change profile</button>
+          </div>
           <div class="eyebrow">Competition OS · Offline MVP</div>
           <h1>Entry Allocation + Judge Mode</h1>
           <p class="small">
@@ -563,17 +615,22 @@
           </p>
           <div class="role-strip panel light">
             <div>
-              <label>Official role</label>
-              <select id="roleSelector">
-                <option>Race Director</option>
-                <option>Head Judge</option>
-                <option>Judge</option>
+              <label data-i18n="Active profile">Active profile</label>
+              <select id="roleSelector" disabled>
+                <option value="Admin">Admin</option>
+                <option value="Race Director">Race Director</option>
+                <option value="Head Judge">Head Judge</option>
+                <option value="Judge">Judge</option>
+                <option value="Staff Viewer">Staff Viewer</option>
               </select>
             </div>
             <p class="small" id="roleSummary"></p>
           </div>
           <div class="tabs">
-            <button class="tab active" data-screen="entry">
+            <button class="tab active" data-screen="dashboard">Dashboard</button>
+            <button class="tab ghost" data-screen="officials">Officials Management</button>
+            <button class="tab ghost" data-screen="profiles">Profiles</button>
+            <button class="tab ghost" data-screen="entry">
               Entry Allocation
             </button>
             <button class="tab ghost" data-screen="bracket">
@@ -610,7 +667,63 @@
         </div>
       </header>
 
-      <main id="entryScreen" class="stack">
+
+      <main id="dashboardScreen" class="stack">
+        <section class="panel light">
+          <div class="eyebrow" data-i18n="Role guide">Role guide</div>
+          <h2 id="guideTitle">How to use this profile</h2>
+          <p class="small" id="guideIntro"></p>
+          <ol id="guideSteps" class="guide-list"></ol>
+        </section>
+        <section class="panel">
+          <div class="eyebrow" data-i18n="Access summary">Access summary</div>
+          <div id="accessSummary" class="grid"></div>
+        </section>
+        <section class="panel access-warning">
+          <button id="resetDemoData" class="danger" data-i18n="Reset local demo data">Reset local demo data</button>
+          <strong data-i18n="Security limitation">Security limitation</strong>
+          <p class="small" data-i18n="Demo access mode — real login will be added later.">Demo access mode — real login will be added later.</p>
+        </section>
+      </main>
+
+      <main id="officialsScreen" class="stack hide">
+        <section class="panel light">
+          <div class="eyebrow" data-i18n="Officials Management">Officials Management</div>
+          <p class="small" id="officialsHelp"></p>
+          <div id="officialForm" class="grid">
+            <div class="three">
+              <div><label data-i18n="Judge name">Judge name</label><input id="officialName" placeholder="Judge name"></div>
+              <div><label data-i18n="Role">Role</label><select id="officialRole"><option value="Judge">Judge</option><option value="Head Judge">Head Judge</option><option value="Race Director">Race Director</option><option value="Staff Viewer">Staff Viewer</option></select></div>
+              <div><label data-i18n="Status">Status</label><select id="officialActive"><option value="active">active</option><option value="inactive">inactive</option></select></div>
+            </div>
+            <div class="four">
+              <div><label data-i18n="Discipline / division">Discipline / division</label><input id="officialDivision" placeholder="Kite-Surf · Open"></div>
+              <div><label data-i18n="Assigned heat(s)">Assigned heat(s)</label><input id="officialHeats" placeholder="H1, H2"></div>
+              <div><label data-i18n="Judging panel">Judging panel</label><input id="officialPanel" placeholder="Panel A"></div>
+              <div><label data-i18n="Admin allows Head Judge assignments">Admin allows Head Judge assignments</label><select id="allowHeadJudgeAssign"><option value="true">Yes</option><option value="false">No</option></select></div>
+            </div>
+            <div class="button-row">
+              <button id="addOfficial" class="primary" data-i18n="Add official">Add official</button>
+              <button id="suggestOfficial" class="secondary" data-i18n="Suggest assignment">Suggest assignment</button>
+            </div>
+          </div>
+        </section>
+        <section class="panel">
+          <div class="eyebrow" data-i18n="Judge status and panels">Judge status and panels</div>
+          <div id="officialList" class="mini-table"></div>
+        </section>
+      </main>
+
+      <main id="profilesScreen" class="stack hide">
+        <section class="panel light">
+          <div class="eyebrow" data-i18n="Profile privacy">Profile privacy</div>
+          <p class="small" data-i18n="Users can only open profile data allowed for their role.">Users can only open profile data allowed for their role.</p>
+          <div id="profileDirectory" class="profile-grid"></div>
+        </section>
+        <section class="panel" id="profileDetail"></section>
+      </main>
+
+      <main id="entryScreen" class="stack hide">
         <section class="panel">
           <div class="subtabs">
             <button
@@ -1226,7 +1339,15 @@
           "video application",
           "organizer selection",
         ];
-        const roles = ["Race Director", "Head Judge", "Judge"];
+        const roles = ["Admin", "Race Director", "Head Judge", "Judge", "Staff Viewer"];
+        const profiles = [
+          { id: "admin", name: "Admin", role: "Admin" },
+          { id: "race-director", name: "Race Director", role: "Race Director" },
+          { id: "head-judge", name: "Head Judge", role: "Head Judge" },
+          { id: "judge-1", name: "Judge 1", role: "Judge", judgeId: "j1" },
+          { id: "judge-2", name: "Judge 2", role: "Judge", judgeId: "j2" },
+          { id: "staff-viewer", name: "Staff Viewer", role: "Staff Viewer" },
+        ];
         const penaltyTypes = [
           "Interference",
           "Priority violation",
@@ -1249,55 +1370,159 @@
           "Head Judge decision required",
         ];
         const roleSummaries = {
+          Admin:
+            "Can create events and users, assign roles, add officials, control settings, and reset local demo data.",
           "Race Director":
-            "Can manage event, registration, heats, safety, schedule, notice board, DNS/DNF; cannot enter or silently edit judge scores.",
+            "Can manage event, riders, registration, entry allocation, waiting list, seeding, heat status, notices, and audit log.",
           "Head Judge":
-            "Can configure judging, validate/reject penalties and interference, approve corrections, validate results, and lock final heat results.",
+            "Can manage judging format, panels when allowed, score review, penalties, corrections, result validation, and final heat score locks.",
           Judge:
-            "Can view the active heat, score attempts, add comments, call possible interference, and request corrections only.",
+            "Can view and score only assigned heats, flag possible penalties/interferences, request corrections, and view own scoring history.",
+          "Staff Viewer":
+            "Can view public-safe event status, schedule, start list, and notices only; cannot edit anything.",
         };
         const permissions = {
+          Admin: new Set([
+            "event", "users", "roles", "officialsManage", "officialsAssign", "settings", "resetDemo", "viewAllProfiles", "registration", "entry", "seeding", "bracket", "heatStatus", "notice", "safety", "schedule", "dnsDnf", "tourAdmin", "auditView", "judgingConfig", "panelAssign", "resultValidate", "penaltyValidate", "scoreCorrection", "finalLock", "penaltyFlag",
+          ]),
           "Race Director": new Set([
-            "event",
-            "registration",
-            "entry",
-            "seeding",
-            "bracket",
-            "heatStatus",
-            "notice",
-            "protest",
-            "safety",
-            "schedule",
-            "dnsDnf",
-            "tourAdmin",
-            "penaltyFlag",
+            "event", "registration", "entry", "riders", "waitingList", "seeding", "bracket", "heatStatus", "notice", "safety", "schedule", "dnsDnf", "tourAdmin", "penaltyFlag", "auditView", "officialsManage", "officialsAssign", "viewOfficials", "viewRiders",
           ]),
           "Head Judge": new Set([
-            "judgingConfig",
-            "resultValidate",
-            "penaltyValidate",
-            "interferenceValidate",
-            "correctionApprove",
-            "scoreCorrection",
-            "finalLock",
-            "tourAdmin",
-            "penaltyFlag",
+            "judgingConfig", "panelSuggest", "resultValidate", "penaltyValidate", "interferenceValidate", "correctionApprove", "scoreCorrection", "finalLock", "tourAdmin", "penaltyFlag", "viewJudges", "viewScoringStatus", "judgingAuditView",
           ]),
           Judge: new Set([
-            "activeHeatView",
-            "score",
-            "miss",
-            "comments",
-            "interferenceFlag",
-            "correctionRequest",
-            "penaltyFlag",
+            "activeHeatView", "assignedHeatView", "score", "miss", "comments", "interferenceFlag", "correctionRequest", "penaltyFlag", "ownProfile", "ownHistory",
           ]),
+          "Staff Viewer": new Set(["publicView"]),
+        };
+        const translations = {
+          fr: {
+            "Competition OS · Demo access": "Competition OS · Accès démo",
+            "Select profile / Sélectionner un profil": "Select profile / Sélectionner un profil",
+            "Demo access mode — real login will be added later.": "Mode d’accès démo — la vraie connexion sera ajoutée plus tard.",
+            "Change profile": "Changer de profil",
+            "Competition OS · Offline MVP": "Competition OS · MVP hors ligne",
+            "Entry Allocation + Judge Mode": "Allocation des inscriptions + Mode juge",
+            "Active profile": "Profil actif",
+            "Official role": "Rôle officiel",
+            "Dashboard": "Tableau de bord",
+            "Officials Management": "Gestion des officiels",
+            "Profiles": "Profils",
+            "Entry Allocation": "Allocation des inscriptions",
+            "Bracket / Heats": "Tableau / Heats",
+            "Heat Management": "Gestion des manches",
+            "Tour Rankings": "Classements du tour",
+            "Judge Mode": "Mode juge",
+            "Role guide": "Guide du rôle",
+            "How to use this profile": "Comment utiliser ce profil",
+            "Access summary": "Résumé des accès",
+            "Security limitation": "Limite de sécurité",
+            "Reset local demo data": "Réinitialiser les données démo locales",
+            "Judge name": "Nom du juge",
+            "Role": "Rôle",
+            "Status": "Statut",
+            "Discipline / division": "Discipline / division",
+            "Assigned heat(s)": "Heat(s) / manche(s) assigné(s)",
+            "Judging panel": "Panel de jugement",
+            "Admin allows Head Judge assignments": "L’admin autorise les affectations du Chef juge",
+            "Add official": "Ajouter un officiel",
+            "Suggest assignment": "Suggérer une affectation",
+            "Judge status and panels": "Statut des juges et panels",
+            "Profile privacy": "Confidentialité des profils",
+            "Users can only open profile data allowed for their role.": "Les utilisateurs peuvent ouvrir uniquement les données de profil autorisées pour leur rôle.",
+            "Access restricted — this profile is not available for your role.": "Accès limité — ce profil n’est pas disponible pour votre rôle.",
+            "Admin": "Admin",
+            "Race Director": "Directeur de course",
+            "Head Judge": "Chef juge",
+            "Judge": "Juge",
+            "Judge 1": "Juge 1",
+            "Judge 2": "Juge 2",
+            "Staff Viewer": "Observateur staff",
+            "Official Notice Board": "Tableau officiel / ONB",
+            "Heat": "Heat / Manche",
+            "Ranking": "Classement",
+            "Penalty": "Pénalité",
+            "Start List": "Liste de départ",
+            "Waiting List": "Liste d’attente",
+            "Seed": "Tête de série",
+            "Registration List": "Liste d’inscription",
+            "Main Event Start List": "Liste de départ de l’événement principal",
+            "Seeding Table": "Table de têtes de série",
+            "Bracket Preview": "Aperçu du tableau",
+            "Audit / Decisions Log": "Journal d’audit / décisions",
+            "Create event": "Créer l’événement",
+            "Add officials": "Ajouter des officiels",
+            "Assign roles": "Attribuer les rôles",
+            "Configure basic settings": "Configurer les paramètres de base",
+            "Check audit log": "Vérifier le journal d’audit",
+            "Import riders": "Importer les riders",
+            "Manage start list": "Gérer la liste de départ",
+            "Seed riders": "Définir les têtes de série",
+            "Generate heats": "Générer les heats",
+            "Control heat status": "Contrôler le statut des heats",
+            "Publish official notices": "Publier les avis officiels",
+            "Handle absences": "Gérer les absences",
+            "Configure judging format": "Configurer le format de jugement",
+            "Monitor judge submissions": "Suivre les envois des juges",
+            "Validate penalties": "Valider les pénalités",
+            "Approve corrections": "Approuver les corrections",
+            "Validate results": "Valider les résultats",
+            "Select assigned heat": "Sélectionner le heat assigné",
+            "Score riders": "Noter les riders",
+            "Confirm score": "Confirmer la note",
+            "Flag penalty/interference": "Signaler une pénalité / interférence",
+            "Request correction": "Demander une correction",
+            "Submit heat scores": "Soumettre les notes du heat",
+            "Follow event status": "Suivre le statut de l’événement",
+            "Check schedule": "Consulter le programme",
+            "Check start list": "Consulter la liste de départ",
+            "Read notices": "Lire les avis",
+            "Only Race Director can start this heat.": "Seul le Directeur de course peut lancer ce heat.",
+            "Only Head Judge can validate penalties.": "Seul le Chef juge peut valider les pénalités.",
+            "Only Admin can add officials.": "Seul l’Admin peut ajouter des officiels.",
+            "Judges can only access assigned heats.": "Les juges peuvent accéder uniquement aux heats qui leur sont assignés.",
+            "Available for this profile": "Disponible pour ce profil",
+            "Restricted for this role": "Limité pour ce rôle",
+            "Allowed": "Autorisé",
+            "Blocked": "Bloqué",
+            "Remove judge from panel": "Retirer le juge du panel",
+            "Admin primarily adds judges; Race Director can add judges when event operations require it.": "L’Admin ajoute principalement les juges ; le Directeur de course peut en ajouter lorsque l’exploitation de l’événement l’exige.",
+            "Head Judge can view panels, suggest assignments, and assign only if permission is enabled by Admin/Race Director.": "Le Chef juge peut voir les panels, suggérer des affectations et affecter seulement si l’Admin ou le Directeur de course l’autorise.",
+            "No bracket heats yet.": "Aucun heat du tableau pour le moment.",
+            "active": "actif", "inactive": "inactif", "pending": "en attente", "validated": "validé", "rejected": "rejeté",
+          },
+        };
+        const guides = {
+          Admin: ["Create event", "Add officials", "Assign roles", "Configure basic settings", "Check audit log"],
+          "Race Director": ["Import riders", "Manage start list", "Seed riders", "Generate heats", "Control heat status", "Publish official notices", "Handle absences"],
+          "Head Judge": ["Configure judging format", "Monitor judge submissions", "Validate penalties", "Approve corrections", "Validate results"],
+          Judge: ["Select assigned heat", "Score riders", "Confirm score", "Flag penalty/interference", "Request correction", "Submit heat scores"],
+          "Staff Viewer": ["Follow event status", "Check schedule", "Check start list", "Read notices"],
+        };
+        const screenPermissions = {
+          dashboard: null,
+          officials: "viewOfficials",
+          profiles: null,
+          entry: "registration",
+          bracket: "bracket",
+          heats: "activeHeatView",
+          tour: "publicView",
+          judge: "activeHeatView",
         };
         const fresh = () => ({
-          screen: "entry",
+          screen: "dashboard",
           entryTab: "registration",
+          lang: "en",
+          profile: null,
           role: "Race Director",
           roleAudit: [],
+          officials: [
+            { id: "j1", name: "Judge 1", role: "Judge", division: "Kite-Surf · Open", heats: "H1", panel: "Panel A", active: "active", ownerProfile: "judge-1" },
+            { id: "j2", name: "Judge 2", role: "Judge", division: "Kite-Surf · Open", heats: "H2", panel: "Panel A", active: "active", ownerProfile: "judge-2" },
+            { id: "hj1", name: "Head Judge", role: "Head Judge", division: "All", heats: "All", panel: "Panel A", active: "active", ownerProfile: "head-judge" },
+          ],
+          settingsAccess: { raceDirectorCanAssignJudges: true, headJudgeCanAssignPanels: false },
           penalties: [],
           selectedPenaltyId: null,
           settings: {
@@ -1350,10 +1575,14 @@
         }
         function migrate(s) {
           const f = fresh();
-          s.screen ??= "entry";
+          s.screen = ["dashboard", "officials", "profiles", "entry", "bracket", "heats", "tour", "judge"].includes(s.screen) ? s.screen : "dashboard";
           s.entryTab ??= "registration";
+          s.lang = ["en", "fr"].includes(s.lang) ? s.lang : "en";
+          s.profile = profiles.some((p) => p.id === s.profile) ? s.profile : null;
           s.role = roles.includes(s.role) ? s.role : "Race Director";
           s.roleAudit ??= [];
+          s.officials ??= f.officials;
+          s.settingsAccess = { ...f.settingsAccess, ...(s.settingsAccess || {}) };
           s.penalties ??= [];
           s.selectedPenaltyId ??= null;
           s.settings = { ...f.settings, ...(s.settings || {}) };
@@ -1381,11 +1610,11 @@
           if (msg) toast(msg);
         }
         function toast(msg) {
-          const t = $("#toast");
-          t.textContent = msg;
-          t.classList.add("show");
+          const el = $("#toast");
+          el.textContent = t(msg);
+          el.classList.add("show");
           clearTimeout(toast.timer);
-          toast.timer = setTimeout(() => t.classList.remove("show"), 2300);
+          toast.timer = setTimeout(() => el.classList.remove("show"), 2300);
         }
         const esc = (v) =>
           String(v ?? "").replace(
@@ -1399,6 +1628,28 @@
                 "'": "&#39;",
               })[m],
           );
+        function t(text) {
+          return state.lang === "fr" ? translations.fr[String(text)] || String(text) : String(text);
+        }
+        function roleLabel(role) { return t(role); }
+        function activeProfile() { return profiles.find((p) => p.id === state.profile) || null; }
+        function translateDOM() {
+          document.documentElement.lang = state.lang;
+          $$('[data-i18n]').forEach((el) => (el.textContent = t(el.dataset.i18n)));
+          $$('.langBtn').forEach((b) => {
+            b.classList.toggle('active', b.dataset.lang === state.lang);
+            b.classList.toggle('ghost', b.dataset.lang !== state.lang);
+          });
+        }
+        function canOpenScreen(screen) {
+          if (state.role === 'Admin') return true;
+          if (state.role === 'Race Director') return !['judge'].includes(screen) || can('activeHeatView');
+          if (state.role === 'Head Judge') return ['dashboard', 'officials', 'profiles', 'heats', 'judge', 'tour'].includes(screen);
+          if (state.role === 'Judge') return ['dashboard', 'profiles', 'heats', 'judge'].includes(screen);
+          if (state.role === 'Staff Viewer') return ['dashboard', 'profiles', 'entry', 'bracket', 'heats', 'tour'].includes(screen);
+          return screen === 'dashboard';
+        }
+        function accessDeniedMessage() { return t('Access restricted — this profile is not available for your role.'); }
         const slug = (v) =>
           String(v || "rider")
             .toLowerCase()
@@ -1416,6 +1667,7 @@
         function audit(action, detail) {
           state.entry.audit.unshift({
             time: new Date().toISOString(),
+            profile: activeProfile()?.name || "No profile",
             role: state.role || "System",
             action,
             detail,
@@ -1429,6 +1681,7 @@
         ) {
           const item = {
             time: new Date().toISOString(),
+            profile: activeProfile()?.name || "No profile",
             role: state.role || "System",
             action,
             affected,
@@ -1438,6 +1691,7 @@
           state.roleAudit.unshift(item);
           state.entry.audit.unshift({
             time: item.time,
+            profile: item.profile,
             role: item.role,
             action,
             detail: `${affected} · ${reason || "No reason recorded"} · ${status}`,
@@ -1448,7 +1702,7 @@
         }
         function deny(reason) {
           toast(reason);
-          roleAudit("permission denied", "UI action", reason, "blocked");
+          roleAudit("restricted action attempted", "UI action", reason, "blocked");
           return false;
         }
         function requirePermission(permission, reason) {
@@ -1796,7 +2050,7 @@
             ]
               .map(
                 (a) =>
-                  `<div class="card"><strong>${esc(a.action)}</strong><span class="small">${esc(a.time)}</span><p class="small">${esc(a.detail)}</p></div>`,
+                  `<div class="card"><strong>${esc(a.action)}</strong><span class="small">${esc(a.time)} · ${esc(a.profile || "No profile")} · ${esc(roleLabel(a.role || "System"))}</span><p class="small">${esc(a.detail || a.reason || "No reason recorded")}</p></div>`,
               )
               .join("") || '<p class="small">No decisions recorded yet.</p>';
           $$("[data-why]").forEach(
@@ -1949,6 +2203,15 @@
         function heat(id = state.activeHeatId) {
           return heats().find((h) => h.id === id);
         }
+        function assignedHeatNumbers() {
+          const official = state.officials.find((o) => o.ownerProfile === state.profile);
+          return String(official?.heats || "").split(/[,;\s]+/).map((x) => x.replace(/^H/i, "")).filter(Boolean);
+        }
+        function heatVisibleToRole(h) {
+          if (state.role !== "Judge") return true;
+          const nums = assignedHeatNumbers();
+          return nums.includes(String(h.heatNumber));
+        }
         function activateHeat(id) {
           if (
             !requirePermission(
@@ -1981,13 +2244,14 @@
           save("Active heat updated");
         }
         function renderHeats() {
+          const visibleHeats = heats().filter(heatVisibleToRole);
           $("#heatList").innerHTML =
-            heats()
+            visibleHeats
               .map(
                 (h) =>
                   `<div class="heat-card ${h.id === state.activeHeatId ? "active" : ""}"><span class="pill ${h.status === "live" ? "green" : "gray"}">${h.status}</span><span><strong>Heat ${h.heatNumber}</strong><br><span class="small">${h.riders.map((r) => r.name + (r.bye ? " (bye)" : "")).join(" vs ")}</span></span><button class="secondary" data-activate="${h.id}">Set live</button></div>`,
               )
-              .join("") || '<p class="small">No bracket heats yet.</p>';
+              .join("") || `<p class="small">${esc(state.role === "Judge" ? t("Judges can only access assigned heats.") : t("No bracket heats yet."))}</p>`;
           $$("[data-activate]").forEach(
             (b) => (b.onclick = () => activateHeat(b.dataset.activate)),
           );
@@ -2761,7 +3025,90 @@
             save("Force-remove audited");
           });
         }
+        function renderProfileButtons() {
+          const wrap = $("#profileButtons");
+          if (!wrap) return;
+          wrap.innerHTML = profiles.map((p) => `<button class="profile-button secondary" data-profile="${p.id}"><strong>${esc(roleLabel(p.name))}</strong><span class="small">${esc(roleLabel(p.role))}</span></button>`).join("");
+          $$('[data-profile]').forEach((b) => b.onclick = () => selectProfile(b.dataset.profile));
+        }
+        function selectProfile(profileId) {
+          const p = profiles.find((x) => x.id === profileId);
+          if (!p) return;
+          const previous = activeProfile()?.name || "No profile";
+          state.profile = p.id;
+          state.role = p.role;
+          state.screen = "dashboard";
+          roleAudit("profile selected", p.name, `Previous profile: ${previous}`, "active");
+          save(`Profile selected: ${p.name}`);
+        }
+        function renderDashboard() {
+          const role = state.role;
+          $("#guideTitle").textContent = t("How to use this profile") + ` · ${roleLabel(role)}`;
+          $("#guideIntro").textContent = t(roleSummaries[role] || "Demo access mode — real login will be added later.");
+          $("#guideSteps").innerHTML = (guides[role] || []).map((step) => `<li>${esc(t(step))}</li>`).join("");
+          const allowed = Object.entries({
+            "Create event": can("event"),
+            "Add officials": can("officialsManage"),
+            "Assign roles": can("roles") || can("officialsAssign"),
+            "Start List": can("entry") || can("publicView"),
+            "Waiting List": can("waitingList") || can("entry"),
+            "Seed": can("seeding"),
+            "Heat": can("heatStatus") || can("assignedHeatView") || can("publicView"),
+            "Penalty": can("penaltyValidate") || can("penaltyFlag"),
+            "Ranking": can("tourAdmin") || can("publicView"),
+          });
+          $("#accessSummary").innerHTML = allowed.map(([name, ok]) => `<div class="rank-row"><span class="pill ${ok ? "green" : "red"}">${esc(t(ok ? "Allowed" : "Blocked"))}</span><strong>${esc(t(name))}</strong><span class="small">${ok ? esc(t("Available for this profile")) : esc(t("Restricted for this role"))}</span></div>`).join("");
+        }
+        function canManageOfficials() { return can("officialsManage") || (state.role === "Head Judge" && state.settingsAccess.headJudgeCanAssignPanels); }
+        function visibleOfficials() {
+          if (state.role === "Admin" || state.role === "Race Director") return state.officials;
+          if (state.role === "Head Judge") return state.officials.filter((o) => ["Judge", "Head Judge"].includes(o.role));
+          if (state.role === "Judge") return state.officials.filter((o) => o.ownerProfile === state.profile);
+          return [];
+        }
+        function renderOfficials() {
+          $("#officialsHelp").textContent = state.role === "Head Judge"
+            ? t("Head Judge can view panels, suggest assignments, and assign only if permission is enabled by Admin/Race Director.")
+            : state.role === "Judge"
+              ? t("Judges can only access assigned heats.")
+              : t("Admin primarily adds judges; Race Director can add judges when event operations require it.");
+          $("#allowHeadJudgeAssign").value = String(!!state.settingsAccess.headJudgeCanAssignPanels);
+          const manager = canManageOfficials();
+          ["officialName", "officialRole", "officialActive", "officialDivision", "officialHeats", "officialPanel"].forEach((id) => {
+            const el = $("#" + id); if (el) el.disabled = !manager;
+          });
+          setActionState($("#addOfficial"), can("officialsManage"), state.role === "Race Director" ? "Race Director may add officials for event operations." : "Only Admin can add officials.");
+          setActionState($("#suggestOfficial"), can("panelSuggest") || can("officialsAssign"), "Only Head Judge/Race Director/Admin can suggest or assign panels.");
+          $("#allowHeadJudgeAssign").disabled = !(state.role === "Admin" || state.role === "Race Director");
+          $("#officialList").innerHTML = visibleOfficials().map((o) => `<div class="rank-row"><span class="pill ${o.active === "active" ? "green" : "gray"}">${esc(t(o.active))}</span><span><strong>${esc(roleLabel(o.name))}</strong><br><span class="small">${esc(roleLabel(o.role))} · ${esc(o.division)} · ${esc(t("Assigned heat(s)"))}: ${esc(o.heats || "—")} · ${esc(t("Judging panel"))}: ${esc(o.panel || "—")}</span></span><button class="ghost" data-remove-panel="${o.id}">${esc(t("Remove judge from panel"))}</button></div>`).join("") || `<p class="small">${esc(accessDeniedMessage())}</p>`;
+          $$('[data-remove-panel]').forEach((b) => b.onclick = () => {
+            if (!can("officialsAssign") && !(state.role === "Head Judge" && state.settingsAccess.headJudgeCanAssignPanels)) return deny("Only Admin/Race Director can remove judge from panel unless Head Judge assignment is enabled.");
+            const o = state.officials.find((x) => x.id === b.dataset.removePanel);
+            if (o) { o.panel = ""; roleAudit("judge assigned", o.name, "Removed from judging panel", "updated"); save("Judge removed from panel"); }
+          });
+        }
+        function canViewProfile(profile) {
+          if (state.role === "Admin") return true;
+          if (state.role === "Race Director") return ["Race Director", "Head Judge", "Judge"].includes(profile.role);
+          if (state.role === "Head Judge") return ["Head Judge", "Judge"].includes(profile.role);
+          if (state.role === "Judge") return profile.id === state.profile;
+          return profile.role === "Staff Viewer" || profile.id === state.profile;
+        }
+        function renderProfiles() {
+          $("#profileDirectory").innerHTML = profiles.map((p) => `<button class="profile-button ${canViewProfile(p) ? "secondary" : "ghost locked-action"}" data-open-profile="${p.id}"><strong>${esc(roleLabel(p.name))}</strong><span class="small">${esc(roleLabel(p.role))}${canViewProfile(p) ? "" : " · " + esc(accessDeniedMessage())}</span></button>`).join("");
+          $$('[data-open-profile]').forEach((b) => b.onclick = () => {
+            const p = profiles.find((x) => x.id === b.dataset.openProfile);
+            if (!p || !canViewProfile(p)) {
+              roleAudit("access denied", p?.name || "profile", "Access restricted — this profile is not available for your role.", "blocked");
+              $("#profileDetail").innerHTML = `<div class="notice small">${esc(accessDeniedMessage())}</div>`;
+              return toast("Access restricted — this profile is not available for your role.");
+            }
+            const assigned = state.officials.filter((o) => o.ownerProfile === p.id || o.name === p.name);
+            $("#profileDetail").innerHTML = `<div class="eyebrow">${esc(t("Profile privacy"))}</div><h2>${esc(roleLabel(p.name))}</h2><p class="small">${esc(roleLabel(p.role))} · ${esc(t(roleSummaries[p.role] || ""))}</p>${assigned.map((o) => `<div class="rank-row"><span class="pill green">${esc(t(o.active))}</span><span>${esc(t("Assigned heat(s)"))}: ${esc(o.heats || "—")} · ${esc(t("Judging panel"))}: ${esc(o.panel || "—")}</span></div>`).join("")}`;
+          });
+        }
         function applyRoleUi() {
+          setActionState($("#resetDemoData"), can("resetDemo"), "Only Admin can reset local demo data.");
           setActionState(
             $("#runAllocation"),
             can("entry"),
@@ -2867,11 +3214,11 @@
           );
         }
         function render() {
+          renderProfileButtons();
+          $("#demoAccess").classList.toggle("hide", !!state.profile);
           $("#roleSelector").value = state.role;
-          $("#roleSummary").textContent =
-            roleSummaries[state.role] ||
-            "Manual MVP role selector; authentication comes later.";
-          ["entry", "bracket", "heats", "tour", "judge"].forEach((s) => {
+          $("#roleSummary").textContent = `${activeProfile()?.name || "No profile"} · ${roleSummaries[state.role] || "Manual MVP role selector; authentication comes later."}`;
+          ["dashboard", "officials", "profiles", "entry", "bracket", "heats", "tour", "judge"].forEach((s) => {
             $("#" + s + "Screen").classList.toggle("hide", state.screen !== s);
           });
           $$(".tab").forEach((b) => {
@@ -2888,12 +3235,16 @@
           $("#heatStatus").textContent = state.activeHeatId
             ? `Heat ${heat()?.heatNumber || ""} live`
             : `${state.entry.allocation.length || 0} in start list · ${state.entry.waiting.length || 0} waiting`;
+          renderDashboard();
+          renderOfficials();
+          renderProfiles();
           renderEntry();
           renderBracket();
           renderHeats();
           renderTour();
           renderJudge();
           applyRoleUi();
+          translateDOM();
         }
 
         ["tourName", "tourDivision", "tourSeedEventNo", "tourManualDiscards"].forEach((id) => {
@@ -2962,26 +3313,38 @@
         $("#printTourPdf").onclick = () => window.print();
         $("#tourRiderSelect").onchange = () => { state.selectedTourRiderId = $("#tourRiderSelect").value; renderTour(); };
         $("#tourEventSelect").onchange = () => renderTour();
+        $$(".langBtn").forEach((b) => b.onclick = () => {
+          state.lang = b.dataset.lang === "fr" ? "fr" : "en";
+          roleAudit("role permission changed", "language", `Language set to ${state.lang}`, "updated");
+          save(state.lang === "fr" ? "Français" : "English");
+        });
+        $("#changeProfile").onclick = () => {
+          state.profile = null;
+          roleAudit("role switched", "profile screen", "User returned to demo profile selector", "pending");
+          save("Select profile / Sélectionner un profil");
+        };
         $("#roleSelector").onchange = () => {
-          state.role = $("#roleSelector").value;
-          roleAudit(
-            "role selected",
-            state.role,
-            "Manual MVP role selection; authentication later",
-            "active",
-          );
-          save(`Role changed to ${state.role}`);
+          roleAudit("restricted action attempted", "role selector", "Use Select profile; free role switching is disabled in demo access mode.", "blocked");
+          $("#roleSelector").value = state.role;
+          toast("Use Select profile; free role switching is disabled in demo access mode.");
         };
         $$(".tab").forEach(
           (b) =>
             (b.onclick = () => {
-              state.screen = b.dataset.screen;
+              const target = b.dataset.screen;
+              if (!canOpenScreen(target)) {
+                roleAudit("access denied", target, "Access restricted — this profile is not available for your role.", "blocked");
+                return toast("Access restricted — this profile is not available for your role.");
+              }
+              state.screen = target;
               save();
             }),
         );
         $$(".subtab").forEach(
           (b) =>
             (b.onclick = () => {
+              if (b.dataset.entryTab === "audit" && !can("auditView")) return deny("Only Race Director/Admin can view audit log.");
+              if (["registration", "seeding", "preview"].includes(b.dataset.entryTab) && state.role === "Judge") return deny("Judges can only access assigned heats.");
               state.entryTab = b.dataset.entryTab;
               save();
             }),
@@ -3344,6 +3707,52 @@
           state.penalties = state.penalties.filter((x) => x.id !== p.id);
           state.selectedPenaltyId = null;
           save("Penalty removed");
+        };
+        $("#resetDemoData").onclick = () => {
+          if (!can("resetDemo")) return deny("Only Admin can reset local demo data.");
+          const lang = state.lang;
+          state = fresh();
+          state.lang = lang;
+          state.profile = "admin";
+          state.role = "Admin";
+          roleAudit("role permission changed", "local demo data", "Admin reset local demo data", "reset");
+          save("Local demo data reset");
+        };
+        $("#allowHeadJudgeAssign").onchange = () => {
+          if (!(state.role === "Admin" || state.role === "Race Director")) return deny("Only Admin/Race Director can change Head Judge assignment permission.");
+          state.settingsAccess.headJudgeCanAssignPanels = $("#allowHeadJudgeAssign").value === "true";
+          roleAudit("role permission changed", "Head Judge panel assignment", `Permission set to ${state.settingsAccess.headJudgeCanAssignPanels}`, "updated");
+          save("Role permission changed");
+        };
+        $("#addOfficial").onclick = () => {
+          if (!can("officialsManage")) return deny(state.role === "Race Director" ? "Race Director may add officials for event operations." : "Only Admin can add officials.");
+          const name = $("#officialName").value.trim();
+          if (!name) return toast("Enter judge name");
+          const official = {
+            id: "off" + Date.now(),
+            name,
+            role: $("#officialRole").value,
+            division: $("#officialDivision").value.trim() || "Open",
+            heats: $("#officialHeats").value.trim(),
+            panel: $("#officialPanel").value.trim(),
+            active: $("#officialActive").value,
+            ownerProfile: null,
+          };
+          state.officials.push(official);
+          roleAudit("official added", name, `${official.role} · ${official.division} · ${official.heats || "no heat"}`, "active");
+          if (official.heats || official.panel) roleAudit("judge assigned", name, `${official.heats || "no heat"} · ${official.panel || "no panel"}`, "active");
+          ["officialName", "officialDivision", "officialHeats", "officialPanel"].forEach((id) => ($("#" + id).value = ""));
+          save("Official added");
+        };
+        $("#suggestOfficial").onclick = () => {
+          if (!can("panelSuggest") && !can("officialsAssign")) return deny("Only Head Judge/Race Director/Admin can suggest or assign panels.");
+          const name = $("#officialName").value.trim() || "Panel assignment";
+          if (state.role === "Head Judge" && !state.settingsAccess.headJudgeCanAssignPanels) {
+            roleAudit("judge assigned", name, "Head Judge suggestion recorded; approval required by Admin/Race Director", "pending");
+            return save("Assignment suggestion recorded");
+          }
+          roleAudit("judge assigned", name, "Panel assignment updated by authorized role", "active");
+          save("Judge assigned");
         };
         runAllocation();
         save();
