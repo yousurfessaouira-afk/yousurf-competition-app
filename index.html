@@ -1,152 +1,2821 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="dark">
-  <title>YouSurf Competition OS · Entry Allocation + Judge Mode</title>
-  <style>
-    :root{--bg:#030815;--panel:#0d1b2d;--panel2:#132843;--ink:#f8fbff;--muted:#a9bad1;--line:rgba(255,255,255,.16);--blue:#29b9ff;--green:#37e69b;--amber:#ffc24d;--red:#ff5263;--black:#06101d;--white:#f8fbff;--shadow:0 18px 60px rgba(0,0,0,.38);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);background:radial-gradient(circle at 10% -10%,rgba(41,185,255,.35),transparent 24rem),linear-gradient(145deg,#030815,#09172a 55%,#02050b)}button,input,select,textarea{font:inherit}button{min-height:46px;border:0;border-radius:14px;font-weight:950;cursor:pointer;touch-action:manipulation}input,select,textarea{width:100%;border:2px solid var(--line);border-radius:13px;padding:11px 12px;color:var(--ink);background:rgba(255,255,255,.08);outline-color:var(--blue)}textarea{min-height:88px;resize:vertical}label{display:block;margin:0 0 6px;color:var(--muted);font-size:.74rem;font-weight:950;letter-spacing:.1em;text-transform:uppercase}h1,h2,h3,p{margin-top:0}h1{margin-bottom:8px;font-size:clamp(2.1rem,7vw,4.8rem);line-height:.9;letter-spacing:-.075em}h2{margin-bottom:8px;font-size:clamp(1.25rem,4vw,2.1rem);line-height:1;letter-spacing:-.045em}h3{margin-bottom:8px}.app{width:min(100%,1380px);margin:0 auto;padding:14px}.hero,.panel,.toast{border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(14px)}.hero{display:grid;gap:12px;margin-bottom:12px;padding:18px;border-radius:28px;background:rgba(255,255,255,.08)}.panel{padding:14px;border-radius:22px;background:rgba(13,27,45,.94)}.panel.light{color:var(--black);background:var(--white)}.panel.light input,.panel.light select,.panel.light textarea{color:var(--black);background:#fff;border-color:rgba(6,16,29,.18)}.panel.light label{color:#52657c}.grid,.stack{display:grid;gap:10px}.two,.three,.four,.tabs{display:grid;gap:10px}.layout,.judge-main{display:grid;gap:12px}.small{color:var(--muted);font-size:.9rem;font-weight:720}.light .small{color:#53677f}.eyebrow{color:#8fe0ff;font-size:.75rem;font-weight:1000;letter-spacing:.14em;text-transform:uppercase}.pill{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:6px 10px;border-radius:999px;color:var(--black);background:var(--blue);font-size:.76rem;font-weight:1000;white-space:nowrap}.pill.green{background:var(--green)}.pill.amber{background:var(--amber)}.pill.red{color:white;background:var(--red)}.pill.gray{color:var(--ink);background:rgba(255,255,255,.13)}.light .pill.gray{color:var(--black);background:#e8eef7}.primary{color:var(--black);background:linear-gradient(135deg,#e9fbff,var(--blue))}.secondary{color:var(--black);background:#e8eef7}.ghost{color:var(--ink);background:rgba(255,255,255,.1);border:1px solid var(--line)}.danger{color:white;background:var(--red)}.button-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.card,.rider-card,.attempt-card,.rank-row,.call-row,.heat-card,.seed-row,.bracket-match,.result-row{display:grid;gap:8px;padding:12px;border:1px solid var(--line);border-radius:17px;background:rgba(255,255,255,.08)}.rider-card,.rank-row,.heat-card{grid-template-columns:auto 1fr auto;align-items:center;text-align:left;color:var(--ink)}.rider-card.active,.attempt-card.active,.heat-card.active{outline:4px solid var(--blue);background:rgba(41,185,255,.18)}.lycra{display:grid;place-items:center;width:48px;height:48px;border:3px solid rgba(255,255,255,.55);border-radius:14px;color:#07111f;font-weight:1000;text-shadow:0 1px rgba(255,255,255,.4)}.Red{background:#ff364c!important;color:white}.Blue{background:#1b78ff!important;color:white}.Yellow{background:#ffe14a!important}.White{background:#fff!important}.Green{background:#37e28d!important}.Black{background:#111!important;color:white}.Orange{background:#ff8c2a!important}.Purple{background:#9a55ff!important;color:white}.score-readout{display:grid;place-items:center;min-height:148px;border-radius:22px;background:#06101d;color:#fff}.score-readout strong{font-size:clamp(4rem,18vw,7rem);line-height:.8;letter-spacing:-.08em}.score-pad{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.score-pad button{color:var(--black);background:#e8eef7}.score-pad button.mark-m{color:#fff;background:#29384e}.attempt-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(142px,1fr));gap:8px}.attempt-card{color:var(--ink);text-align:left}.attempt-card.locked{border-color:rgba(55,230,155,.65)}.total{font-size:1.55rem;font-weight:1000}.notice{border-left:5px solid var(--amber);padding:10px 12px;border-radius:14px;background:rgba(255,194,77,.12)}.toast{position:fixed;right:14px;bottom:14px;z-index:20;max-width:min(420px,calc(100% - 28px));padding:12px 14px;border-radius:18px;background:#06101d;color:#fff;display:none}.toast.show{display:block}.hide{display:none!important}.tab.active{color:var(--black);background:var(--green)}.subtabs{display:flex;gap:8px;overflow:auto;padding-bottom:4px}.subtab{min-width:max-content}.subtab.active{color:var(--black);background:var(--amber)}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:18px}.data-table{width:100%;min-width:980px;border-collapse:collapse}.data-table th,.data-table td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.data-table th{position:sticky;top:0;background:#10223a;color:#8fe0ff;font-size:.76rem;text-transform:uppercase;letter-spacing:.08em}.data-table td input,.data-table td select{min-width:120px;padding:8px;border-radius:10px}.reason{white-space:pre-wrap;line-height:1.35}.bracket-scroll{overflow-x:auto;padding-bottom:6px}.bracket-board{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(260px,1fr);gap:10px;min-width:780px}.bracket-round{display:grid;gap:10px;align-content:start}.bracket-match{min-height:128px}.bracket-rider{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px;border-radius:12px;background:rgba(255,255,255,.08)}.bracket-rider.bye{outline:2px solid var(--green)}@media(min-width:760px){.two{grid-template-columns:repeat(2,1fr)}.three{grid-template-columns:repeat(3,1fr)}.four{grid-template-columns:repeat(4,1fr)}.tabs{grid-template-columns:repeat(4,1fr)}.hero{grid-template-columns:1fr 360px}.layout{grid-template-columns:360px 1fr}.judge-main{grid-template-columns:1fr 360px}.button-row{display:flex;flex-wrap:wrap}.button-row button{flex:1 1 180px}}@media(max-width:759px){.data-table{min-width:850px}.subtabs{margin-inline:-4px}.score-pad{grid-template-columns:repeat(3,1fr)}}
-  </style>
-</head>
-<body>
-<div class="app">
-  <header class="hero">
-    <div>
-      <div class="eyebrow">Competition OS · Offline MVP</div>
-      <h1>Entry Allocation + Judge Mode</h1>
-      <p class="small">GKA-inspired entry allocation, waiting list, seeding, byes, and bracket preparation. All data stays in this browser with localStorage; no backend, build step, npm, or external libraries.</p>
-      <div class="tabs">
-        <button class="tab active" data-screen="entry">Entry Allocation</button>
-        <button class="tab ghost" data-screen="bracket">Bracket / Heats</button>
-        <button class="tab ghost" data-screen="heats">Heat Management</button>
-        <button class="tab ghost" data-screen="judge">Judge Mode</button>
-      </div>
-    </div>
-    <div class="panel light">
-      <strong id="heatStatus">Competition ready</strong>
-      <p class="small" id="ruleSummary">Main event limit defaults to 24 per gender for Kite-Surf, Freestyle, Big Air, and Hydrofoil Big Air. Custom local limits are allowed and flagged as non-sanctioned / Race Notice settings.</p>
-    </div>
-  </header>
-
-  <main id="entryScreen" class="stack">
-    <section class="panel">
-      <div class="subtabs">
-        <button class="subtab active secondary" data-entry-tab="registration">Registration List</button>
-        <button class="subtab ghost" data-entry-tab="start">Main Event Start List</button>
-        <button class="subtab ghost" data-entry-tab="waiting">Waiting List</button>
-        <button class="subtab ghost" data-entry-tab="seeding">Seeding Table</button>
-        <button class="subtab ghost" data-entry-tab="preview">Bracket Preview</button>
-        <button class="subtab ghost" data-entry-tab="audit">Audit / Decisions Log</button>
-      </div>
-    </section>
-
-    <section class="panel">
-      <div class="eyebrow">GKA-inspired rule basis from GKA RULEBOOK 2025.pdf</div>
-      <p class="small">Used in this module: maximum 24 competitors per gender for Kite-Surf, Freestyle, Big Air and Hydrofoil Big Air; when entries exceed the maximum, selection is based on previous participation/ranking and/or kite merits, with video footage possible; local organizer wildcards require approval and published allocation; waiting lists are formed from pre-registered riders unable to gain immediate entry and ordered by seeding list, video applications, or wildcard category; a pull-out from a seeding-list place is replaced by the next rider by seeding list, a video application place by the next ranked video, and a wildcard place by GKA/local organizer decision; seeding for the first World Cup uses previous-year annual ranking results. Unclear or event-specific items are marked “Head Judge / Race Director decision required”.</p>
-    </section>
-
-    <section id="entry-registration" class="entry-pane stack">
-      <section class="panel light">
-        <div class="eyebrow">Event entry limits</div>
-        <div class="four">
-          <div><label>Gender</label><select id="filterGender"><option>Women</option><option>Men</option></select></div>
-          <div><label>Discipline</label><select id="filterDiscipline"><option>Kite-Surf</option><option>Freestyle</option><option>Big Air</option><option>Hydrofoil Big Air</option><option>Local / Other</option></select></div>
-          <div><label>Main event limit</label><input id="entryLimit" type="number" min="1" max="64" value="24"></div>
-          <div><label>Bracket spots</label><select id="prepBracketSize"><option selected>24</option><option>12</option><option>6</option><option>Custom</option></select></div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>YouSurf Competition OS · Entry Allocation + Judge Mode</title>
+    <style>
+      :root {
+        --bg: #030815;
+        --panel: #0d1b2d;
+        --panel2: #132843;
+        --ink: #f8fbff;
+        --muted: #a9bad1;
+        --line: rgba(255, 255, 255, 0.16);
+        --blue: #29b9ff;
+        --green: #37e69b;
+        --amber: #ffc24d;
+        --red: #ff5263;
+        --black: #06101d;
+        --white: #f8fbff;
+        --shadow: 0 18px 60px rgba(0, 0, 0, 0.38);
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          Arial,
+          sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background:
+          radial-gradient(
+            circle at 10% -10%,
+            rgba(41, 185, 255, 0.35),
+            transparent 24rem
+          ),
+          linear-gradient(145deg, #030815, #09172a 55%, #02050b);
+      }
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+      button {
+        min-height: 46px;
+        border: 0;
+        border-radius: 14px;
+        font-weight: 950;
+        cursor: pointer;
+        touch-action: manipulation;
+      }
+      input,
+      select,
+      textarea {
+        width: 100%;
+        border: 2px solid var(--line);
+        border-radius: 13px;
+        padding: 11px 12px;
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.08);
+        outline-color: var(--blue);
+      }
+      textarea {
+        min-height: 88px;
+        resize: vertical;
+      }
+      label {
+        display: block;
+        margin: 0 0 6px;
+        color: var(--muted);
+        font-size: 0.74rem;
+        font-weight: 950;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+      h1 {
+        margin-bottom: 8px;
+        font-size: clamp(2.1rem, 7vw, 4.8rem);
+        line-height: 0.9;
+        letter-spacing: -0.075em;
+      }
+      h2 {
+        margin-bottom: 8px;
+        font-size: clamp(1.25rem, 4vw, 2.1rem);
+        line-height: 1;
+        letter-spacing: -0.045em;
+      }
+      h3 {
+        margin-bottom: 8px;
+      }
+      .app {
+        width: min(100%, 1380px);
+        margin: 0 auto;
+        padding: 14px;
+      }
+      .hero,
+      .panel,
+      .toast {
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+      .hero {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding: 18px;
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .panel {
+        padding: 14px;
+        border-radius: 22px;
+        background: rgba(13, 27, 45, 0.94);
+      }
+      .panel.light {
+        color: var(--black);
+        background: var(--white);
+      }
+      .panel.light input,
+      .panel.light select,
+      .panel.light textarea {
+        color: var(--black);
+        background: #fff;
+        border-color: rgba(6, 16, 29, 0.18);
+      }
+      .panel.light label {
+        color: #52657c;
+      }
+      .grid,
+      .stack {
+        display: grid;
+        gap: 10px;
+      }
+      .two,
+      .three,
+      .four,
+      .tabs {
+        display: grid;
+        gap: 10px;
+      }
+      .layout,
+      .judge-main {
+        display: grid;
+        gap: 12px;
+      }
+      .small {
+        color: var(--muted);
+        font-size: 0.9rem;
+        font-weight: 720;
+      }
+      .light .small {
+        color: #53677f;
+      }
+      .eyebrow {
+        color: #8fe0ff;
+        font-size: 0.75rem;
+        font-weight: 1000;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 30px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        color: var(--black);
+        background: var(--blue);
+        font-size: 0.76rem;
+        font-weight: 1000;
+        white-space: nowrap;
+      }
+      .pill.green {
+        background: var(--green);
+      }
+      .pill.amber {
+        background: var(--amber);
+      }
+      .pill.red {
+        color: white;
+        background: var(--red);
+      }
+      .pill.gray {
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.13);
+      }
+      .light .pill.gray {
+        color: var(--black);
+        background: #e8eef7;
+      }
+      .primary {
+        color: var(--black);
+        background: linear-gradient(135deg, #e9fbff, var(--blue));
+      }
+      .secondary {
+        color: var(--black);
+        background: #e8eef7;
+      }
+      .ghost {
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--line);
+      }
+      .danger {
+        color: white;
+        background: var(--red);
+      }
+      .button-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .card,
+      .rider-card,
+      .attempt-card,
+      .rank-row,
+      .call-row,
+      .heat-card,
+      .seed-row,
+      .bracket-match,
+      .result-row {
+        display: grid;
+        gap: 8px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 17px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .rider-card,
+      .rank-row,
+      .heat-card {
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        text-align: left;
+        color: var(--ink);
+      }
+      .rider-card.active,
+      .attempt-card.active,
+      .heat-card.active {
+        outline: 4px solid var(--blue);
+        background: rgba(41, 185, 255, 0.18);
+      }
+      .lycra {
+        display: grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        border: 3px solid rgba(255, 255, 255, 0.55);
+        border-radius: 14px;
+        color: #07111f;
+        font-weight: 1000;
+        text-shadow: 0 1px rgba(255, 255, 255, 0.4);
+      }
+      .Red {
+        background: #ff364c !important;
+        color: white;
+      }
+      .Blue {
+        background: #1b78ff !important;
+        color: white;
+      }
+      .Yellow {
+        background: #ffe14a !important;
+      }
+      .White {
+        background: #fff !important;
+      }
+      .Green {
+        background: #37e28d !important;
+      }
+      .Black {
+        background: #111 !important;
+        color: white;
+      }
+      .Orange {
+        background: #ff8c2a !important;
+      }
+      .Purple {
+        background: #9a55ff !important;
+        color: white;
+      }
+      .score-readout {
+        display: grid;
+        place-items: center;
+        min-height: 148px;
+        border-radius: 22px;
+        background: #06101d;
+        color: #fff;
+      }
+      .score-readout strong {
+        font-size: clamp(4rem, 18vw, 7rem);
+        line-height: 0.8;
+        letter-spacing: -0.08em;
+      }
+      .score-pad {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+      }
+      .score-pad button {
+        color: var(--black);
+        background: #e8eef7;
+      }
+      .score-pad button.mark-m {
+        color: #fff;
+        background: #29384e;
+      }
+      .attempt-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(142px, 1fr));
+        gap: 8px;
+      }
+      .attempt-card {
+        color: var(--ink);
+        text-align: left;
+      }
+      .attempt-card.locked {
+        border-color: rgba(55, 230, 155, 0.65);
+      }
+      .total {
+        font-size: 1.55rem;
+        font-weight: 1000;
+      }
+      .notice {
+        border-left: 5px solid var(--amber);
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(255, 194, 77, 0.12);
+      }
+      .toast {
+        position: fixed;
+        right: 14px;
+        bottom: 14px;
+        z-index: 20;
+        max-width: min(420px, calc(100% - 28px));
+        padding: 12px 14px;
+        border-radius: 18px;
+        background: #06101d;
+        color: #fff;
+        display: none;
+      }
+      .toast.show {
+        display: block;
+      }
+      .hide {
+        display: none !important;
+      }
+      .tab.active {
+        color: var(--black);
+        background: var(--green);
+      }
+      .subtabs {
+        display: flex;
+        gap: 8px;
+        overflow: auto;
+        padding-bottom: 4px;
+      }
+      .subtab {
+        min-width: max-content;
+      }
+      .subtab.active {
+        color: var(--black);
+        background: var(--amber);
+      }
+      .table-wrap {
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+      }
+      .data-table {
+        width: 100%;
+        min-width: 980px;
+        border-collapse: collapse;
+      }
+      .data-table th,
+      .data-table td {
+        padding: 10px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+      .data-table th {
+        position: sticky;
+        top: 0;
+        background: #10223a;
+        color: #8fe0ff;
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .data-table td input,
+      .data-table td select {
+        min-width: 120px;
+        padding: 8px;
+        border-radius: 10px;
+      }
+      .reason {
+        white-space: pre-wrap;
+        line-height: 1.35;
+      }
+      .bracket-scroll {
+        overflow-x: auto;
+        padding-bottom: 6px;
+      }
+      .bracket-board {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(260px, 1fr);
+        gap: 10px;
+        min-width: 780px;
+      }
+      .bracket-round {
+        display: grid;
+        gap: 10px;
+        align-content: start;
+      }
+      .bracket-match {
+        min-height: 128px;
+      }
+      .bracket-rider {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .bracket-rider.bye {
+        outline: 2px solid var(--green);
+      }
+      .role-strip {
+        display: grid;
+        gap: 10px;
+      }
+      .rule-notes {
+        display: grid;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .rule-notes li {
+        padding: 8px 10px;
+        border-radius: 12px;
+        background: rgba(41, 185, 255, 0.12);
+      }
+      .locked-action,
+      button:disabled {
+        opacity: 0.52;
+        cursor: not-allowed;
+      }
+      .penalty-row {
+        border-left: 5px solid var(--amber);
+      }
+      .penalty-row.validated,
+      .penalty-row.applied {
+        border-left-color: var(--green);
+      }
+      .penalty-row.rejected {
+        border-left-color: var(--red);
+      }
+      @media (min-width: 760px) {
+        .two {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .three {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .four {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .tabs {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .hero {
+          grid-template-columns: 1fr 360px;
+        }
+        .layout {
+          grid-template-columns: 360px 1fr;
+        }
+        .judge-main {
+          grid-template-columns: 1fr 360px;
+        }
+        .button-row {
+          display: flex;
+          flex-wrap: wrap;
+        }
+        .button-row button {
+          flex: 1 1 180px;
+        }
+      }
+      @media (max-width: 759px) {
+        .data-table {
+          min-width: 850px;
+        }
+        .subtabs {
+          margin-inline: -4px;
+        }
+        .score-pad {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="hero">
+        <div>
+          <div class="eyebrow">Competition OS · Offline MVP</div>
+          <h1>Entry Allocation + Judge Mode</h1>
+          <p class="small">
+            GKA-inspired entry allocation, waiting list, seeding, byes, bracket
+            preparation, official role separation, and penalty validation. All
+            data stays in this browser with localStorage; no backend, build
+            step, npm, or external libraries.
+          </p>
+          <div class="role-strip panel light">
+            <div>
+              <label>Official role</label>
+              <select id="roleSelector">
+                <option>Race Director</option>
+                <option>Head Judge</option>
+                <option>Judge</option>
+              </select>
+            </div>
+            <p class="small" id="roleSummary"></p>
+          </div>
+          <div class="tabs">
+            <button class="tab active" data-screen="entry">
+              Entry Allocation
+            </button>
+            <button class="tab ghost" data-screen="bracket">
+              Bracket / Heats
+            </button>
+            <button class="tab ghost" data-screen="heats">
+              Heat Management
+            </button>
+            <button class="tab ghost" data-screen="judge">Judge Mode</button>
+          </div>
         </div>
-        <div class="two"><div><label>Custom bracket spots</label><input id="customBracketSize" type="number" min="2" max="64" value="24"></div><div><label>Video score minimum</label><input id="videoMinimum" type="number" min="0" max="100" value="70"></div></div>
-        <p id="limitWarning" class="notice small"></p>
-        <div class="button-row"><button id="runAllocation" class="primary">Run allocation + seeding</button><button id="loadEntrySample" class="secondary">Load 40-rider sample with replacement</button><button id="clearEntryData" class="ghost">Clear entry module</button></div>
-      </section>
+        <div class="panel light">
+          <strong id="heatStatus">Competition ready</strong>
+          <p class="small" id="ruleSummary">
+            Main event limit defaults to 24 per gender for Kite-Surf, Freestyle,
+            Big Air, and Hydrofoil Big Air. Custom local limits are allowed and
+            flagged as non-sanctioned / Race Notice settings.
+          </p>
+          <ul class="rule-notes small">
+            <li>
+              Race Director controls competition conditions and heat status.
+            </li>
+            <li>
+              Head Judge controls judging decisions, corrections, penalties, and
+              final result validation.
+            </li>
+            <li>Judges score only and cannot edit confirmed scores.</li>
+            <li>
+              Interference requires majority judge call before Head Judge
+              penalty decision.
+            </li>
+          </ul>
+        </div>
+      </header>
 
-      <section class="panel">
-        <div class="eyebrow">Import or paste ranking table</div>
-        <p class="small">CSV columns: lastYearRank,riderName,nationality,gender,division,discipline,points,status,source,videoScore,manualSeed,manualOverrideReason,notes. Unknown ranks can be blank.</p>
-        <textarea id="pasteBox" placeholder="1,Amina Hart,ESP,Women,Open,Kite-Surf,1000,registered,ranking,,,..."></textarea>
-        <div class="button-row"><button id="importPaste" class="secondary">Import pasted rows</button><button id="addBlankRider" class="ghost">Add manual rider</button></div>
-      </section>
+      <main id="entryScreen" class="stack">
+        <section class="panel">
+          <div class="subtabs">
+            <button
+              class="subtab active secondary"
+              data-entry-tab="registration"
+            >
+              Registration List
+            </button>
+            <button class="subtab ghost" data-entry-tab="start">
+              Main Event Start List
+            </button>
+            <button class="subtab ghost" data-entry-tab="waiting">
+              Waiting List
+            </button>
+            <button class="subtab ghost" data-entry-tab="seeding">
+              Seeding Table
+            </button>
+            <button class="subtab ghost" data-entry-tab="preview">
+              Bracket Preview
+            </button>
+            <button class="subtab ghost" data-entry-tab="audit">
+              Audit / Decisions Log
+            </button>
+          </div>
+        </section>
 
-      <section class="panel">
-        <div class="eyebrow">Registration List</div>
-        <div class="table-wrap"><table class="data-table"><thead><tr><th>Rank</th><th>Rider</th><th>Nat</th><th>Gender</th><th>Division</th><th>Discipline</th><th>Points</th><th>Status</th><th>Source</th><th>Video</th><th>Manual seed</th><th>Override / notes</th><th></th></tr></thead><tbody id="registrationRows"></tbody></table></div>
-      </section>
-    </section>
+        <section class="panel">
+          <div class="eyebrow">
+            GKA-inspired rule basis from GKA RULEBOOK 2025.pdf
+          </div>
+          <p class="small">
+            Used in this module: maximum 24 competitors per gender for
+            Kite-Surf, Freestyle, Big Air and Hydrofoil Big Air; when entries
+            exceed the maximum, selection is based on previous
+            participation/ranking and/or kite merits, with video footage
+            possible; local organizer wildcards require approval and published
+            allocation; waiting lists are formed from pre-registered riders
+            unable to gain immediate entry and ordered by seeding list, video
+            applications, or wildcard category; a pull-out from a seeding-list
+            place is replaced by the next rider by seeding list, a video
+            application place by the next ranked video, and a wildcard place by
+            GKA/local organizer decision; seeding for the first World Cup uses
+            previous-year annual ranking results. Unclear or event-specific
+            items are marked “Head Judge / Race Director decision required”.
+          </p>
+        </section>
 
-    <section id="entry-start" class="entry-pane stack hide"><section class="panel"><div class="eyebrow">Main Event Start List</div><div id="startList" class="grid"></div></section></section>
-    <section id="entry-waiting" class="entry-pane stack hide"><section class="panel"><div class="eyebrow">Waiting List Management</div><div id="replacementBox" class="notice small"></div><div id="waitingList" class="grid"></div></section></section>
-    <section id="entry-seeding" class="entry-pane stack hide"><section class="panel light"><div class="eyebrow">Seeding Table</div><p class="small">Highest ranked confirmed rider receives seed 1. Unknown/new riders follow ranked riders unless manually seeded or wildcard-selected. Manual Race Director changes require a reason.</p><div id="seedingTable" class="grid"></div></section></section>
-    <section id="entry-preview" class="entry-pane stack hide"><section class="panel"><div class="eyebrow">Bracket Preview</div><p class="small">GKA-ready preparation prioritizes 24 / 12 / 6 brackets and does not force a 16-rider default. Empty bracket spots become byes allocated due to seed position.</p><div id="entryBracketPreview" class="bracket-scroll"></div></section></section>
-    <section id="entry-audit" class="entry-pane stack hide"><section class="panel"><div class="eyebrow">Audit / Decisions Log</div><div id="auditLog" class="grid"></div></section></section>
-  </main>
+        <section id="entry-registration" class="entry-pane stack">
+          <section class="panel light">
+            <div class="eyebrow">Event entry limits</div>
+            <div class="four">
+              <div>
+                <label>Gender</label
+                ><select id="filterGender">
+                  <option>Women</option>
+                  <option>Men</option>
+                </select>
+              </div>
+              <div>
+                <label>Discipline</label
+                ><select id="filterDiscipline">
+                  <option>Kite-Surf</option>
+                  <option>Freestyle</option>
+                  <option>Big Air</option>
+                  <option>Hydrofoil Big Air</option>
+                  <option>Local / Other</option>
+                </select>
+              </div>
+              <div>
+                <label>Main event limit</label
+                ><input
+                  id="entryLimit"
+                  type="number"
+                  min="1"
+                  max="64"
+                  value="24"
+                />
+              </div>
+              <div>
+                <label>Bracket spots</label
+                ><select id="prepBracketSize">
+                  <option selected>24</option>
+                  <option>12</option>
+                  <option>6</option>
+                  <option>Custom</option>
+                </select>
+              </div>
+            </div>
+            <div class="two">
+              <div>
+                <label>Custom bracket spots</label
+                ><input
+                  id="customBracketSize"
+                  type="number"
+                  min="2"
+                  max="64"
+                  value="24"
+                />
+              </div>
+              <div>
+                <label>Video score minimum</label
+                ><input
+                  id="videoMinimum"
+                  type="number"
+                  min="0"
+                  max="100"
+                  value="70"
+                />
+              </div>
+            </div>
+            <p id="limitWarning" class="notice small"></p>
+            <div class="button-row">
+              <button id="runAllocation" class="primary">
+                Run allocation + seeding</button
+              ><button id="loadEntrySample" class="secondary">
+                Load 40-rider sample with replacement</button
+              ><button id="clearEntryData" class="ghost">
+                Clear entry module
+              </button>
+            </div>
+          </section>
 
-  <main id="bracketScreen" class="stack hide">
-    <section class="panel"><div class="eyebrow">Bracket setup</div><div class="four"><div><label>Event name</label><input id="eventName" placeholder="Tarfaya Wave Classic"></div><div><label>Bracket size</label><select id="bracketSize"><option>6</option><option>8</option><option>12</option><option selected>24</option></select></div><div><label>Format</label><select id="bracketFormat"><option value="single">Single elimination / prepared heats</option></select></div><div><label>Status</label><select id="bracketOfficial"><option value="provisional">Provisional</option><option value="official">Official</option></select></div></div><div class="button-row"><button id="useEntrySeeds" class="secondary">Use seeding table</button><button id="resizeSeeds" class="secondary">Apply bracket size</button><button id="generateBracket" class="primary">Generate heats with byes</button></div></section>
-    <section class="panel light"><div class="eyebrow">Manual seeding</div><div id="seedList" class="grid"></div></section>
-    <section class="panel"><div class="eyebrow">Bracket view</div><div class="bracket-scroll"><div id="bracketBoard" class="bracket-board"></div></div></section>
-  </main>
+          <section class="panel">
+            <div class="eyebrow">Import or paste ranking table</div>
+            <p class="small">
+              CSV columns:
+              lastYearRank,riderName,nationality,gender,division,discipline,points,status,source,videoScore,manualSeed,manualOverrideReason,notes.
+              Unknown ranks can be blank.
+            </p>
+            <textarea
+              id="pasteBox"
+              placeholder="1,Amina Hart,ESP,Women,Open,Kite-Surf,1000,registered,ranking,,,..."
+            ></textarea>
+            <div class="button-row">
+              <button id="importPaste" class="secondary">
+                Import pasted rows</button
+              ><button id="addBlankRider" class="ghost">
+                Add manual rider
+              </button>
+            </div>
+          </section>
 
-  <main id="heatsScreen" class="stack hide"><section class="panel"><div class="eyebrow">Heat Management</div><p class="small">Every bracket heat is listed here as a normal heat. Set a heat live to make it the active Judge Mode heat.</p><div id="heatList" class="grid"></div></section></main>
+          <section class="panel">
+            <div class="eyebrow">Registration List</div>
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Rider</th>
+                    <th>Nat</th>
+                    <th>Gender</th>
+                    <th>Division</th>
+                    <th>Discipline</th>
+                    <th>Points</th>
+                    <th>Status</th>
+                    <th>Source</th>
+                    <th>Video</th>
+                    <th>Manual seed</th>
+                    <th>Override / notes</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="registrationRows"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
 
-  <main id="judgeScreen" class="layout hide">
-    <aside class="stack"><section class="panel"><div class="eyebrow">Heat configuration</div><div class="two"><div><label>Format</label><select id="format"><option value="wave">Wave</option><option value="trick">Trick / Strapless Freestyle</option><option value="mixed">Mixed Wave + Trick</option></select></div><div><label>Discipline note</label><select id="discipline"><option>Kite-Surf</option><option>Freestyle</option><option>Hydrofoil Big Air</option><option>Big Air</option><option>Other / Head Judge decision required</option></select></div></div><div class="three"><div><label>Judges on panel</label><input id="judgeCount" type="number" min="3" step="2" value="5"></div><div><label>Counting waves</label><input id="countWaves" type="number" min="0" max="8" value="2"></div><div><label>Counting tricks</label><input id="countTricks" type="number" min="0" max="8" value="3"></div></div></section><section class="panel"><div class="eyebrow">Riders</div><div id="riderList" class="grid"></div><div class="three"><input id="newRiderName" placeholder="Rider name"><select id="newRiderLycra"><option>Red</option><option>Blue</option><option>Yellow</option><option>White</option><option>Green</option><option>Black</option><option>Orange</option><option>Purple</option></select><button id="addRider" class="secondary">Add rider</button></div></section></aside>
-    <section class="judge-main"><div class="stack"><section class="panel light"><div class="eyebrow">Selected rider</div><h2 id="selectedName">Select a rider</h2><p class="small" id="selectedMeta">Confirmed score cards are locked. Corrections require a Head Judge reason.</p><div class="attempt-list" id="attemptList"></div><div class="button-row"><button id="addWave" class="secondary">Add wave attempt</button><button id="addTrick" class="secondary">Add trick attempt</button></div></section><section class="panel"><div class="eyebrow">Live ranking and tie-break guidance</div><div id="leaderboard" class="grid"></div></section><section class="panel"><div class="eyebrow">Interference call workflow</div><p class="small">Judges record calls. If the applicable rule is unclear: Head Judge / Race Director decision required.</p><div id="interferenceList" class="grid"></div></section></div><aside class="score-tools stack"><section class="panel light"><div class="eyebrow">Score entry</div><h2 id="attemptTitle">No attempt</h2><div><label>Judge mark slot</label><select id="judgeSlot"></select></div><div class="score-readout"><strong id="scoreReadout">—</strong></div><div class="score-pad" id="scorePad"></div><div class="button-row"><button id="scoreDown" class="secondary">− 0.1</button><button id="scoreUp" class="secondary">+ 0.1</button></div><button id="confirmScore" class="primary">Confirm score and lock</button><button id="requestCorrection" class="ghost">Head Judge correction</button><div id="correctionBox" class="grid hide"><textarea id="correctionReason" placeholder="Head Judge correction reason (required)"></textarea><button id="unlockScore" class="danger">Unlock with Head Judge reason</button></div><p class="small" id="lockStatus">Select or create an attempt to score.</p></section></aside></section>
-  </main>
-</div>
-<div class="toast" id="toast"></div>
-<script>
-(() => {
-  const KEY='yousurf_entry_allocation_v2';
-  const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-  const lycras=['Red','Blue','Yellow','White','Green','Black','Orange','Purple'];
-  const statuses=['registered','confirmed','absent','injured','wildcard','waiting list'];
-  const sources=['ranking','wildcard','video application','organizer selection'];
-  const fresh=()=>({screen:'entry',entryTab:'registration',settings:{format:'mixed',discipline:'Kite-Surf',judgeCount:5,countWaves:2,countTricks:3},entry:{gender:'Women',discipline:'Kite-Surf',limit:24,bracketSize:24,customBracketSize:24,videoMinimum:70,registrations:sampleRegistrations(),allocation:[],waiting:[],seeds:[],replacements:[],audit:[]},riders:[],selectedRiderId:null,selectedAttemptId:null,selectedJudgeIndex:0,attempts:[],interference:{},activeHeatId:null,bracket:{eventName:'GKA-ready local event',size:24,type:'single',official:'provisional',seeds:[],rounds:[]}});
-  let state=load();
-  function load(){try{const saved=JSON.parse(localStorage.getItem(KEY));return saved&&saved.entry?migrate(saved):fresh()}catch{return fresh()}}
-  function migrate(s){const f=fresh();s.screen??='entry';s.entryTab??='registration';s.settings={...f.settings,...(s.settings||{})};s.entry={...f.entry,...(s.entry||{})};s.entry.audit??=[];s.entry.replacements??=[];s.riders??=[];s.attempts??=[];s.interference??={};s.bracket={...f.bracket,...(s.bracket||{})};s.bracket.rounds??=[];s.bracket.seeds??=[];return s}
-  function save(msg){localStorage.setItem(KEY,JSON.stringify(state));render();if(msg)toast(msg)}
-  function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),2300)}
-  const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  const slug=v=>String(v||'rider').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-  const ranked=r=>Number.isFinite(+r.rank)&&+r.rank>0;
-  const activeRegs=()=>state.entry.registrations.filter(r=>r.gender===state.entry.gender&&r.discipline===state.entry.discipline&&r.status!=='absent'&&r.status!=='injured');
-  function audit(action,detail){state.entry.audit.unshift({time:new Date().toISOString(),action,detail})}
-  function sampleRegistrations(){const names=['Amina Hart','Bianca Sol','Carla Mendes','Dina Koenig','Elisa Noor','Farah Haddad','Gaia Costa','Hana Park','Ines Ribeiro','Jade Martin','Kira Lopes','Laila Benali','Maya Cruz','Nora Finch','Olivia Reyes','Pia Dubois','Quinn Adler','Rosa Vale','Sara Novak','Talia Silva','Uma Weiss','Vera Klein','Willa Stone','Xenia Marin','Yara Moon','Zoe Rivers','Alba Torres','Bruna Lima','Cleo James','Dalia Frost','Eva Nadir','Faye Kim','Gina Rossi','Hope Diaz','Iris Chen','Juno Fox','Kenza Amrani','Lina Blue','Mona West','Nia Brooks'];return names.map((name,i)=>({id:'reg'+(i+1),rank:i<30?i+1:'',name,nationality:['ESP','BRA','POR','GER','MAR','FRA','ITA','KOR'][i%8],gender:'Women',division:'Open',discipline:'Kite-Surf',points:i<30?1000-i*20:0,status:i<24?'confirmed':i===24?'absent':i===25||i===36?'wildcard':i>30?'waiting list':'registered',source:i===25||i===36?'wildcard':i>29?'video application':'ranking',videoScore:i>29?95-(i-30)*3:'',manualSeed:i===25?18:'',manualOverrideReason:i===25?'Organizer wildcard approved; manual seed requires Race Director confirmation.':i===24?'Absent scenario: automatic replacement should be proposed from waiting list.':'',notes:i>29?'New rider / no previous ranking.':''}))}
-  function priority(r){let base=ranked(r)?+r.rank:9999;if(r.source==='video application')base+=10000-(+r.videoScore||0);if(r.source==='wildcard'||r.status==='wildcard')base+=5000;if(r.manualOverrideReason)base-=.5;return base}
-  function selectionReason(r){if(r.manualOverrideReason)return `Manual Race Director override: ${r.manualOverrideReason}`;if(r.status==='wildcard'||r.source==='wildcard')return 'Wildcard source: GKA/local organizer wildcard decision path; approval/publication must be verified.';if(r.source==='video application')return `Video application candidate scored ${r.videoScore||'not scored'}; videos ordered high-to-low when used.`;if(ranked(r))return `Selected by previous-year ranking priority (rank ${r.rank}).`;return 'No ranking: kite merits / Race Director draw or decision required.'}
-  function waitingReason(r){if(r.source==='video application')return `Waiting list by video application score ${r.videoScore||0}.`;if(r.status==='wildcard'||r.source==='wildcard')return 'Waiting list wildcard category: next wildcard offer is organizer / GKA decision.';if(ranked(r))return `Waiting list by seeding-list priority from previous-year rank ${r.rank}.`;return 'Unranked waiting-list rider: Head Judge / Race Director decision required.'}
-  function runAllocation(){const regs=activeRegs().sort((a,b)=>priority(a)-priority(b)||String(a.name).localeCompare(b.name));const limit=+state.entry.limit||24;let start=regs.slice(0,limit), wait=regs.slice(limit);start=start.map((r,i)=>({...r,entryPosition:i+1,allocated:true,selectionReason:selectionReason(r)}));wait=wait.map((r,i)=>({...r,waitingPosition:i+1,allocated:false,waitingReason:waitingReason(r)}));state.entry.allocation=start;state.entry.waiting=wait;state.entry.seeds=seedList(start);state.bracket.size=bracketSize();state.bracket.seeds=state.entry.seeds.map(s=>({seed:s.seed,name:s.name,lycra:lycras[(s.seed-1)%lycras.length],nationality:s.nationality,reason:s.seedReason}));const absent=state.entry.registrations.find(r=>r.status==='absent'&&r.gender===state.entry.gender&&r.discipline===state.entry.discipline);state.entry.replacements=[];if(absent&&wait[0]){state.entry.replacements.push({absent:absent.name,next:wait[0].name,reason:'Replacement based on waiting list priority',audit:`${wait[0].name} proposed for ${absent.name}: ${waitingReason(wait[0])}`});audit('automatic replacement proposed',`${wait[0].name} proposed for absent rider ${absent.name}. Replacement based on waiting list priority.`)}audit('allocation run',`${start.length} main event riders and ${wait.length} waiting-list riders for ${state.entry.gender} ${state.entry.discipline}.`)}
-  function seedList(list){return list.slice().sort((a,b)=>{const am=+a.manualSeed||9999,bm=+b.manualSeed||9999;if(am!==bm)return am-bm;return (ranked(a)?+a.rank:9999)-(ranked(b)?+b.rank:9999)||priority(a)-priority(b)}).map((r,i)=>({...r,seed:i+1,seedReason:r.manualSeed?`Manual seed ${r.manualSeed}: ${r.manualOverrideReason||'Race Director reason required.'}`:ranked(r)?`Seeded by previous-year ranking; highest ranked rider is seed 1.`:r.source==='wildcard'?`Wildcard/new rider seeded after ranked riders unless manually placed.`:'Missing ranking: Race Director draw/manual placement required.'}))}
-  function bracketSize(){return $('#prepBracketSize')?.value==='Custom'?(+state.entry.customBracketSize||24):(+state.entry.bracketSize||24)}
-  function byes(){const size=bracketSize(), seeds=state.entry.seeds, empty=Math.max(0,size-seeds.length);return seeds.slice(0,empty).map(s=>s.seed)}
-  function buildPreview(){const size=bracketSize(), seeds=state.entry.seeds, byeSeeds=byes(), spots=Array.from({length:size},(_,i)=>seeds[i]||{seed:i+1,name:'Empty bracket spot',nationality:'',seedReason:'Empty spot'});let matches=[];for(let i=0;i<spots.length;i+=2)matches.push([spots[i],spots[i+1]]);return `<div class="bracket-board"><div class="bracket-round"><h3>Prepared bracket (${size})</h3>${matches.map((m,i)=>`<div class="bracket-match"><span class="pill gray">Heat ${i+1}</span>${m.map(r=>`<div class="bracket-rider ${byeSeeds.includes(r.seed)?'bye':''}"><span><strong>${esc(r.name)}</strong><br><span class="small">Seed ${r.seed} ${byeSeeds.includes(r.seed)?'· BYE: Bye allocated due to seed position':''}</span></span><button class="ghost" data-why="${esc(r.id||r.name)}">Why?</button></div>`).join('')}</div>`).join('')}</div></div>`}
-  function updateEntrySettings(){state.entry.gender=$('#filterGender').value;state.entry.discipline=$('#filterDiscipline').value;state.entry.limit=+$('#entryLimit').value||24;state.entry.bracketSize=$('#prepBracketSize').value==='Custom'?'Custom':+$('#prepBracketSize').value;state.entry.customBracketSize=+$('#customBracketSize').value||24;state.entry.videoMinimum=+$('#videoMinimum').value||0}
-  function renderRegistration(){const rows=state.entry.registrations.map((r,i)=>`<tr><td><input data-reg="${i}" data-field="rank" value="${esc(r.rank)}"></td><td><input data-reg="${i}" data-field="name" value="${esc(r.name)}"></td><td><input data-reg="${i}" data-field="nationality" value="${esc(r.nationality)}"></td><td><select data-reg="${i}" data-field="gender"><option ${r.gender==='Women'?'selected':''}>Women</option><option ${r.gender==='Men'?'selected':''}>Men</option></select></td><td><input data-reg="${i}" data-field="division" value="${esc(r.division)}"></td><td><select data-reg="${i}" data-field="discipline">${['Kite-Surf','Freestyle','Big Air','Hydrofoil Big Air','Local / Other'].map(x=>`<option ${r.discipline===x?'selected':''}>${x}</option>`).join('')}</select></td><td><input data-reg="${i}" data-field="points" type="number" value="${esc(r.points)}"></td><td><select data-reg="${i}" data-field="status">${statuses.map(x=>`<option ${r.status===x?'selected':''}>${x}</option>`).join('')}</select></td><td><select data-reg="${i}" data-field="source">${sources.map(x=>`<option ${r.source===x?'selected':''}>${x}</option>`).join('')}</select></td><td><input data-reg="${i}" data-field="videoScore" type="number" value="${esc(r.videoScore)}"></td><td><input data-reg="${i}" data-field="manualSeed" type="number" value="${esc(r.manualSeed)}"></td><td><textarea data-reg="${i}" data-field="manualOverrideReason">${esc(r.manualOverrideReason||r.notes)}</textarea></td><td><button class="danger" data-del-reg="${i}">Delete</button></td></tr>`).join('');$('#registrationRows').innerHTML=rows;$$('[data-reg]').forEach(el=>el.onchange=()=>{const r=state.entry.registrations[+el.dataset.reg];r[el.dataset.field]=el.value;if(el.dataset.field==='manualOverrideReason')audit('manual reason updated',`${r.name}: ${el.value||'blank reason'}`);save()});$$('[data-del-reg]').forEach(b=>b.onclick=()=>{state.entry.registrations.splice(+b.dataset.delReg,1);save('Registration deleted')})}
-  function renderEntry(){['filterGender','filterDiscipline','entryLimit','prepBracketSize','customBracketSize','videoMinimum'].forEach(id=>{$('#'+id).value=state.entry[id.replace('filterG','g').replace('filterD','d')]||state.entry[id]||$('#'+id).value});$('#filterGender').value=state.entry.gender;$('#filterDiscipline').value=state.entry.discipline;$('#entryLimit').value=state.entry.limit;$('#prepBracketSize').value=state.entry.bracketSize==='Custom'?'Custom':state.entry.bracketSize;$('#customBracketSize').value=state.entry.customBracketSize;$('#videoMinimum').value=state.entry.videoMinimum;const count=activeRegs().length;$('#limitWarning').textContent=count>state.entry.limit?`Warning: ${count} active registered riders exceed the ${state.entry.limit}-rider main event limit. Allocation will create a start list and waiting list.`:`${count} active registered riders for this gender/discipline. Limit ${state.entry.limit}.`;renderRegistration();$('#startList').innerHTML=state.entry.allocation.map(r=>card(r,`Entry #${r.entryPosition}`,r.selectionReason)).join('')||'<p class="small">Run allocation to build the main event start list.</p>';$('#replacementBox').innerHTML=state.entry.replacements.map(x=>`<strong>${esc(x.next)}</strong> proposed for <strong>${esc(x.absent)}</strong>. ${esc(x.reason)}<br>${esc(x.audit)}`).join('<hr>')||'No absent confirmed rider replacement pending.';$('#waitingList').innerHTML=state.entry.waiting.map(r=>card(r,`Waiting #${r.waitingPosition}`,r.waitingReason)).join('')||'<p class="small">No waiting-list riders for the current allocation.</p>';$('#seedingTable').innerHTML=state.entry.seeds.map(r=>`<div class="card"><div><span class="pill green">Seed ${r.seed}</span> <strong>${esc(r.name)}</strong> <span class="small">${esc(r.nationality)} · rank ${esc(r.rank||'—')}</span></div><p class="small reason">${esc(r.seedReason)}\nSelection: ${esc(r.selectionReason)}</p><button class="secondary" data-why="${esc(r.id)}">Why this rider is seeded here?</button></div>`).join('')||'<p class="small">Run allocation to generate seeds.</p>';$('#entryBracketPreview').innerHTML=buildPreview();$('#auditLog').innerHTML=[...state.entry.audit,...state.entry.replacements.map(r=>({time:'sample scenario',action:'replacement note',detail:r.audit}))].map(a=>`<div class="card"><strong>${esc(a.action)}</strong><span class="small">${esc(a.time)}</span><p class="small">${esc(a.detail)}</p></div>`).join('')||'<p class="small">No decisions recorded yet.</p>';$$('[data-why]').forEach(b=>b.onclick=()=>showWhy(b.dataset.why))}
-  function card(r,label,reason){return `<div class="card"><div><span class="pill ${r.status==='confirmed'||r.allocated?'green':r.status==='absent'?'red':'amber'}">${esc(label)}</span> <strong>${esc(r.name)}</strong> <span class="small">${esc(r.nationality)} · ${esc(r.source)} · rank ${esc(r.rank||'—')}</span></div><p class="small reason">${esc(reason)}</p><button class="secondary" data-why="${esc(r.id)}">Why this rider is seeded here?</button></div>`}
-  function showWhy(id){const r=[...state.entry.allocation,...state.entry.waiting,...state.entry.seeds,state.entry.registrations].flat().find(x=>x&&String(x.id||x.name)===String(id)||String(x?.name)===String(id));if(!r)return toast('No rider explanation available');alert(`${r.name}\nRanking source: ${r.source}${r.rank?` / rank ${r.rank}`:' / no previous ranking'}\nSelection reason: ${r.selectionReason||selectionReason(r)}\nSeed reason: ${r.seedReason||'Not seeded in main event yet.'}\nManual override reason: ${r.manualOverrideReason||'None recorded. If changed manually, Race Director reason required.'}`)}
-  function parseCSV(text){return text.trim().split(/\n+/).map(line=>line.split(',').map(x=>x.trim())).filter(r=>r.length>1).map((c,i)=>({id:'reg'+Date.now()+i,rank:c[0],name:c[1],nationality:c[2],gender:c[3]||state.entry.gender,division:c[4]||'Open',discipline:c[5]||state.entry.discipline,points:c[6]||0,status:c[7]||'registered',source:c[8]||'ranking',videoScore:c[9]||'',manualSeed:c[10]||'',manualOverrideReason:c[11]||'',notes:c[12]||''}))}
-  function renderBracket(){if(!state.bracket.seeds.length)state.bracket.seeds=state.entry.seeds.map(s=>({seed:s.seed,name:s.name,lycra:lycras[(s.seed-1)%lycras.length],nationality:s.nationality}));$('#eventName').value=state.bracket.eventName;$('#bracketSize').value=state.bracket.size;$('#bracketOfficial').value=state.bracket.official;$('#seedList').innerHTML=Array.from({length:+state.bracket.size||24},(_,i)=>state.bracket.seeds[i]||{seed:i+1,name:'',lycra:lycras[i%lycras.length],nationality:''}).map(s=>`<div class="seed-row"><input data-seed-no value="${s.seed}"><input data-seed-name value="${esc(s.name)}" placeholder="Rider"><input data-seed-nat value="${esc(s.nationality||'')}" placeholder="NAT"><select data-seed-lycra>${lycras.map(l=>`<option ${s.lycra===l?'selected':''}>${l}</option>`).join('')}</select></div>`).join('');$('#bracketBoard').innerHTML=state.bracket.rounds.map(r=>`<div class="bracket-round"><h3>${esc(r.name)}</h3>${r.heats.map(h=>`<div class="bracket-match"><span class="pill gray">Heat ${h.heatNumber}</span>${h.riders.map(x=>`<div class="bracket-rider ${x.bye?'bye':''}"><span>${esc(x.name)}<br><span class="small">Seed ${x.seed}${x.bye?' · BYE':''}</span></span></div>`).join('')}<button class="secondary" data-activate="${h.id}">Set live</button></div>`).join('')}</div>`).join('')||'<p class="small">Generate heats to preview bracket.</p>';$$('[data-activate]').forEach(b=>b.onclick=()=>activateHeat(b.dataset.activate))}
-  function updateSeedsFromDom(){state.bracket.seeds=$$('.seed-row').map((row,i)=>({seed:+row.querySelector('[data-seed-no]').value||i+1,name:row.querySelector('[data-seed-name]').value.trim(),nationality:row.querySelector('[data-seed-nat]').value.trim().toUpperCase(),lycra:row.querySelector('[data-seed-lycra]').value})).sort((a,b)=>a.seed-b.seed)}
-  function generateBracket(){updateSeedsFromDom();const size=+state.bracket.size||24,seeds=state.bracket.seeds.filter(s=>s.name),empty=Math.max(0,size-seeds.length),byeSeeds=seeds.slice(0,empty).map(s=>s.seed),spots=Array.from({length:size},(_,i)=>seeds[i]||{seed:i+1,name:'Empty spot',lycra:lycras[i%lycras.length],nationality:'',bye:false});const heats=[];for(let i=0;i<spots.length;i+=2){const riders=[spots[i],spots[i+1]].filter(Boolean).map(s=>({id:`seed-${s.seed}-${slug(s.name)}`,seed:s.seed,name:s.name,lycra:s.lycra,nationality:s.nationality,bye:byeSeeds.includes(s.seed),reason:s.reason||''}));heats.push({id:'h'+Date.now()+i,heatNumber:i/2+1,status:'upcoming',official:state.bracket.official,riders})}state.bracket.rounds=[{name:`Round of ${size}`,heats}];audit('bracket generated',`${size}-spot bracket prepared with ${empty} bye(s). Bye allocated due to seed position.`);save('Bracket generated with byes')}
-  function heats(){return state.bracket.rounds.flatMap(r=>r.heats)}
-  function heat(id=state.activeHeatId){return heats().find(h=>h.id===id)}
-  function activateHeat(id){state.activeHeatId=id;heats().forEach(h=>h.status=h.id===id?'live':h.status==='live'?'upcoming':h.status);state.riders=(heat(id)?.riders||[]).filter(r=>!r.bye&&!r.name.includes('Empty')).map(r=>({...r}));state.selectedRiderId=state.riders[0]?.id||null;state.selectedAttemptId=null;save('Active heat updated')}
-  function renderHeats(){ $('#heatList').innerHTML=heats().map(h=>`<div class="heat-card ${h.id===state.activeHeatId?'active':''}"><span class="pill ${h.status==='live'?'green':'gray'}">${h.status}</span><span><strong>Heat ${h.heatNumber}</strong><br><span class="small">${h.riders.map(r=>r.name+(r.bye?' (bye)':'')).join(' vs ')}</span></span><button class="secondary" data-activate="${h.id}">Set live</button></div>`).join('')||'<p class="small">No bracket heats yet.</p>';$$('[data-activate]').forEach(b=>b.onclick=()=>activateHeat(b.dataset.activate))}
-  function selectedAttempt(){return state.attempts.find(a=>a.id===state.selectedAttemptId)}
-  function attemptScore(a){if(!a)return null;if(a.confirmedScore!==null&&a.confirmedScore!==undefined)return a.confirmedScore;const vals=a.judgeScores.filter(Number.isFinite).sort((x,y)=>x-y);if(!vals.length)return 0;const counted=vals.length>=5?vals.slice(1,-1):vals;return Math.round((counted.reduce((s,v)=>s+v,0)/counted.length)*100)/100}
-  function validScores(riderId,type){return state.attempts.filter(a=>a.riderId===riderId&&a.type===type&&a.heatId===state.activeHeatId).map(attemptScore).filter(Number.isFinite).sort((a,b)=>b-a)}
-  function total(r){return validScores(r.id,'wave').slice(0,state.settings.countWaves).reduce((s,v)=>s+v,0)+validScores(r.id,'trick').slice(0,state.settings.countTricks).reduce((s,v)=>s+v,0)}
-  function renderJudge(){['format','discipline','judgeCount','countWaves','countTricks'].forEach(id=>{$('#'+id).value=state.settings[id]});$('#riderList').innerHTML=state.riders.map(r=>`<button class="rider-card ${r.id===state.selectedRiderId?'active':''}" data-rider="${r.id}"><span class="lycra ${r.lycra||'Red'}">${(r.lycra||'R')[0]}</span><span><strong>${esc(r.name)}</strong><br><span class="small">Seed ${r.seed||'—'} · ${esc(r.nationality||'')}</span></span><span class="pill gray">${total(r).toFixed(2)}</span></button>`).join('')||'<p class="small">Activate a bracket heat or add riders manually.</p>';$$('[data-rider]').forEach(b=>b.onclick=()=>{state.selectedRiderId=b.dataset.rider;state.selectedAttemptId=null;save()});const r=state.riders.find(x=>x.id===state.selectedRiderId);$('#selectedName').textContent=r?r.name:'Select a rider';$('#selectedMeta').textContent=r?`${r.lycra||'No'} lycra · active heat ${heat()?.heatNumber||'manual'}`:'No rider selected';const attempts=state.attempts.filter(a=>a.riderId===state.selectedRiderId&&a.heatId===state.activeHeatId);$('#attemptList').innerHTML=attempts.map(a=>`<button class="attempt-card ${a.id===state.selectedAttemptId?'active':''} ${a.confirmed?'locked':''}" data-attempt="${a.id}"><strong>${a.type.toUpperCase()}</strong><span class="small">${a.confirmed?'Confirmed':'Draft'} · ${scoreLabel(attemptScore(a))}</span></button>`).join('')||'<p class="small">Create a wave or trick attempt for this rider.</p>';$$('[data-attempt]').forEach(b=>b.onclick=()=>{state.selectedAttemptId=b.dataset.attempt;save()});renderScoreTool();$('#leaderboard').innerHTML=state.riders.map(r=>({r,total:total(r)})).sort((a,b)=>b.total-a.total).map((e,i)=>`<div class="rank-row"><span class="pill ${i?'gray':'green'}">#${i+1}</span><span><strong>${esc(e.r.name)}</strong><br><span class="small">Tie guide: compare counting scores best-to-worst. If still unclear: Head Judge decision required.</span></span><strong>${e.total.toFixed(2)}</strong></div>`).join('')||'<p class="small">No riders in active heat.</p>';$('#interferenceList').innerHTML=state.riders.map(r=>`<div class="call-row"><strong>${esc(r.name)}</strong><p class="small">Interference workflow retained; final penalty application requires Head Judge confirmation.</p></div>`).join('')||'<p class="small">No riders in active heat.</p>'}
-  const scoreLabel=v=>v==='M'?'M':Number.isFinite(v)?v.toFixed(1):'—';
-  function renderScoreTool(){const a=selectedAttempt();state.selectedJudgeIndex=Math.min(state.selectedJudgeIndex||0,state.settings.judgeCount-1);$('#judgeSlot').innerHTML=Array.from({length:state.settings.judgeCount},(_,i)=>`<option value="${i}" ${i===state.selectedJudgeIndex?'selected':''}>Judge ${i+1}</option>`).join('');$('#attemptTitle').textContent=a?a.type.toUpperCase():'No attempt';$('#scoreReadout').textContent=a?scoreLabel(attemptScore(a)):'—';$('#lockStatus').textContent=!a?'Select or create an attempt to score.':a.confirmed?'Confirmed score locked.':'Draft score. Confirm to lock.';$('#confirmScore').disabled=!a||a.confirmed;$('#scorePad').innerHTML=[.1,1,2,3,4,5,6,7,8,9,10].map(v=>`<button data-score="${v}">${v.toFixed(1)}</button>`).join('')+'<button class="mark-m" data-score="M">Missed M</button>';$$('[data-score]').forEach(b=>b.onclick=()=>setScore(b.dataset.score==='M'?'M':+b.dataset.score));$('#correctionBox').classList.add('hide')}
-  function setScore(v){const a=selectedAttempt();if(!a)return toast('Create an attempt first');if(a.confirmed)return toast('Score locked. Use Head Judge correction workflow.');if(v==='M'){a.judgeScores=['M'];a.confirmedScore='M'}else{a.judgeScores[state.selectedJudgeIndex||0]=Math.max(.1,Math.min(10,Math.round(v*10)/10));a.confirmedScore=null}save('Judge mark saved')}
-  function addAttempt(type){if(!state.selectedRiderId)return toast('Select a rider first');const id='a'+Date.now();state.attempts.push({id,heatId:state.activeHeatId,riderId:state.selectedRiderId,type,created:Date.now(),judgeScores:[],confirmedScore:null,confirmed:false,correctionReason:''});state.selectedAttemptId=id;save(`${type} attempt added`)}
-  function syncSettings(){['format','discipline'].forEach(id=>state.settings[id]=$('#'+id).value);['judgeCount','countWaves','countTricks'].forEach(id=>state.settings[id]=+$('#'+id).value||0);if(state.settings.judgeCount%2===0)state.settings.judgeCount++;if(state.settings.judgeCount<3)state.settings.judgeCount=3}
-  function render(){['entry','bracket','heats','judge'].forEach(s=>{$('#'+s+'Screen').classList.toggle('hide',state.screen!==s)});$$('.tab').forEach(b=>{b.classList.toggle('active',b.dataset.screen===state.screen);b.classList.toggle('ghost',b.dataset.screen!==state.screen)});$$('.subtab').forEach(b=>{b.classList.toggle('active',b.dataset.entryTab===state.entryTab);b.classList.toggle('ghost',b.dataset.entryTab!==state.entryTab)});$$('.entry-pane').forEach(p=>p.classList.toggle('hide',p.id!==`entry-${state.entryTab}`));$('#heatStatus').textContent=state.activeHeatId?`Heat ${heat()?.heatNumber||''} live`:`${state.entry.allocation.length||0} in start list · ${state.entry.waiting.length||0} waiting`;renderEntry();renderBracket();renderHeats();renderJudge()}
-  $$('.tab').forEach(b=>b.onclick=()=>{state.screen=b.dataset.screen;save()});$$('.subtab').forEach(b=>b.onclick=()=>{state.entryTab=b.dataset.entryTab;save()});['filterGender','filterDiscipline','entryLimit','prepBracketSize','customBracketSize','videoMinimum'].forEach(id=>$('#'+id).onchange=()=>{updateEntrySettings();save('Entry settings saved')});$('#runAllocation').onclick=()=>{updateEntrySettings();runAllocation();save('Allocation and seeding rebuilt')};$('#loadEntrySample').onclick=()=>{state.entry.registrations=sampleRegistrations();runAllocation();save('40-rider sample loaded')};$('#clearEntryData').onclick=()=>{state.entry.registrations=[];state.entry.allocation=[];state.entry.waiting=[];state.entry.seeds=[];audit('entry module cleared','All registrations, allocation, waiting list, and seeds cleared.');save('Entry module cleared')};$('#importPaste').onclick=()=>{const rows=parseCSV($('#pasteBox').value);state.entry.registrations.push(...rows);audit('registrations imported',`${rows.length} pasted rows imported.`);$('#pasteBox').value='';save('Rows imported')};$('#addBlankRider').onclick=()=>{state.entry.registrations.push({id:'reg'+Date.now(),rank:'',name:'New Rider',nationality:'',gender:state.entry.gender,division:'Open',discipline:state.entry.discipline,points:0,status:'registered',source:'organizer selection',videoScore:'',manualSeed:'',manualOverrideReason:'',notes:''});save('Manual rider added')};['eventName','bracketSize','bracketOfficial'].forEach(id=>$('#'+id).onchange=()=>{state.bracket.eventName=$('#eventName').value;state.bracket.size=+$('#bracketSize').value;state.bracket.official=$('#bracketOfficial').value;save('Bracket setup saved')});$('#useEntrySeeds').onclick=()=>{state.bracket.size=bracketSize();state.bracket.seeds=state.entry.seeds.map(s=>({seed:s.seed,name:s.name,lycra:lycras[(s.seed-1)%lycras.length],nationality:s.nationality,reason:s.seedReason}));save('Entry seeds copied to bracket')};$('#resizeSeeds').onclick=()=>{updateSeedsFromDom();state.bracket.size=+$('#bracketSize').value;state.bracket.seeds=Array.from({length:state.bracket.size},(_,i)=>state.bracket.seeds.find(s=>s.seed===i+1)||{seed:i+1,name:'',lycra:lycras[i%lycras.length],nationality:''});save('Seed list resized')};$('#generateBracket').onclick=generateBracket;['format','discipline','judgeCount','countWaves','countTricks'].forEach(id=>$('#'+id).onchange=()=>{syncSettings();save('Heat configuration updated')});$('#judgeSlot').onchange=()=>{state.selectedJudgeIndex=+$('#judgeSlot').value||0;save()};$('#addRider').onclick=()=>{const name=$('#newRiderName').value.trim();if(!name)return toast('Enter rider name');state.riders.push({id:'r'+Date.now(),name,lycra:$('#newRiderLycra').value,nationality:''});$('#newRiderName').value='';save('Rider added')};$('#addWave').onclick=()=>addAttempt('wave');$('#addTrick').onclick=()=>addAttempt('trick');$('#scoreDown').onclick=()=>{const s=attemptScore(selectedAttempt());if(Number.isFinite(s))setScore(s-.1)};$('#scoreUp').onclick=()=>{const s=attemptScore(selectedAttempt());setScore(Number.isFinite(s)?s+.1:.1)};$('#confirmScore').onclick=()=>{const a=selectedAttempt();if(!a)return;if(a.confirmedScore===null||a.confirmedScore===undefined)a.confirmedScore=attemptScore(a);a.confirmed=true;save('Score confirmed and locked')};$('#requestCorrection').onclick=()=>$('#correctionBox').classList.toggle('hide');$('#unlockScore').onclick=()=>{const a=selectedAttempt(),reason=$('#correctionReason').value.trim();if(!a||!reason)return toast('Head Judge correction reason required');a.confirmed=false;a.correctionReason=reason;$('#correctionReason').value='';save('Unlocked with Head Judge reason')};runAllocation();save();
-})();
-</script>
-</body>
+        <section id="entry-start" class="entry-pane stack hide">
+          <section class="panel">
+            <div class="eyebrow">Main Event Start List</div>
+            <div id="startList" class="grid"></div>
+          </section>
+        </section>
+        <section id="entry-waiting" class="entry-pane stack hide">
+          <section class="panel">
+            <div class="eyebrow">Waiting List Management</div>
+            <div id="replacementBox" class="notice small"></div>
+            <div id="waitingList" class="grid"></div>
+          </section>
+        </section>
+        <section id="entry-seeding" class="entry-pane stack hide">
+          <section class="panel light">
+            <div class="eyebrow">Seeding Table</div>
+            <p class="small">
+              Highest ranked confirmed rider receives seed 1. Unknown/new riders
+              follow ranked riders unless manually seeded or wildcard-selected.
+              Manual Race Director changes require a reason.
+            </p>
+            <div id="seedingTable" class="grid"></div>
+          </section>
+        </section>
+        <section id="entry-preview" class="entry-pane stack hide">
+          <section class="panel">
+            <div class="eyebrow">Bracket Preview</div>
+            <p class="small">
+              GKA-ready preparation prioritizes 24 / 12 / 6 brackets and does
+              not force a 16-rider default. Empty bracket spots become byes
+              allocated due to seed position.
+            </p>
+            <div id="entryBracketPreview" class="bracket-scroll"></div>
+          </section>
+        </section>
+        <section id="entry-audit" class="entry-pane stack hide">
+          <section class="panel">
+            <div class="eyebrow">Audit / Decisions Log</div>
+            <div id="auditLog" class="grid"></div>
+          </section>
+        </section>
+      </main>
+
+      <main id="bracketScreen" class="stack hide">
+        <section class="panel">
+          <div class="eyebrow">Bracket setup</div>
+          <div class="four">
+            <div>
+              <label>Event name</label
+              ><input id="eventName" placeholder="Tarfaya Wave Classic" />
+            </div>
+            <div>
+              <label>Bracket size</label
+              ><select id="bracketSize">
+                <option>6</option>
+                <option>8</option>
+                <option>12</option>
+                <option selected>24</option>
+              </select>
+            </div>
+            <div>
+              <label>Format</label
+              ><select id="bracketFormat">
+                <option value="single">
+                  Single elimination / prepared heats
+                </option>
+              </select>
+            </div>
+            <div>
+              <label>Status</label
+              ><select id="bracketOfficial">
+                <option value="provisional">Provisional</option>
+                <option value="official">Official</option>
+              </select>
+            </div>
+          </div>
+          <div class="button-row">
+            <button id="useEntrySeeds" class="secondary">
+              Use seeding table</button
+            ><button id="resizeSeeds" class="secondary">
+              Apply bracket size</button
+            ><button id="generateBracket" class="primary">
+              Generate heats with byes
+            </button>
+          </div>
+        </section>
+        <section class="panel light">
+          <div class="eyebrow">Manual seeding</div>
+          <div id="seedList" class="grid"></div>
+        </section>
+        <section class="panel">
+          <div class="eyebrow">Bracket view</div>
+          <div class="bracket-scroll">
+            <div id="bracketBoard" class="bracket-board"></div>
+          </div>
+        </section>
+      </main>
+
+      <main id="heatsScreen" class="stack hide">
+        <section class="panel">
+          <div class="eyebrow">Heat Management</div>
+          <p class="small">
+            Every bracket heat is listed here as a normal heat. Set a heat live
+            to make it the active Judge Mode heat.
+          </p>
+          <div id="heatList" class="grid"></div>
+        </section>
+      </main>
+
+      <main id="judgeScreen" class="layout hide">
+        <aside class="stack">
+          <section class="panel">
+            <div class="eyebrow">Heat configuration</div>
+            <div class="two">
+              <div>
+                <label>Format</label
+                ><select id="format">
+                  <option value="wave">Wave</option>
+                  <option value="trick">Trick / Strapless Freestyle</option>
+                  <option value="mixed">Mixed Wave + Trick</option>
+                </select>
+              </div>
+              <div>
+                <label>Discipline note</label
+                ><select id="discipline">
+                  <option>Kite-Surf</option>
+                  <option>Freestyle</option>
+                  <option>Hydrofoil Big Air</option>
+                  <option>Big Air</option>
+                  <option>Other / Head Judge decision required</option>
+                </select>
+              </div>
+            </div>
+            <div class="three">
+              <div>
+                <label>Judges on panel</label
+                ><input
+                  id="judgeCount"
+                  type="number"
+                  min="3"
+                  step="2"
+                  value="5"
+                />
+              </div>
+              <div>
+                <label>Counting waves</label
+                ><input
+                  id="countWaves"
+                  type="number"
+                  min="0"
+                  max="8"
+                  value="2"
+                />
+              </div>
+              <div>
+                <label>Counting tricks</label
+                ><input
+                  id="countTricks"
+                  type="number"
+                  min="0"
+                  max="8"
+                  value="3"
+                />
+              </div>
+            </div>
+          </section>
+          <section class="panel">
+            <div class="eyebrow">Riders</div>
+            <div id="riderList" class="grid"></div>
+            <div class="three">
+              <input id="newRiderName" placeholder="Rider name" /><select
+                id="newRiderLycra"
+              >
+                <option>Red</option>
+                <option>Blue</option>
+                <option>Yellow</option>
+                <option>White</option>
+                <option>Green</option>
+                <option>Black</option>
+                <option>Orange</option>
+                <option>Purple</option></select
+              ><button id="addRider" class="secondary">Add rider</button>
+            </div>
+          </section>
+        </aside>
+        <section class="judge-main">
+          <div class="stack">
+            <section class="panel light">
+              <div class="eyebrow">Selected rider</div>
+              <h2 id="selectedName">Select a rider</h2>
+              <p class="small" id="selectedMeta">
+                Confirmed score cards are locked. Corrections require a Head
+                Judge reason.
+              </p>
+              <div class="attempt-list" id="attemptList"></div>
+              <div class="button-row">
+                <button id="addWave" class="secondary">Add wave attempt</button
+                ><button id="addTrick" class="secondary">
+                  Add trick attempt
+                </button>
+              </div>
+            </section>
+            <section class="panel">
+              <div class="eyebrow">Live ranking and tie-break guidance</div>
+              <div id="leaderboard" class="grid"></div>
+              <div class="button-row">
+                <button id="validateResult" class="primary">
+                  Head Judge validate final result
+                </button>
+              </div>
+              <p class="small" id="resultStatus">
+                Result is provisional until Head Judge validation.
+              </p>
+            </section>
+            <section class="panel">
+              <div class="eyebrow">Interference call workflow</div>
+              <p class="small">
+                Judges record calls. If the applicable rule is unclear: Head
+                Judge decision required.
+              </p>
+              <div id="interferenceList" class="grid"></div>
+            </section>
+            <section class="panel light">
+              <div class="eyebrow">Official penalty management</div>
+              <p class="small">
+                Dropdown first, rider second, impact third. Judges can flag
+                possible penalties; only the Head Judge can validate or reject
+                and apply them.
+              </p>
+              <div class="three">
+                <div>
+                  <label>Penalty type</label
+                  ><select id="penaltyType"></select>
+                </div>
+                <div>
+                  <label>Rider</label
+                  ><select id="penaltyRider"></select>
+                </div>
+                <div>
+                  <label>Impact</label
+                  ><select id="penaltyImpact"></select>
+                </div>
+              </div>
+              <div class="two">
+                <div>
+                  <label>Heat</label
+                  ><select id="penaltyHeat"></select>
+                </div>
+                <div>
+                  <label>Score deduction if Head Judge sets one</label
+                  ><input
+                    id="penaltyDeduction"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    placeholder="No hardcoded value"
+                  />
+                </div>
+              </div>
+              <div class="two">
+                <div>
+                  <label>Attempt to invalidate if applicable</label
+                  ><select id="penaltyAttempt"></select>
+                </div>
+                <div>
+                  <label>Heat rank places penalty</label
+                  ><input
+                    id="penaltyPlaces"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="Head Judge value"
+                  />
+                </div>
+              </div>
+              <textarea
+                id="penaltyComment"
+                placeholder="Description / comment / reason required"
+              ></textarea>
+              <div class="button-row">
+                <button id="flagPenalty" class="primary">
+                  Flag possible penalty
+                </button>
+                <button id="validatePenalty" class="secondary">
+                  Validate selected penalty
+                </button>
+                <button id="rejectPenalty" class="ghost">
+                  Reject selected penalty
+                </button>
+                <button id="removePenalty" class="danger">
+                  Remove selected penalty
+                </button>
+              </div>
+              <div id="penaltyList" class="grid"></div>
+            </section>
+          </div>
+          <aside class="score-tools stack">
+            <section class="panel light">
+              <div class="eyebrow">Score entry</div>
+              <h2 id="attemptTitle">No attempt</h2>
+              <div>
+                <label>Judge mark slot</label
+                ><select id="judgeSlot"></select>
+              </div>
+              <div class="score-readout">
+                <strong id="scoreReadout">—</strong>
+              </div>
+              <div class="score-pad" id="scorePad"></div>
+              <div class="button-row">
+                <button id="scoreDown" class="secondary">− 0.1</button
+                ><button id="scoreUp" class="secondary">+ 0.1</button>
+              </div>
+              <button id="confirmScore" class="primary">
+                Confirm score and lock</button
+              ><button id="requestCorrection" class="ghost">
+                Head Judge correction
+              </button>
+              <div id="correctionBox" class="grid hide">
+                <textarea
+                  id="correctionReason"
+                  placeholder="Head Judge correction reason (required)"
+                ></textarea
+                ><button id="unlockScore" class="danger">
+                  Unlock with Head Judge reason
+                </button>
+              </div>
+              <p class="small" id="lockStatus">
+                Select or create an attempt to score.
+              </p>
+            </section>
+          </aside>
+        </section>
+      </main>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script>
+      (() => {
+        const KEY = "yousurf_entry_allocation_v2";
+        const $ = (s) => document.querySelector(s),
+          $$ = (s) => Array.from(document.querySelectorAll(s));
+        const lycras = [
+          "Red",
+          "Blue",
+          "Yellow",
+          "White",
+          "Green",
+          "Black",
+          "Orange",
+          "Purple",
+        ];
+        const statuses = [
+          "registered",
+          "confirmed",
+          "absent",
+          "injured",
+          "wildcard",
+          "waiting list",
+        ];
+        const sources = [
+          "ranking",
+          "wildcard",
+          "video application",
+          "organizer selection",
+        ];
+        const roles = ["Race Director", "Head Judge", "Judge"];
+        const penaltyTypes = [
+          "Interference",
+          "Priority violation",
+          "Dangerous riding",
+          "Unsportsmanlike conduct",
+          "Outside competition area",
+          "Late start",
+          "Equipment rule violation",
+          "No show / DNS",
+          "Did not finish / DNF",
+          "Disqualification / DSQ",
+          "Custom penalty",
+        ];
+        const penaltyImpacts = [
+          "warning only",
+          "score deduction",
+          "attempt invalidated",
+          "heat ranking penalty",
+          "disqualification",
+          "Head Judge decision required",
+        ];
+        const roleSummaries = {
+          "Race Director":
+            "Can manage event, registration, heats, safety, schedule, notice board, DNS/DNF; cannot enter or silently edit judge scores.",
+          "Head Judge":
+            "Can configure judging, validate/reject penalties and interference, approve corrections, validate results, and lock final heat results.",
+          Judge:
+            "Can view the active heat, score attempts, add comments, call possible interference, and request corrections only.",
+        };
+        const permissions = {
+          "Race Director": new Set([
+            "event",
+            "registration",
+            "entry",
+            "seeding",
+            "bracket",
+            "heatStatus",
+            "notice",
+            "protest",
+            "safety",
+            "schedule",
+            "dnsDnf",
+            "penaltyFlag",
+          ]),
+          "Head Judge": new Set([
+            "judgingConfig",
+            "resultValidate",
+            "penaltyValidate",
+            "interferenceValidate",
+            "correctionApprove",
+            "scoreCorrection",
+            "finalLock",
+            "penaltyFlag",
+          ]),
+          Judge: new Set([
+            "activeHeatView",
+            "score",
+            "miss",
+            "comments",
+            "interferenceFlag",
+            "correctionRequest",
+            "penaltyFlag",
+          ]),
+        };
+        const fresh = () => ({
+          screen: "entry",
+          entryTab: "registration",
+          role: "Race Director",
+          roleAudit: [],
+          penalties: [],
+          selectedPenaltyId: null,
+          settings: {
+            format: "mixed",
+            discipline: "Kite-Surf",
+            judgeCount: 5,
+            countWaves: 2,
+            countTricks: 3,
+          },
+          entry: {
+            gender: "Women",
+            discipline: "Kite-Surf",
+            limit: 24,
+            bracketSize: 24,
+            customBracketSize: 24,
+            videoMinimum: 70,
+            registrations: sampleRegistrations(),
+            allocation: [],
+            waiting: [],
+            seeds: [],
+            replacements: [],
+            audit: [],
+          },
+          riders: [],
+          selectedRiderId: null,
+          selectedAttemptId: null,
+          selectedJudgeIndex: 0,
+          attempts: [],
+          interference: {},
+          activeHeatId: null,
+          bracket: {
+            eventName: "GKA-ready local event",
+            size: 24,
+            type: "single",
+            official: "provisional",
+            seeds: [],
+            rounds: [],
+          },
+        });
+        let state = load();
+        function load() {
+          try {
+            const saved = JSON.parse(localStorage.getItem(KEY));
+            return saved && saved.entry ? migrate(saved) : fresh();
+          } catch {
+            return fresh();
+          }
+        }
+        function migrate(s) {
+          const f = fresh();
+          s.screen ??= "entry";
+          s.entryTab ??= "registration";
+          s.role = roles.includes(s.role) ? s.role : "Race Director";
+          s.roleAudit ??= [];
+          s.penalties ??= [];
+          s.selectedPenaltyId ??= null;
+          s.settings = { ...f.settings, ...(s.settings || {}) };
+          s.entry = { ...f.entry, ...(s.entry || {}) };
+          s.entry.audit ??= [];
+          s.entry.replacements ??= [];
+          s.riders ??= [];
+          s.attempts ??= [];
+          s.interference ??= {};
+          s.bracket = { ...f.bracket, ...(s.bracket || {}) };
+          s.bracket.rounds ??= [];
+          s.bracket.seeds ??= [];
+          return s;
+        }
+        function save(msg) {
+          localStorage.setItem(KEY, JSON.stringify(state));
+          render();
+          if (msg) toast(msg);
+        }
+        function toast(msg) {
+          const t = $("#toast");
+          t.textContent = msg;
+          t.classList.add("show");
+          clearTimeout(toast.timer);
+          toast.timer = setTimeout(() => t.classList.remove("show"), 2300);
+        }
+        const esc = (v) =>
+          String(v ?? "").replace(
+            /[&<>"']/g,
+            (m) =>
+              ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;",
+              })[m],
+          );
+        const slug = (v) =>
+          String(v || "rider")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "");
+        const ranked = (r) => Number.isFinite(+r.rank) && +r.rank > 0;
+        const activeRegs = () =>
+          state.entry.registrations.filter(
+            (r) =>
+              r.gender === state.entry.gender &&
+              r.discipline === state.entry.discipline &&
+              r.status !== "absent" &&
+              r.status !== "injured",
+          );
+        function audit(action, detail) {
+          state.entry.audit.unshift({
+            time: new Date().toISOString(),
+            role: state.role || "System",
+            action,
+            detail,
+          });
+        }
+        function roleAudit(
+          action,
+          affected = "—",
+          reason = "",
+          status = "recorded",
+        ) {
+          const item = {
+            time: new Date().toISOString(),
+            role: state.role || "System",
+            action,
+            affected,
+            reason,
+            status,
+          };
+          state.roleAudit.unshift(item);
+          state.entry.audit.unshift({
+            time: item.time,
+            role: item.role,
+            action,
+            detail: `${affected} · ${reason || "No reason recorded"} · ${status}`,
+          });
+        }
+        function can(permission) {
+          return permissions[state.role]?.has(permission);
+        }
+        function deny(reason) {
+          toast(reason);
+          roleAudit("permission denied", "UI action", reason, "blocked");
+          return false;
+        }
+        function requirePermission(permission, reason) {
+          return can(permission) || deny(reason);
+        }
+        function setActionState(el, allowed, reason) {
+          if (!el) return;
+          el.disabled = !allowed;
+          el.title = allowed ? "" : reason;
+          el.dataset.reason = allowed ? "" : reason;
+          el.classList.toggle("locked-action", !allowed);
+        }
+        function sampleRegistrations() {
+          const names = [
+            "Amina Hart",
+            "Bianca Sol",
+            "Carla Mendes",
+            "Dina Koenig",
+            "Elisa Noor",
+            "Farah Haddad",
+            "Gaia Costa",
+            "Hana Park",
+            "Ines Ribeiro",
+            "Jade Martin",
+            "Kira Lopes",
+            "Laila Benali",
+            "Maya Cruz",
+            "Nora Finch",
+            "Olivia Reyes",
+            "Pia Dubois",
+            "Quinn Adler",
+            "Rosa Vale",
+            "Sara Novak",
+            "Talia Silva",
+            "Uma Weiss",
+            "Vera Klein",
+            "Willa Stone",
+            "Xenia Marin",
+            "Yara Moon",
+            "Zoe Rivers",
+            "Alba Torres",
+            "Bruna Lima",
+            "Cleo James",
+            "Dalia Frost",
+            "Eva Nadir",
+            "Faye Kim",
+            "Gina Rossi",
+            "Hope Diaz",
+            "Iris Chen",
+            "Juno Fox",
+            "Kenza Amrani",
+            "Lina Blue",
+            "Mona West",
+            "Nia Brooks",
+          ];
+          return names.map((name, i) => ({
+            id: "reg" + (i + 1),
+            rank: i < 30 ? i + 1 : "",
+            name,
+            nationality: [
+              "ESP",
+              "BRA",
+              "POR",
+              "GER",
+              "MAR",
+              "FRA",
+              "ITA",
+              "KOR",
+            ][i % 8],
+            gender: "Women",
+            division: "Open",
+            discipline: "Kite-Surf",
+            points: i < 30 ? 1000 - i * 20 : 0,
+            status:
+              i < 24
+                ? "confirmed"
+                : i === 24
+                  ? "absent"
+                  : i === 25 || i === 36
+                    ? "wildcard"
+                    : i > 30
+                      ? "waiting list"
+                      : "registered",
+            source:
+              i === 25 || i === 36
+                ? "wildcard"
+                : i > 29
+                  ? "video application"
+                  : "ranking",
+            videoScore: i > 29 ? 95 - (i - 30) * 3 : "",
+            manualSeed: i === 25 ? 18 : "",
+            manualOverrideReason:
+              i === 25
+                ? "Organizer wildcard approved; manual seed requires Race Director confirmation."
+                : i === 24
+                  ? "Absent scenario: automatic replacement should be proposed from waiting list."
+                  : "",
+            notes: i > 29 ? "New rider / no previous ranking." : "",
+          }));
+        }
+        function priority(r) {
+          let base = ranked(r) ? +r.rank : 9999;
+          if (r.source === "video application")
+            base += 10000 - (+r.videoScore || 0);
+          if (r.source === "wildcard" || r.status === "wildcard") base += 5000;
+          if (r.manualOverrideReason) base -= 0.5;
+          return base;
+        }
+        function selectionReason(r) {
+          if (r.manualOverrideReason)
+            return `Manual Race Director override: ${r.manualOverrideReason}`;
+          if (r.status === "wildcard" || r.source === "wildcard")
+            return "Wildcard source: GKA/local organizer wildcard decision path; approval/publication must be verified.";
+          if (r.source === "video application")
+            return `Video application candidate scored ${r.videoScore || "not scored"}; videos ordered high-to-low when used.`;
+          if (ranked(r))
+            return `Selected by previous-year ranking priority (rank ${r.rank}).`;
+          return "No ranking: kite merits / Race Director draw or decision required.";
+        }
+        function waitingReason(r) {
+          if (r.source === "video application")
+            return `Waiting list by video application score ${r.videoScore || 0}.`;
+          if (r.status === "wildcard" || r.source === "wildcard")
+            return "Waiting list wildcard category: next wildcard offer is organizer / GKA decision.";
+          if (ranked(r))
+            return `Waiting list by seeding-list priority from previous-year rank ${r.rank}.`;
+          return "Unranked waiting-list rider: Head Judge / Race Director decision required.";
+        }
+        function runAllocation() {
+          const regs = activeRegs().sort(
+            (a, b) =>
+              priority(a) - priority(b) || String(a.name).localeCompare(b.name),
+          );
+          const limit = +state.entry.limit || 24;
+          let start = regs.slice(0, limit),
+            wait = regs.slice(limit);
+          start = start.map((r, i) => ({
+            ...r,
+            entryPosition: i + 1,
+            allocated: true,
+            selectionReason: selectionReason(r),
+          }));
+          wait = wait.map((r, i) => ({
+            ...r,
+            waitingPosition: i + 1,
+            allocated: false,
+            waitingReason: waitingReason(r),
+          }));
+          state.entry.allocation = start;
+          state.entry.waiting = wait;
+          state.entry.seeds = seedList(start);
+          state.bracket.size = bracketSize();
+          state.bracket.seeds = state.entry.seeds.map((s) => ({
+            seed: s.seed,
+            name: s.name,
+            lycra: lycras[(s.seed - 1) % lycras.length],
+            nationality: s.nationality,
+            reason: s.seedReason,
+          }));
+          const absent = state.entry.registrations.find(
+            (r) =>
+              r.status === "absent" &&
+              r.gender === state.entry.gender &&
+              r.discipline === state.entry.discipline,
+          );
+          state.entry.replacements = [];
+          if (absent && wait[0]) {
+            state.entry.replacements.push({
+              absent: absent.name,
+              next: wait[0].name,
+              reason: "Replacement based on waiting list priority",
+              audit: `${wait[0].name} proposed for ${absent.name}: ${waitingReason(wait[0])}`,
+            });
+            audit(
+              "automatic replacement proposed",
+              `${wait[0].name} proposed for absent rider ${absent.name}. Replacement based on waiting list priority.`,
+            );
+          }
+          audit(
+            "allocation run",
+            `${start.length} main event riders and ${wait.length} waiting-list riders for ${state.entry.gender} ${state.entry.discipline}.`,
+          );
+        }
+        function seedList(list) {
+          return list
+            .slice()
+            .sort((a, b) => {
+              const am = +a.manualSeed || 9999,
+                bm = +b.manualSeed || 9999;
+              if (am !== bm) return am - bm;
+              return (
+                (ranked(a) ? +a.rank : 9999) - (ranked(b) ? +b.rank : 9999) ||
+                priority(a) - priority(b)
+              );
+            })
+            .map((r, i) => ({
+              ...r,
+              seed: i + 1,
+              seedReason: r.manualSeed
+                ? `Manual seed ${r.manualSeed}: ${r.manualOverrideReason || "Race Director reason required."}`
+                : ranked(r)
+                  ? `Seeded by previous-year ranking; highest ranked rider is seed 1.`
+                  : r.source === "wildcard"
+                    ? `Wildcard/new rider seeded after ranked riders unless manually placed.`
+                    : "Missing ranking: Race Director draw/manual placement required.",
+            }));
+        }
+        function bracketSize() {
+          return $("#prepBracketSize")?.value === "Custom"
+            ? +state.entry.customBracketSize || 24
+            : +state.entry.bracketSize || 24;
+        }
+        function byes() {
+          const size = bracketSize(),
+            seeds = state.entry.seeds,
+            empty = Math.max(0, size - seeds.length);
+          return seeds.slice(0, empty).map((s) => s.seed);
+        }
+        function buildPreview() {
+          const size = bracketSize(),
+            seeds = state.entry.seeds,
+            byeSeeds = byes(),
+            spots = Array.from(
+              { length: size },
+              (_, i) =>
+                seeds[i] || {
+                  seed: i + 1,
+                  name: "Empty bracket spot",
+                  nationality: "",
+                  seedReason: "Empty spot",
+                },
+            );
+          let matches = [];
+          for (let i = 0; i < spots.length; i += 2)
+            matches.push([spots[i], spots[i + 1]]);
+          return `<div class="bracket-board"><div class="bracket-round"><h3>Prepared bracket (${size})</h3>${matches.map((m, i) => `<div class="bracket-match"><span class="pill gray">Heat ${i + 1}</span>${m.map((r) => `<div class="bracket-rider ${byeSeeds.includes(r.seed) ? "bye" : ""}"><span><strong>${esc(r.name)}</strong><br><span class="small">Seed ${r.seed} ${byeSeeds.includes(r.seed) ? "· BYE: Bye allocated due to seed position" : ""}</span></span><button class="ghost" data-why="${esc(r.id || r.name)}">Why?</button></div>`).join("")}</div>`).join("")}</div></div>`;
+        }
+        function updateEntrySettings() {
+          state.entry.gender = $("#filterGender").value;
+          state.entry.discipline = $("#filterDiscipline").value;
+          state.entry.limit = +$("#entryLimit").value || 24;
+          state.entry.bracketSize =
+            $("#prepBracketSize").value === "Custom"
+              ? "Custom"
+              : +$("#prepBracketSize").value;
+          state.entry.customBracketSize = +$("#customBracketSize").value || 24;
+          state.entry.videoMinimum = +$("#videoMinimum").value || 0;
+        }
+        function renderRegistration() {
+          const rows = state.entry.registrations
+            .map(
+              (r, i) =>
+                `<tr><td><input data-reg="${i}" data-field="rank" value="${esc(r.rank)}"></td><td><input data-reg="${i}" data-field="name" value="${esc(r.name)}"></td><td><input data-reg="${i}" data-field="nationality" value="${esc(r.nationality)}"></td><td><select data-reg="${i}" data-field="gender"><option ${r.gender === "Women" ? "selected" : ""}>Women</option><option ${r.gender === "Men" ? "selected" : ""}>Men</option></select></td><td><input data-reg="${i}" data-field="division" value="${esc(r.division)}"></td><td><select data-reg="${i}" data-field="discipline">${["Kite-Surf", "Freestyle", "Big Air", "Hydrofoil Big Air", "Local / Other"].map((x) => `<option ${r.discipline === x ? "selected" : ""}>${x}</option>`).join("")}</select></td><td><input data-reg="${i}" data-field="points" type="number" value="${esc(r.points)}"></td><td><select data-reg="${i}" data-field="status">${statuses.map((x) => `<option ${r.status === x ? "selected" : ""}>${x}</option>`).join("")}</select></td><td><select data-reg="${i}" data-field="source">${sources.map((x) => `<option ${r.source === x ? "selected" : ""}>${x}</option>`).join("")}</select></td><td><input data-reg="${i}" data-field="videoScore" type="number" value="${esc(r.videoScore)}"></td><td><input data-reg="${i}" data-field="manualSeed" type="number" value="${esc(r.manualSeed)}"></td><td><textarea data-reg="${i}" data-field="manualOverrideReason">${esc(r.manualOverrideReason || r.notes)}</textarea></td><td><button class="danger" data-del-reg="${i}">Delete</button></td></tr>`,
+            )
+            .join("");
+          $("#registrationRows").innerHTML = rows;
+          $$("[data-reg]").forEach(
+            (el) =>
+              (el.onchange = () => {
+                const r = state.entry.registrations[+el.dataset.reg];
+                r[el.dataset.field] = el.value;
+                if (el.dataset.field === "manualOverrideReason")
+                  audit(
+                    "manual reason updated",
+                    `${r.name}: ${el.value || "blank reason"}`,
+                  );
+                save();
+              }),
+          );
+          $$("[data-del-reg]").forEach(
+            (b) =>
+              (b.onclick = () => {
+                state.entry.registrations.splice(+b.dataset.delReg, 1);
+                save("Registration deleted");
+              }),
+          );
+        }
+        function renderEntry() {
+          [
+            "filterGender",
+            "filterDiscipline",
+            "entryLimit",
+            "prepBracketSize",
+            "customBracketSize",
+            "videoMinimum",
+          ].forEach((id) => {
+            $("#" + id).value =
+              state.entry[id.replace("filterG", "g").replace("filterD", "d")] ||
+              state.entry[id] ||
+              $("#" + id).value;
+          });
+          $("#filterGender").value = state.entry.gender;
+          $("#filterDiscipline").value = state.entry.discipline;
+          $("#entryLimit").value = state.entry.limit;
+          $("#prepBracketSize").value =
+            state.entry.bracketSize === "Custom"
+              ? "Custom"
+              : state.entry.bracketSize;
+          $("#customBracketSize").value = state.entry.customBracketSize;
+          $("#videoMinimum").value = state.entry.videoMinimum;
+          const count = activeRegs().length;
+          $("#limitWarning").textContent =
+            count > state.entry.limit
+              ? `Warning: ${count} active registered riders exceed the ${state.entry.limit}-rider main event limit. Allocation will create a start list and waiting list.`
+              : `${count} active registered riders for this gender/discipline. Limit ${state.entry.limit}.`;
+          renderRegistration();
+          $("#startList").innerHTML =
+            state.entry.allocation
+              .map((r) =>
+                card(r, `Entry #${r.entryPosition}`, r.selectionReason),
+              )
+              .join("") ||
+            '<p class="small">Run allocation to build the main event start list.</p>';
+          $("#replacementBox").innerHTML =
+            state.entry.replacements
+              .map(
+                (x) =>
+                  `<strong>${esc(x.next)}</strong> proposed for <strong>${esc(x.absent)}</strong>. ${esc(x.reason)}<br>${esc(x.audit)}`,
+              )
+              .join("<hr>") || "No absent confirmed rider replacement pending.";
+          $("#waitingList").innerHTML =
+            state.entry.waiting
+              .map((r) =>
+                card(r, `Waiting #${r.waitingPosition}`, r.waitingReason),
+              )
+              .join("") ||
+            '<p class="small">No waiting-list riders for the current allocation.</p>';
+          $("#seedingTable").innerHTML =
+            state.entry.seeds
+              .map(
+                (r) =>
+                  `<div class="card"><div><span class="pill green">Seed ${r.seed}</span> <strong>${esc(r.name)}</strong> <span class="small">${esc(r.nationality)} · rank ${esc(r.rank || "—")}</span></div><p class="small reason">${esc(r.seedReason)}\nSelection: ${esc(r.selectionReason)}</p><button class="secondary" data-why="${esc(r.id)}">Why this rider is seeded here?</button></div>`,
+              )
+              .join("") ||
+            '<p class="small">Run allocation to generate seeds.</p>';
+          $("#entryBracketPreview").innerHTML = buildPreview();
+          $("#auditLog").innerHTML =
+            [
+              ...state.entry.audit,
+              ...state.entry.replacements.map((r) => ({
+                time: "sample scenario",
+                action: "replacement note",
+                detail: r.audit,
+              })),
+            ]
+              .map(
+                (a) =>
+                  `<div class="card"><strong>${esc(a.action)}</strong><span class="small">${esc(a.time)}</span><p class="small">${esc(a.detail)}</p></div>`,
+              )
+              .join("") || '<p class="small">No decisions recorded yet.</p>';
+          $$("[data-why]").forEach(
+            (b) => (b.onclick = () => showWhy(b.dataset.why)),
+          );
+        }
+        function card(r, label, reason) {
+          return `<div class="card"><div><span class="pill ${r.status === "confirmed" || r.allocated ? "green" : r.status === "absent" ? "red" : "amber"}">${esc(label)}</span> <strong>${esc(r.name)}</strong> <span class="small">${esc(r.nationality)} · ${esc(r.source)} · rank ${esc(r.rank || "—")}</span></div><p class="small reason">${esc(reason)}</p><button class="secondary" data-why="${esc(r.id)}">Why this rider is seeded here?</button></div>`;
+        }
+        function showWhy(id) {
+          const r = [
+            ...state.entry.allocation,
+            ...state.entry.waiting,
+            ...state.entry.seeds,
+            state.entry.registrations,
+          ]
+            .flat()
+            .find(
+              (x) =>
+                (x && String(x.id || x.name) === String(id)) ||
+                String(x?.name) === String(id),
+            );
+          if (!r) return toast("No rider explanation available");
+          alert(
+            `${r.name}\nRanking source: ${r.source}${r.rank ? ` / rank ${r.rank}` : " / no previous ranking"}\nSelection reason: ${r.selectionReason || selectionReason(r)}\nSeed reason: ${r.seedReason || "Not seeded in main event yet."}\nManual override reason: ${r.manualOverrideReason || "None recorded. If changed manually, Race Director reason required."}`,
+          );
+        }
+        function parseCSV(text) {
+          return text
+            .trim()
+            .split(/\n+/)
+            .map((line) => line.split(",").map((x) => x.trim()))
+            .filter((r) => r.length > 1)
+            .map((c, i) => ({
+              id: "reg" + Date.now() + i,
+              rank: c[0],
+              name: c[1],
+              nationality: c[2],
+              gender: c[3] || state.entry.gender,
+              division: c[4] || "Open",
+              discipline: c[5] || state.entry.discipline,
+              points: c[6] || 0,
+              status: c[7] || "registered",
+              source: c[8] || "ranking",
+              videoScore: c[9] || "",
+              manualSeed: c[10] || "",
+              manualOverrideReason: c[11] || "",
+              notes: c[12] || "",
+            }));
+        }
+        function renderBracket() {
+          if (!state.bracket.seeds.length)
+            state.bracket.seeds = state.entry.seeds.map((s) => ({
+              seed: s.seed,
+              name: s.name,
+              lycra: lycras[(s.seed - 1) % lycras.length],
+              nationality: s.nationality,
+            }));
+          $("#eventName").value = state.bracket.eventName;
+          $("#bracketSize").value = state.bracket.size;
+          $("#bracketOfficial").value = state.bracket.official;
+          $("#seedList").innerHTML = Array.from(
+            { length: +state.bracket.size || 24 },
+            (_, i) =>
+              state.bracket.seeds[i] || {
+                seed: i + 1,
+                name: "",
+                lycra: lycras[i % lycras.length],
+                nationality: "",
+              },
+          )
+            .map(
+              (s) =>
+                `<div class="seed-row"><input data-seed-no value="${s.seed}"><input data-seed-name value="${esc(s.name)}" placeholder="Rider"><input data-seed-nat value="${esc(s.nationality || "")}" placeholder="NAT"><select data-seed-lycra>${lycras.map((l) => `<option ${s.lycra === l ? "selected" : ""}>${l}</option>`).join("")}</select></div>`,
+            )
+            .join("");
+          $("#bracketBoard").innerHTML =
+            state.bracket.rounds
+              .map(
+                (r) =>
+                  `<div class="bracket-round"><h3>${esc(r.name)}</h3>${r.heats.map((h) => `<div class="bracket-match"><span class="pill gray">Heat ${h.heatNumber}</span>${h.riders.map((x) => `<div class="bracket-rider ${x.bye ? "bye" : ""}"><span>${esc(x.name)}<br><span class="small">Seed ${x.seed}${x.bye ? " · BYE" : ""}</span></span></div>`).join("")}<button class="secondary" data-activate="${h.id}">Set live</button></div>`).join("")}</div>`,
+              )
+              .join("") ||
+            '<p class="small">Generate heats to preview bracket.</p>';
+          $$("[data-activate]").forEach(
+            (b) => (b.onclick = () => activateHeat(b.dataset.activate)),
+          );
+        }
+        function updateSeedsFromDom() {
+          state.bracket.seeds = $$(".seed-row")
+            .map((row, i) => ({
+              seed: +row.querySelector("[data-seed-no]").value || i + 1,
+              name: row.querySelector("[data-seed-name]").value.trim(),
+              nationality: row
+                .querySelector("[data-seed-nat]")
+                .value.trim()
+                .toUpperCase(),
+              lycra: row.querySelector("[data-seed-lycra]").value,
+            }))
+            .sort((a, b) => a.seed - b.seed);
+        }
+        function generateBracket() {
+          updateSeedsFromDom();
+          const size = +state.bracket.size || 24,
+            seeds = state.bracket.seeds.filter((s) => s.name),
+            empty = Math.max(0, size - seeds.length),
+            byeSeeds = seeds.slice(0, empty).map((s) => s.seed),
+            spots = Array.from(
+              { length: size },
+              (_, i) =>
+                seeds[i] || {
+                  seed: i + 1,
+                  name: "Empty spot",
+                  lycra: lycras[i % lycras.length],
+                  nationality: "",
+                  bye: false,
+                },
+            );
+          const heats = [];
+          for (let i = 0; i < spots.length; i += 2) {
+            const riders = [spots[i], spots[i + 1]]
+              .filter(Boolean)
+              .map((s) => ({
+                id: `seed-${s.seed}-${slug(s.name)}`,
+                seed: s.seed,
+                name: s.name,
+                lycra: s.lycra,
+                nationality: s.nationality,
+                bye: byeSeeds.includes(s.seed),
+                reason: s.reason || "",
+              }));
+            heats.push({
+              id: "h" + Date.now() + i,
+              heatNumber: i / 2 + 1,
+              status: "upcoming",
+              official: state.bracket.official,
+              riders,
+            });
+          }
+          state.bracket.rounds = [{ name: `Round of ${size}`, heats }];
+          audit(
+            "bracket generated",
+            `${size}-spot bracket prepared with ${empty} bye(s). Bye allocated due to seed position.`,
+          );
+          save("Bracket generated with byes");
+        }
+        function heats() {
+          return state.bracket.rounds.flatMap((r) => r.heats);
+        }
+        function heat(id = state.activeHeatId) {
+          return heats().find((h) => h.id === id);
+        }
+        function activateHeat(id) {
+          if (
+            !requirePermission(
+              "heatStatus",
+              "Only Race Director can start/postpone/abandon heat",
+            )
+          )
+            return;
+          state.activeHeatId = id;
+          heats().forEach(
+            (h) =>
+              (h.status =
+                h.id === id
+                  ? "live"
+                  : h.status === "live"
+                    ? "upcoming"
+                    : h.status),
+          );
+          state.riders = (heat(id)?.riders || [])
+            .filter((r) => !r.bye && !r.name.includes("Empty"))
+            .map((r) => ({ ...r }));
+          state.selectedRiderId = state.riders[0]?.id || null;
+          state.selectedAttemptId = null;
+          roleAudit(
+            "heat set live",
+            `Heat ${heat(id)?.heatNumber || "manual"}`,
+            "Race Director controls heat status",
+            "live",
+          );
+          save("Active heat updated");
+        }
+        function renderHeats() {
+          $("#heatList").innerHTML =
+            heats()
+              .map(
+                (h) =>
+                  `<div class="heat-card ${h.id === state.activeHeatId ? "active" : ""}"><span class="pill ${h.status === "live" ? "green" : "gray"}">${h.status}</span><span><strong>Heat ${h.heatNumber}</strong><br><span class="small">${h.riders.map((r) => r.name + (r.bye ? " (bye)" : "")).join(" vs ")}</span></span><button class="secondary" data-activate="${h.id}">Set live</button></div>`,
+              )
+              .join("") || '<p class="small">No bracket heats yet.</p>';
+          $$("[data-activate]").forEach(
+            (b) => (b.onclick = () => activateHeat(b.dataset.activate)),
+          );
+        }
+        function selectedAttempt() {
+          return state.attempts.find((a) => a.id === state.selectedAttemptId);
+        }
+        function attemptScore(a) {
+          if (!a) return null;
+          if (a.confirmedScore !== null && a.confirmedScore !== undefined)
+            return a.confirmedScore;
+          const vals = a.judgeScores
+            .filter(Number.isFinite)
+            .sort((x, y) => x - y);
+          if (!vals.length) return 0;
+          const counted = vals.length >= 5 ? vals.slice(1, -1) : vals;
+          return (
+            Math.round(
+              (counted.reduce((s, v) => s + v, 0) / counted.length) * 100,
+            ) / 100
+          );
+        }
+        function validScores(riderId, type) {
+          return state.attempts
+            .filter(
+              (a) =>
+                a.riderId === riderId &&
+                a.type === type &&
+                a.heatId === state.activeHeatId &&
+                !isAttemptInvalidated(a.id),
+            )
+            .map(attemptScore)
+            .filter(Number.isFinite)
+            .sort((a, b) => b - a);
+        }
+        function activePenalties() {
+          return state.penalties.filter(
+            (p) => p.status === "validated" || p.status === "applied",
+          );
+        }
+        function penaltiesFor(riderId, heatId = state.activeHeatId) {
+          return activePenalties().filter(
+            (p) => p.riderId === riderId && (!heatId || p.heatId === heatId),
+          );
+        }
+        function isAttemptInvalidated(attemptId) {
+          return activePenalties().some(
+            (p) =>
+              p.impact === "attempt invalidated" && p.attemptId === attemptId,
+          );
+        }
+        function penaltyDeduction(riderId, heatId = state.activeHeatId) {
+          return penaltiesFor(riderId, heatId)
+            .filter((p) => p.impact === "score deduction")
+            .reduce((sum, p) => sum + (+p.deduction || 0), 0);
+        }
+        function hasDisqualification(riderId, heatId = state.activeHeatId) {
+          return penaltiesFor(riderId, heatId).some(
+            (p) => p.impact === "disqualification",
+          );
+        }
+        function heatRankPenalty(riderId, heatId = state.activeHeatId) {
+          return penaltiesFor(riderId, heatId)
+            .filter((p) => p.impact === "heat ranking penalty")
+            .reduce((sum, p) => sum + (+p.places || 0), 0);
+        }
+        function rawTotal(r) {
+          return (
+            validScores(r.id, "wave")
+              .slice(0, state.settings.countWaves)
+              .reduce((s, v) => s + v, 0) +
+            validScores(r.id, "trick")
+              .slice(0, state.settings.countTricks)
+              .reduce((s, v) => s + v, 0)
+          );
+        }
+        function total(r) {
+          if (hasDisqualification(r.id)) return 0;
+          return Math.max(0, rawTotal(r) - penaltyDeduction(r.id));
+        }
+        function rankingEntries() {
+          return state.riders
+            .map((r) => ({
+              r,
+              total: total(r),
+              provisional: state.penalties.some(
+                (p) =>
+                  p.heatId === state.activeHeatId && p.status === "pending",
+              ),
+              dsq: hasDisqualification(r.id),
+              rankPenalty: heatRankPenalty(r.id),
+            }))
+            .sort((a, b) => {
+              if (a.dsq !== b.dsq) return a.dsq ? 1 : -1;
+              return b.total - a.total || a.rankPenalty - b.rankPenalty;
+            })
+            .map((e, i) => ({ ...e, place: i + 1 + e.rankPenalty }));
+        }
+        function selectedPenalty() {
+          return state.penalties.find((p) => p.id === state.selectedPenaltyId);
+        }
+        function penaltyRiderName(p) {
+          return (
+            state.riders.find((r) => r.id === p.riderId)?.name ||
+            p.riderName ||
+            "—"
+          );
+        }
+        function penaltyHeatName(p) {
+          return `Heat ${heat(p.heatId)?.heatNumber || p.heatNumber || "manual"}`;
+        }
+        function logPenalty(p, action, status = p.status) {
+          const entry = {
+            timestamp: new Date().toISOString(),
+            rider: penaltyRiderName(p),
+            heat: penaltyHeatName(p),
+            official: state.role,
+            reason: p.comment || p.validationDecision || "No reason recorded",
+            impact: p.impact,
+            action,
+            status,
+          };
+          p.auditHistory.unshift(entry);
+          roleAudit(
+            `penalty ${action}`,
+            `${entry.rider} · ${entry.heat}`,
+            `${p.type}: ${entry.reason} · ${entry.impact}`,
+            status,
+          );
+        }
+        function selectedPenaltyPayload(status = "pending") {
+          const rider = state.riders.find(
+            (r) => r.id === $("#penaltyRider").value,
+          );
+          const h = heat($("#penaltyHeat").value) || heat();
+          return {
+            id: "pen" + Date.now(),
+            type: $("#penaltyType").value,
+            riderId: rider?.id || "",
+            riderName: rider?.name || "No rider selected",
+            heatId: h?.id || state.activeHeatId || "manual",
+            heatNumber: h?.heatNumber || "manual",
+            status,
+            impact: $("#penaltyImpact").value,
+            comment: $("#penaltyComment").value.trim(),
+            deduction: +$("#penaltyDeduction").value || 0,
+            places: +$("#penaltyPlaces").value || 0,
+            attemptId: $("#penaltyAttempt").value || "",
+            validationDecision: "",
+            auditHistory: [],
+            createdAt: new Date().toISOString(),
+          };
+        }
+        function needsHeadJudgeDecision(p) {
+          return (
+            p.impact === "Head Judge decision required" ||
+            (p.impact === "score deduction" && !(+p.deduction > 0)) ||
+            (p.impact === "attempt invalidated" && !p.attemptId) ||
+            (p.impact === "heat ranking penalty" && !(+p.places > 0))
+          );
+        }
+        function markHeatProvisional(p) {
+          const h = heat(p.heatId);
+          if (h) {
+            h.official = "provisional";
+            h.resultStatus = "provisional due to validated penalty";
+          }
+          state.bracket.official = "provisional";
+        }
+        function applyPenalty(p) {
+          if (p.status !== "validated") return;
+          p.status = "applied";
+          p.appliedAt = new Date().toISOString();
+          markHeatProvisional(p);
+          logPenalty(p, "applied", "applied");
+        }
+        function renderPenaltyPanel() {
+          const active = heat();
+          $("#penaltyType").innerHTML = penaltyTypes
+            .map((x) => `<option>${x}</option>`)
+            .join("");
+          $("#penaltyImpact").innerHTML = penaltyImpacts
+            .map((x) => `<option>${x}</option>`)
+            .join("");
+          $("#penaltyRider").innerHTML =
+            state.riders
+              .map((r) => `<option value="${r.id}">${esc(r.name)}</option>`)
+              .join("") || '<option value="">No active rider</option>';
+          $("#penaltyHeat").innerHTML =
+            heats()
+              .map(
+                (h) =>
+                  `<option value="${h.id}" ${h.id === state.activeHeatId ? "selected" : ""}>Heat ${h.heatNumber} · ${h.status}</option>`,
+              )
+              .join("") || '<option value="manual">Manual heat</option>';
+          const attempts = state.attempts.filter(
+            (a) =>
+              a.heatId === state.activeHeatId &&
+              a.riderId === $("#penaltyRider").value,
+          );
+          $("#penaltyAttempt").innerHTML =
+            '<option value="">Not applicable / Head Judge decision required</option>' +
+            attempts
+              .map(
+                (a) =>
+                  `<option value="${a.id}">${a.type.toUpperCase()} · ${scoreLabel(attemptScore(a))}</option>`,
+              )
+              .join("");
+          const selected = selectedPenalty();
+          const statusPill = (p) =>
+            p.status === "applied" || p.status === "validated"
+              ? "green"
+              : p.status === "rejected"
+                ? "red"
+                : "amber";
+          $("#penaltyList").innerHTML =
+            state.penalties
+              .filter(
+                (p) =>
+                  !active || p.heatId === active.id || p.heatId === "manual",
+              )
+              .map(
+                (p) =>
+                  `<button class="card penalty-row ${p.status} ${p.id === state.selectedPenaltyId ? "active" : ""}" data-penalty="${p.id}"><span><span class="pill ${statusPill(p)}">${esc(p.status)}</span> <strong>${esc(p.type)}</strong></span><span>${esc(penaltyRiderName(p))} · ${esc(penaltyHeatName(p))}</span><span class="small">Impact: ${esc(p.impact)}${p.deduction ? ` · -${p.deduction}` : ""}${p.places ? ` · +${p.places} rank place(s)` : ""}${needsHeadJudgeDecision(p) ? " · Head Judge decision required" : ""}</span><span class="small reason">${esc(p.comment || p.validationDecision || "No comment")}</span><span class="small">Audit entries: ${p.auditHistory.length}</span></button>`,
+              )
+              .join("") ||
+            '<p class="small">No penalties logged for this heat.</p>';
+          $$("[data-penalty]").forEach(
+            (b) =>
+              (b.onclick = () => {
+                state.selectedPenaltyId = b.dataset.penalty;
+                save();
+              }),
+          );
+          const canFlag = can("penaltyFlag");
+          const canValidate =
+            can("penaltyValidate") && selected?.status === "pending";
+          setActionState(
+            $("#flagPenalty"),
+            canFlag,
+            "Officials may flag penalties; judges flag only pending calls.",
+          );
+          setActionState(
+            $("#validatePenalty"),
+            canValidate,
+            "Only Head Judge can validate this",
+          );
+          setActionState(
+            $("#rejectPenalty"),
+            canValidate,
+            "Only Head Judge can validate this",
+          );
+          setActionState(
+            $("#removePenalty"),
+            can("penaltyValidate") && !!selected,
+            "Only Head Judge can remove validated penalty records",
+          );
+        }
+        function renderJudge() {
+          [
+            "format",
+            "discipline",
+            "judgeCount",
+            "countWaves",
+            "countTricks",
+          ].forEach((id) => {
+            $("#" + id).value = state.settings[id];
+          });
+          $("#riderList").innerHTML =
+            state.riders
+              .map(
+                (r) =>
+                  `<button class="rider-card ${r.id === state.selectedRiderId ? "active" : ""}" data-rider="${r.id}"><span class="lycra ${r.lycra || "Red"}">${(r.lycra || "R")[0]}</span><span><strong>${esc(r.name)}</strong><br><span class="small">Seed ${r.seed || "—"} · ${esc(r.nationality || "")}</span></span><span class="pill gray">${total(r).toFixed(2)}</span></button>`,
+              )
+              .join("") ||
+            '<p class="small">Activate a bracket heat or add riders manually.</p>';
+          $$("[data-rider]").forEach(
+            (b) =>
+              (b.onclick = () => {
+                state.selectedRiderId = b.dataset.rider;
+                state.selectedAttemptId = null;
+                save();
+              }),
+          );
+          const r = state.riders.find((x) => x.id === state.selectedRiderId);
+          $("#selectedName").textContent = r ? r.name : "Select a rider";
+          $("#selectedMeta").textContent = r
+            ? `${r.lycra || "No"} lycra · active heat ${heat()?.heatNumber || "manual"}`
+            : "No rider selected";
+          const attempts = state.attempts.filter(
+            (a) =>
+              a.riderId === state.selectedRiderId &&
+              a.heatId === state.activeHeatId,
+          );
+          $("#attemptList").innerHTML =
+            attempts
+              .map(
+                (a) =>
+                  `<button class="attempt-card ${a.id === state.selectedAttemptId ? "active" : ""} ${a.confirmed ? "locked" : ""}" data-attempt="${a.id}"><strong>${a.type.toUpperCase()}</strong><span class="small">${a.confirmed ? "Confirmed" : "Draft"} · ${scoreLabel(attemptScore(a))}</span></button>`,
+              )
+              .join("") ||
+            '<p class="small">Create a wave or trick attempt for this rider.</p>';
+          $$("[data-attempt]").forEach(
+            (b) =>
+              (b.onclick = () => {
+                state.selectedAttemptId = b.dataset.attempt;
+                save();
+              }),
+          );
+          renderScoreTool();
+          $("#leaderboard").innerHTML =
+            rankingEntries()
+              .map(
+                (e) =>
+                  `<div class="rank-row"><span class="pill ${e.place === 1 ? "green" : e.provisional ? "amber" : "gray"}">#${e.place}</span><span><strong>${esc(e.r.name)}</strong><br><span class="small">${e.provisional ? "Ranking provisional until Head Judge final validation. " : ""}${e.dsq ? "DSQ applied. " : ""}${e.rankPenalty ? `Heat ranking penalty +${e.rankPenalty} place(s). ` : ""}Tie guide: compare counting scores best-to-worst. If still unclear: Head Judge decision required.</span></span><strong>${e.total.toFixed(2)}</strong></div>`,
+              )
+              .join("") || '<p class="small">No riders in active heat.</p>';
+          const h = heat();
+          $("#resultStatus").textContent = h
+            ? `Official result status: ${h.resultStatus || h.official || "provisional"}. Bracket advancement remains provisional until final validation.`
+            : "Result is provisional until Head Judge validation.";
+          setActionState(
+            $("#validateResult"),
+            can("resultValidate") && !!h,
+            "Only Head Judge can validate this",
+          );
+          $("#interferenceList").innerHTML =
+            state.riders
+              .map(
+                (r) =>
+                  `<div class="call-row"><strong>${esc(r.name)}</strong><p class="small">Judge can call possible interference; majority judge call is required before Head Judge penalty decision.</p></div>`,
+              )
+              .join("") || '<p class="small">No riders in active heat.</p>';
+          renderPenaltyPanel();
+        }
+        const scoreLabel = (v) =>
+          v === "M" ? "M" : Number.isFinite(v) ? v.toFixed(1) : "—";
+        function renderScoreTool() {
+          const a = selectedAttempt();
+          state.selectedJudgeIndex = Math.min(
+            state.selectedJudgeIndex || 0,
+            state.settings.judgeCount - 1,
+          );
+          $("#judgeSlot").innerHTML = Array.from(
+            { length: state.settings.judgeCount },
+            (_, i) =>
+              `<option value="${i}" ${i === state.selectedJudgeIndex ? "selected" : ""}>Judge ${i + 1}</option>`,
+          ).join("");
+          $("#attemptTitle").textContent = a
+            ? a.type.toUpperCase()
+            : "No attempt";
+          $("#scoreReadout").textContent = a
+            ? scoreLabel(attemptScore(a))
+            : "—";
+          $("#lockStatus").textContent = !a
+            ? "Select or create an attempt to score."
+            : a.confirmed
+              ? "Confirmed score locked."
+              : "Draft score. Confirm to lock.";
+          $("#confirmScore").disabled = !a || a.confirmed;
+          $("#scorePad").innerHTML =
+            [0.1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+              .map((v) => `<button data-score="${v}">${v.toFixed(1)}</button>`)
+              .join("") +
+            '<button class="mark-m" data-score="M">Missed M</button>';
+          $$("[data-score]").forEach(
+            (b) =>
+              (b.onclick = () =>
+                setScore(b.dataset.score === "M" ? "M" : +b.dataset.score)),
+          );
+          $("#correctionBox").classList.add("hide");
+        }
+        function setScore(v) {
+          if (
+            !requirePermission(
+              "score",
+              "Race Director and Head Judge cannot enter judge scores",
+            )
+          )
+            return;
+          const a = selectedAttempt();
+          if (!a) return toast("Create an attempt first");
+          if (a.confirmed)
+            return toast("Score locked. Use Head Judge correction workflow.");
+          if (v === "M") {
+            a.judgeScores = ["M"];
+            a.confirmedScore = "M";
+          } else {
+            a.judgeScores[state.selectedJudgeIndex || 0] = Math.max(
+              0.1,
+              Math.min(10, Math.round(v * 10) / 10),
+            );
+            a.confirmedScore = null;
+          }
+          save("Judge mark saved");
+        }
+        function addAttempt(type) {
+          if (
+            !requirePermission("score", "Only Judge can score rider attempts")
+          )
+            return;
+          if (!state.selectedRiderId) return toast("Select a rider first");
+          const id = "a" + Date.now();
+          state.attempts.push({
+            id,
+            heatId: state.activeHeatId,
+            riderId: state.selectedRiderId,
+            type,
+            created: Date.now(),
+            judgeScores: [],
+            confirmedScore: null,
+            confirmed: false,
+            correctionReason: "",
+          });
+          state.selectedAttemptId = id;
+          save(`${type} attempt added`);
+        }
+        function syncSettings() {
+          if (
+            !requirePermission(
+              "judgingConfig",
+              "Only Head Judge can configure judging format",
+            )
+          )
+            return;
+          ["format", "discipline"].forEach(
+            (id) => (state.settings[id] = $("#" + id).value),
+          );
+          ["judgeCount", "countWaves", "countTricks"].forEach(
+            (id) => (state.settings[id] = +$("#" + id).value || 0),
+          );
+          if (state.settings.judgeCount % 2 === 0) state.settings.judgeCount++;
+          if (state.settings.judgeCount < 3) state.settings.judgeCount = 3;
+        }
+        function applyRoleUi() {
+          setActionState(
+            $("#runAllocation"),
+            can("entry"),
+            "Only Race Director can manage entry allocation",
+          );
+          setActionState(
+            $("#loadEntrySample"),
+            can("registration"),
+            "Only Race Director can manage registration",
+          );
+          setActionState(
+            $("#clearEntryData"),
+            can("registration"),
+            "Only Race Director can manage registration",
+          );
+          setActionState(
+            $("#importPaste"),
+            can("registration"),
+            "Only Race Director can manage registration",
+          );
+          setActionState(
+            $("#addBlankRider"),
+            can("registration"),
+            "Only Race Director can manage registration",
+          );
+          setActionState(
+            $("#useEntrySeeds"),
+            can("seeding"),
+            "Only Race Director can manage seeding",
+          );
+          setActionState(
+            $("#resizeSeeds"),
+            can("seeding"),
+            "Only Race Director can manage seeding",
+          );
+          setActionState(
+            $("#generateBracket"),
+            can("bracket"),
+            "Only Race Director can generate heats/brackets",
+          );
+          setActionState(
+            $("#addRider"),
+            can("heatStatus"),
+            "Only Race Director can change rider list",
+          );
+          setActionState(
+            $("#addWave"),
+            can("score"),
+            "Only Judge can score rider attempts",
+          );
+          setActionState(
+            $("#addTrick"),
+            can("score"),
+            "Only Judge can score rider attempts",
+          );
+          setActionState(
+            $("#confirmScore"),
+            can("score") && !selectedAttempt()?.confirmed,
+            "Judge scores are locked after confirmation",
+          );
+          setActionState(
+            $("#unlockScore"),
+            can("scoreCorrection"),
+            "Only Head Judge can validate this",
+          );
+          setActionState(
+            $("#validateResult"),
+            can("resultValidate") && !!heat(),
+            "Only Head Judge can validate this",
+          );
+          [
+            "format",
+            "discipline",
+            "judgeCount",
+            "countWaves",
+            "countTricks",
+          ].forEach((id) => {
+            const el = $("#" + id);
+            if (el) {
+              el.disabled = !can("judgingConfig");
+              el.title = can("judgingConfig")
+                ? ""
+                : "Only Head Judge can configure judging format";
+            }
+          });
+          $$("[data-activate]").forEach((b) =>
+            setActionState(
+              b,
+              can("heatStatus"),
+              "Only Race Director can start/postpone/abandon heat",
+            ),
+          );
+          $$("[data-score]").forEach((b) =>
+            setActionState(
+              b,
+              can("score"),
+              "Only Judge can score rider attempts",
+            ),
+          );
+        }
+        function render() {
+          $("#roleSelector").value = state.role;
+          $("#roleSummary").textContent =
+            roleSummaries[state.role] ||
+            "Manual MVP role selector; authentication comes later.";
+          ["entry", "bracket", "heats", "judge"].forEach((s) => {
+            $("#" + s + "Screen").classList.toggle("hide", state.screen !== s);
+          });
+          $$(".tab").forEach((b) => {
+            b.classList.toggle("active", b.dataset.screen === state.screen);
+            b.classList.toggle("ghost", b.dataset.screen !== state.screen);
+          });
+          $$(".subtab").forEach((b) => {
+            b.classList.toggle("active", b.dataset.entryTab === state.entryTab);
+            b.classList.toggle("ghost", b.dataset.entryTab !== state.entryTab);
+          });
+          $$(".entry-pane").forEach((p) =>
+            p.classList.toggle("hide", p.id !== `entry-${state.entryTab}`),
+          );
+          $("#heatStatus").textContent = state.activeHeatId
+            ? `Heat ${heat()?.heatNumber || ""} live`
+            : `${state.entry.allocation.length || 0} in start list · ${state.entry.waiting.length || 0} waiting`;
+          renderEntry();
+          renderBracket();
+          renderHeats();
+          renderJudge();
+          applyRoleUi();
+        }
+        $("#roleSelector").onchange = () => {
+          state.role = $("#roleSelector").value;
+          roleAudit(
+            "role selected",
+            state.role,
+            "Manual MVP role selection; authentication later",
+            "active",
+          );
+          save(`Role changed to ${state.role}`);
+        };
+        $$(".tab").forEach(
+          (b) =>
+            (b.onclick = () => {
+              state.screen = b.dataset.screen;
+              save();
+            }),
+        );
+        $$(".subtab").forEach(
+          (b) =>
+            (b.onclick = () => {
+              state.entryTab = b.dataset.entryTab;
+              save();
+            }),
+        );
+        [
+          "filterGender",
+          "filterDiscipline",
+          "entryLimit",
+          "prepBracketSize",
+          "customBracketSize",
+          "videoMinimum",
+        ].forEach(
+          (id) =>
+            ($("#" + id).onchange = () => {
+              updateEntrySettings();
+              save("Entry settings saved");
+            }),
+        );
+        $("#runAllocation").onclick = () => {
+          if (
+            !requirePermission(
+              "entry",
+              "Only Race Director can manage entry allocation",
+            )
+          )
+            return;
+          updateEntrySettings();
+          runAllocation();
+          save("Allocation and seeding rebuilt");
+        };
+        $("#loadEntrySample").onclick = () => {
+          if (
+            !requirePermission(
+              "entry",
+              "Only Race Director can manage registration",
+            )
+          )
+            return;
+          state.entry.registrations = sampleRegistrations();
+          runAllocation();
+          save("40-rider sample loaded");
+        };
+        $("#clearEntryData").onclick = () => {
+          if (
+            !requirePermission(
+              "entry",
+              "Only Race Director can manage registration",
+            )
+          )
+            return;
+          state.entry.registrations = [];
+          state.entry.allocation = [];
+          state.entry.waiting = [];
+          state.entry.seeds = [];
+          audit(
+            "entry module cleared",
+            "All registrations, allocation, waiting list, and seeds cleared.",
+          );
+          save("Entry module cleared");
+        };
+        $("#importPaste").onclick = () => {
+          if (
+            !requirePermission(
+              "registration",
+              "Only Race Director can manage registration",
+            )
+          )
+            return;
+          const rows = parseCSV($("#pasteBox").value);
+          state.entry.registrations.push(...rows);
+          audit(
+            "registrations imported",
+            `${rows.length} pasted rows imported.`,
+          );
+          $("#pasteBox").value = "";
+          save("Rows imported");
+        };
+        $("#addBlankRider").onclick = () => {
+          if (
+            !requirePermission(
+              "registration",
+              "Only Race Director can manage registration",
+            )
+          )
+            return;
+          state.entry.registrations.push({
+            id: "reg" + Date.now(),
+            rank: "",
+            name: "New Rider",
+            nationality: "",
+            gender: state.entry.gender,
+            division: "Open",
+            discipline: state.entry.discipline,
+            points: 0,
+            status: "registered",
+            source: "organizer selection",
+            videoScore: "",
+            manualSeed: "",
+            manualOverrideReason: "",
+            notes: "",
+          });
+          save("Manual rider added");
+        };
+        ["eventName", "bracketSize", "bracketOfficial"].forEach(
+          (id) =>
+            ($("#" + id).onchange = () => {
+              state.bracket.eventName = $("#eventName").value;
+              state.bracket.size = +$("#bracketSize").value;
+              state.bracket.official = $("#bracketOfficial").value;
+              save("Bracket setup saved");
+            }),
+        );
+        $("#useEntrySeeds").onclick = () => {
+          if (
+            !requirePermission(
+              "seeding",
+              "Only Race Director can manage seeding unless Head Judge override is later authenticated",
+            )
+          )
+            return;
+          state.bracket.size = bracketSize();
+          state.bracket.seeds = state.entry.seeds.map((s) => ({
+            seed: s.seed,
+            name: s.name,
+            lycra: lycras[(s.seed - 1) % lycras.length],
+            nationality: s.nationality,
+            reason: s.seedReason,
+          }));
+          save("Entry seeds copied to bracket");
+        };
+        $("#resizeSeeds").onclick = () => {
+          if (
+            !requirePermission(
+              "seeding",
+              "Only Race Director can manage seeding unless Head Judge override is later authenticated",
+            )
+          )
+            return;
+          updateSeedsFromDom();
+          state.bracket.size = +$("#bracketSize").value;
+          state.bracket.seeds = Array.from(
+            { length: state.bracket.size },
+            (_, i) =>
+              state.bracket.seeds.find((s) => s.seed === i + 1) || {
+                seed: i + 1,
+                name: "",
+                lycra: lycras[i % lycras.length],
+                nationality: "",
+              },
+          );
+          save("Seed list resized");
+        };
+        $("#generateBracket").onclick = () => {
+          if (
+            !requirePermission(
+              "bracket",
+              "Only Race Director can generate heats/brackets",
+            )
+          )
+            return;
+          generateBracket();
+        };
+        [
+          "format",
+          "discipline",
+          "judgeCount",
+          "countWaves",
+          "countTricks",
+        ].forEach(
+          (id) =>
+            ($("#" + id).onchange = () => {
+              syncSettings();
+              save("Heat configuration updated");
+            }),
+        );
+        $("#judgeSlot").onchange = () => {
+          state.selectedJudgeIndex = +$("#judgeSlot").value || 0;
+          save();
+        };
+        $("#addRider").onclick = () => {
+          if (
+            !requirePermission(
+              "heatStatus",
+              "Only Race Director can change rider list",
+            )
+          )
+            return;
+          const name = $("#newRiderName").value.trim();
+          if (!name) return toast("Enter rider name");
+          state.riders.push({
+            id: "r" + Date.now(),
+            name,
+            lycra: $("#newRiderLycra").value,
+            nationality: "",
+          });
+          $("#newRiderName").value = "";
+          save("Rider added");
+        };
+        $("#addWave").onclick = () => addAttempt("wave");
+        $("#addTrick").onclick = () => addAttempt("trick");
+        $("#scoreDown").onclick = () => {
+          const s = attemptScore(selectedAttempt());
+          if (Number.isFinite(s)) setScore(s - 0.1);
+        };
+        $("#scoreUp").onclick = () => {
+          const s = attemptScore(selectedAttempt());
+          setScore(Number.isFinite(s) ? s + 0.1 : 0.1);
+        };
+        $("#confirmScore").onclick = () => {
+          if (
+            !requirePermission(
+              "score",
+              "Only Judge can submit score; confirmed scores then lock",
+            )
+          )
+            return;
+          const a = selectedAttempt();
+          if (!a) return;
+          if (a.confirmedScore === null || a.confirmedScore === undefined)
+            a.confirmedScore = attemptScore(a);
+          a.confirmed = true;
+          roleAudit(
+            "score submitted and locked",
+            `${state.riders.find((r) => r.id === a.riderId)?.name || "rider"} · ${a.type}`,
+            "Judge submitted score; correction request must go to Head Judge",
+            "confirmed",
+          );
+          save("Score confirmed and locked");
+        };
+        $("#requestCorrection").onclick = () =>
+          $("#correctionBox").classList.toggle("hide");
+        $("#unlockScore").onclick = () => {
+          if (
+            !requirePermission(
+              "scoreCorrection",
+              "Only Head Judge can approve judge correction requests",
+            )
+          )
+            return;
+          const a = selectedAttempt(),
+            reason = $("#correctionReason").value.trim();
+          if (!a || !reason)
+            return toast("Head Judge correction reason required");
+          a.confirmed = false;
+          a.correctionReason = reason;
+          roleAudit(
+            "score correction approved",
+            `${state.riders.find((r) => r.id === a.riderId)?.name || "rider"} · ${a.type}`,
+            reason,
+            "unlocked",
+          );
+          $("#correctionReason").value = "";
+          save("Unlocked with Head Judge reason");
+        };
+        $("#validateResult").onclick = () => {
+          if (
+            !requirePermission(
+              "resultValidate",
+              "Only Head Judge can validate this",
+            )
+          )
+            return;
+          const h = heat();
+          if (!h) return toast("Activate a heat first");
+          if (
+            state.penalties.some(
+              (p) => p.heatId === h.id && p.status === "pending",
+            )
+          )
+            return toast("Resolve pending penalties before final validation");
+          h.official = "official";
+          h.resultStatus = "official / locked";
+          state.bracket.official = "official";
+          roleAudit(
+            "final heat result validated",
+            `Heat ${h.heatNumber}`,
+            "Head Judge locked final ranking; bracket advancement can proceed",
+            "official",
+          );
+          save("Final heat result validated and ranking official");
+        };
+        $("#penaltyRider").onchange = () => renderPenaltyPanel();
+        $("#flagPenalty").onclick = () => {
+          if (
+            !requirePermission(
+              "penaltyFlag",
+              "Selected role cannot flag penalties",
+            )
+          )
+            return;
+          const p = selectedPenaltyPayload("pending");
+          if (!p.riderId)
+            return toast("Select rider second before flagging penalty");
+          if (!p.comment)
+            return toast("Add description/comment before flagging penalty");
+          if (needsHeadJudgeDecision(p))
+            p.impact = "Head Judge decision required";
+          state.penalties.unshift(p);
+          state.selectedPenaltyId = p.id;
+          logPenalty(p, "created", "pending");
+          logPenalty(p, "pending", "pending");
+          save("Penalty flagged pending Head Judge validation");
+        };
+        $("#validatePenalty").onclick = () => {
+          if (
+            !requirePermission(
+              "penaltyValidate",
+              "Only Head Judge can validate this",
+            )
+          )
+            return;
+          const p = selectedPenalty();
+          if (!p || p.status !== "pending")
+            return toast("Select a pending penalty first");
+          const reason = $("#penaltyComment").value.trim() || p.comment;
+          if (!reason) return toast("Head Judge validation reason required");
+          p.validationDecision = reason;
+          if (needsHeadJudgeDecision(p)) {
+            p.impact = "Head Judge decision required";
+            p.status = "validated";
+            logPenalty(p, "validated", "Head Judge decision required");
+            markHeatProvisional(p);
+            return save(
+              "Penalty validated; Head Judge decision still required before numeric impact",
+            );
+          }
+          p.status = "validated";
+          logPenalty(p, "validated", "validated");
+          applyPenalty(p);
+          save("Penalty validated and automatically applied");
+        };
+        $("#rejectPenalty").onclick = () => {
+          if (
+            !requirePermission(
+              "penaltyValidate",
+              "Only Head Judge can validate this",
+            )
+          )
+            return;
+          const p = selectedPenalty();
+          if (!p || p.status !== "pending")
+            return toast("Select a pending penalty first");
+          p.status = "rejected";
+          p.validationDecision =
+            $("#penaltyComment").value.trim() || "Head Judge rejected penalty";
+          logPenalty(p, "rejected", "rejected");
+          save("Penalty rejected");
+        };
+        $("#removePenalty").onclick = () => {
+          if (
+            !requirePermission(
+              "penaltyValidate",
+              "Only Head Judge can remove validated penalty records",
+            )
+          )
+            return;
+          const p = selectedPenalty();
+          if (!p) return toast("Select a penalty first");
+          logPenalty(p, "removed", "removed");
+          state.penalties = state.penalties.filter((x) => x.id !== p.id);
+          state.selectedPenaltyId = null;
+          save("Penalty removed");
+        };
+        runAllocation();
+        save();
+      })();
+    </script>
+  </body>
 </html>
