@@ -912,15 +912,34 @@
         </section>
 
         <section class="panel">
-          <div class="eyebrow">Import messy federation spreadsheet</div>
+          <div class="eyebrow">Text ranking import · CSV / TSV / spreadsheet paste</div>
+          <div class="notice small">
+            <strong>Excel files are not imported directly in this MVP.</strong> Please export your spreadsheet as CSV or copy/paste rows from Google Sheets.
+          </div>
           <p class="small">
-            Paste CSV/TSV/table text. The parser detects rider names, nationalities, previous-year ranks, event columns, totals, DNS/DNF/“-”, cancelled stages and duplicate names. Spreadsheet totals are ignored and recalculated internally.
+            Upload a text CSV/TSV file or paste copied rows from Google Sheets / Excel. The parser accepts comma CSV, semicolon CSV, tab-separated paste, messy headers, multiple event columns, stage points, placements, totals, empty cells, “-”, DNS, DNF, cancelled event columns, duplicate rider names, and UTF-8 names. Spreadsheet totals are never trusted; final rankings are recalculated internally with GKA-style discard rules.
           </p>
+          <div class="two">
+            <div>
+              <label>CSV / TSV text file upload</label>
+              <input id="tourCsvFile" type="file" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values,text/plain">
+            </div>
+            <div>
+              <label>Detected import format</label>
+              <input id="tourImportFormat" readonly placeholder="Paste or upload text to detect format">
+            </div>
+          </div>
+          <label>Paste ranking rows</label>
           <textarea id="tourImportBox" placeholder="Rank,Name,NAT,Prev,Stage 1,Stage 2,Stage 3,Stage 4,Total&#10;1,Amina Hart,ESP,2,1000,870,1000,732,3602"></textarea>
           <div class="button-row">
             <button id="importTour" class="secondary">Import + recalculate</button>
             <button id="addTourCorrection" class="ghost">Apply manual correction</button>
           </div>
+        </section>
+
+        <section class="panel light">
+          <div class="eyebrow">Import preview + parser report</div>
+          <div id="tourImportReport" class="grid"></div>
         </section>
 
         <section class="panel light">
@@ -1346,6 +1365,7 @@
           s.tour.riders ??= [];
           s.tour.corrections ??= [];
           s.tour.audit ??= [];
+          s.tour.importReport ??= null;
           s.selectedTourRiderId ??= null;
           s.riders ??= [];
           s.attempts ??= [];
@@ -2537,37 +2557,164 @@
             return { rider: r, score, source };
           }).sort((a, b) => a.score - b.score || a.rider.name.localeCompare(b.rider.name)).map((s, i) => ({ ...s, seed: i + 1 }));
         }
+        function importReportEmpty(message = "No ranking import has been processed yet.") {
+          return { message, format: "—", delimiter: "—", headerRow: 0, columns: {}, stages: [], skippedRows: [], duplicateNames: [], ignoredTotals: [], previewRows: [], finalPreview: [] };
+        }
+        function normalizeHeader(v) {
+          return String(v || "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, " ")
+            .trim();
+        }
+        function csvSplitLine(line, delimiter) {
+          const out = [];
+          let cell = "", quoted = false;
+          for (let i = 0; i < line.length; i++) {
+            const ch = line[i], next = line[i + 1];
+            if (ch === '"' && quoted && next === '"') { cell += '"'; i++; }
+            else if (ch === '"') quoted = !quoted;
+            else if (ch === delimiter && !quoted) { out.push(cell.trim()); cell = ""; }
+            else cell += ch;
+          }
+          out.push(cell.trim());
+          return out.map((x) => x.replace(/^"|"$/g, "").trim());
+        }
+        function detectDelimiter(lines) {
+          const counts = (d) => lines.slice(0, 12).reduce((sum, l) => sum + csvSplitLine(l, d).length - 1, 0);
+          const tab = counts("\t"), semi = counts(";"), comma = counts(",");
+          if (tab >= semi && tab >= comma && tab > 0) return { delimiter: "\t", format: "tab-separated spreadsheet paste / TSV" };
+          if (semi > comma) return { delimiter: ";", format: "semicolon-separated CSV" };
+          return { delimiter: ",", format: "comma-separated CSV" };
+        }
+        function headerScore(row) {
+          const h = row.map(normalizeHeader);
+          let score = 0;
+          if (h.some((x) => /\b(name|rider|athlete|competitor)\b/.test(x))) score += 5;
+          if (h.some((x) => /\b(nat|nation|country|team)\b/.test(x))) score += 1;
+          if (h.some((x) => /\b(total|overall|sum)\b/.test(x))) score += 1;
+          score += h.filter((x) => /\b(stage|event|round|stop|cup)\b|\be\s*\d+\b|\d/.test(x)).length;
+          return score;
+        }
+        function isStatusCell(raw, word) {
+          return new RegExp(`(^|[^a-z])${word}([^a-z]|$)`, "i").test(String(raw || ""));
+        }
+        function pointsFromPlacement(place) {
+          const table = [1000, 870, 750, 690, 610, 530, 460, 400, 360, 320, 290, 260, 240, 220, 200, 180, 160, 145, 130, 115, 100, 90, 80, 70, 60, 50, 45, 40, 35, 30, 25, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 1];
+          return table[Math.max(1, place) - 1] || 0;
+        }
+        function numberFromCell(raw) {
+          const match = String(raw || "").replace(/,/g, ".").match(/-?\d+(?:\.\d+)?/);
+          return match ? +match[0] : NaN;
+        }
+        function parseStageCell(raw, columnMode) {
+          const text = String(raw || "").trim();
+          if (!text || text === "-" || /^—+$/.test(text)) return { placement: "", points: 0, status: "invalid result", note: "empty / dash" };
+          if (/cancel|abandon|void|no\s*result/i.test(text)) return { placement: "", points: 0, status: "cancelled", note: "cancelled cell" };
+          if (isStatusCell(text, "dns")) return { placement: "", points: 0, status: "dns", note: "DNS" };
+          if (isStatusCell(text, "dnf")) return { placement: "", points: 0, status: "dnf", note: "DNF" };
+          if (/invalid|n\/a|na/i.test(text)) return { placement: "", points: 0, status: "invalid result", note: "invalid cell" };
+          const n = numberFromCell(text);
+          if (!Number.isFinite(n)) return { placement: "", points: 0, status: "invalid result", note: "non-numeric" };
+          if (columnMode === "placement") {
+            const placement = Math.max(1, Math.round(n));
+            return { placement, points: pointsFromPlacement(placement), status: "valid", note: "placement converted to points" };
+          }
+          return { placement: "", points: Math.max(0, n), status: "valid", note: "points" };
+        }
         function parseTourImport(text) {
-          const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-          if (!lines.length) return toast("Paste a ranking table first");
-          const split = (l) => l.includes("\t") ? l.split("\t") : l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map((x) => x.replace(/^"|"$/g, "").trim());
-          const rows = lines.map(split);
-          const header = rows[0].map((h) => h.toLowerCase());
-          const nameIdx = header.findIndex((h) => /name|rider|competitor/.test(h));
-          if (nameIdx < 0) { state.tour.safetyNotice = "Rule confirmation required by Head Judge / Race Director."; return toast(state.tour.safetyNotice); }
-          const natIdx = header.findIndex((h) => /nat|country/.test(h));
-          const prevIdx = header.findIndex((h) => /prev|last|rank/.test(h));
-          const totalIdx = header.findIndex((h) => /total/.test(h));
-          const eventIdxs = header.map((h, i) => ({ h, i })).filter((x) => x.i !== nameIdx && x.i !== natIdx && x.i !== prevIdx && x.i !== totalIdx && /(stage|event|round|stop|cup|\d)/.test(x.h));
-          if (!eventIdxs.length) { state.tour.safetyNotice = "Rule confirmation required by Head Judge / Race Director."; return toast(state.tour.safetyNotice); }
-          state.tour.events = eventIdxs.map((x, i) => ({ id: "imp" + i, name: x.h.replace(/\b\w/g, (m) => m.toUpperCase()), status: "completed", forceCount: false, forceRemove: false }));
-          const seen = {};
-          state.tour.riders = rows.slice(1).filter((r) => r[nameIdx]).map((r, ri) => {
-            const base = r[nameIdx].trim(); seen[base] = (seen[base] || 0) + 1;
-            const rider = { id: "ir" + Date.now() + ri, name: seen[base] > 1 ? `${base} (${seen[base]})` : base, nationality: natIdx >= 0 ? r[natIdx] : "", previousRank: prevIdx >= 0 ? +r[prevIdx] || "" : "", wildcard: false, unseeded: false, manualSeed: "", manualSeedReason: "", forcedRank: "", results: {} };
-            eventIdxs.forEach((x, ei) => {
-              const raw = String(r[x.i] || "").trim();
-              let status = "valid", points = parseFloat(raw.replace(/[^0-9.-]/g, "")) || 0;
-              if (/cancel/i.test(raw)) { status = "cancelled"; state.tour.events[ei].status = "cancelled"; }
-              else if (/dns/i.test(raw)) status = "dns";
-              else if (/dnf/i.test(raw)) status = "dnf";
-              else if (!raw || raw === "-" || /invalid/i.test(raw)) status = "invalid result";
-              rider.results[state.tour.events[ei].id] = { placement: "", points, status, penalty: 0 };
-            });
-            return rider;
+          const rawLines = String(text || "").replace(/^\uFEFF/, "").split(/\r?\n/).filter((l) => l.trim().length);
+          if (!rawLines.length) { state.tour.importReport = importReportEmpty("Paste or upload a text CSV/TSV ranking table first."); return toast("Paste a ranking table first"); }
+          const detected = detectDelimiter(rawLines);
+          const rows = rawLines.map((l) => csvSplitLine(l, detected.delimiter));
+          const headerRow = rows.slice(0, Math.min(rows.length, 6)).map((r, i) => ({ i, score: headerScore(r) })).sort((a, b) => b.score - a.score)[0]?.i || 0;
+          const headers = rows[headerRow].map((h, i) => ({ raw: h || `Column ${i + 1}`, key: normalizeHeader(h), i }));
+          const dataRows = rows.slice(headerRow + 1);
+          const findCol = (patterns) => headers.find((h) => patterns.some((p) => p.test(h.key)))?.i ?? -1;
+          const nameIdx = findCol([/\b(name|rider|athlete|competitor)\b/]);
+          if (nameIdx < 0) { state.tour.safetyNotice = "Rule confirmation required by Head Judge / Race Director: no rider/name column detected."; state.tour.importReport = importReportEmpty(state.tour.safetyNotice); return toast(state.tour.safetyNotice); }
+          const natIdx = findCol([/\b(nat|nation|nationality|country|team)\b/]);
+          const prevIdx = findCol([/\b(prev|previous|last year|lastyear|seed rank)\b/, /\b2024\s*rank\b/]);
+          const totalIdxs = headers.filter((h) => /\b(total|overall|sum|points total|grand total)\b/.test(h.key)).map((h) => h.i);
+          const rankIdx = findCol([/^rank$/, /\boverall rank\b/, /\bcurrent rank\b/]);
+          const metaIdxs = new Set([nameIdx, natIdx, prevIdx, rankIdx, ...totalIdxs].filter((i) => i >= 0));
+          const hasNumericData = (i) => dataRows.some((r) => Number.isFinite(numberFromCell(r[i])) || /dns|dnf|cancel|invalid|-/.test(String(r[i] || "").toLowerCase()));
+          let eventCols = headers.filter((h) => !metaIdxs.has(h.i) && (/\b(stage|event|round|stop|cup|heat)\b|\be\s*\d+\b|^\d+$/.test(h.key) || hasNumericData(h.i)));
+          eventCols = eventCols.filter((h) => !/\b(total|overall|sum|rank|name|rider|nation|country|prev|previous)\b/.test(h.key));
+          if (!eventCols.length) { state.tour.safetyNotice = "Rule confirmation required by Head Judge / Race Director: no event/stage columns detected."; state.tour.importReport = importReportEmpty(state.tour.safetyNotice); return toast(state.tour.safetyNotice); }
+          const stages = eventCols.map((h, ei) => {
+            const cells = dataRows.map((r) => String(r[h.i] || "").trim());
+            const nonEmpty = cells.filter((c) => c && c !== "-");
+            const cancelledHeader = /cancel|invalid|void|abandon|no result/.test(h.key);
+            const cancelledCells = nonEmpty.length > 0 && nonEmpty.every((c) => /cancel|void|abandon|no result/i.test(c));
+            const numeric = cells.map(numberFromCell).filter(Number.isFinite);
+            const placementLike = /\b(place|placement|rank|pos|result)\b/.test(h.key) || (numeric.length >= Math.max(2, Math.ceil(dataRows.length * 0.45)) && numeric.every((n) => Number.isInteger(n) && n > 0 && n <= Math.max(32, dataRows.length + 6)));
+            return { id: "imp" + ei + "_" + Date.now(), name: h.raw || `Stage ${ei + 1}`, status: cancelledHeader || cancelledCells ? "cancelled" : "completed", forceCount: false, forceRemove: false, sourceIndex: h.i, mode: placementLike ? "placement" : "points" };
           });
-          state.tour.safetyNotice = totalIdx >= 0 ? "Spreadsheet total column detected and ignored; totals were recalculated internally." : "Imported and recalculated internally.";
-          tourAudit("import", "tour spreadsheet", "pasted rows", `${state.tour.riders.length} riders / ${state.tour.events.length} events`, state.tour.safetyNotice);
+          const seen = {}, skippedRows = [], duplicateNames = [], riders = [];
+          dataRows.forEach((row, ri) => {
+            const originalLine = headerRow + ri + 2;
+            const baseName = String(row[nameIdx] || "").trim();
+            if (!baseName || /^total|overall|rank$/i.test(baseName)) { skippedRows.push({ row: originalLine, reason: "missing rider name or summary row", raw: row.join(" | ") }); return; }
+            seen[baseName] = (seen[baseName] || 0) + 1;
+            if (seen[baseName] > 1) duplicateNames.push(`${baseName} (row ${originalLine})`);
+            const name = seen[baseName] > 1 ? `${baseName} (${seen[baseName]})` : baseName;
+            const rider = { id: "ir" + Date.now() + "_" + ri, name, nationality: natIdx >= 0 ? String(row[natIdx] || "").trim() : "", previousRank: prevIdx >= 0 ? numberFromCell(row[prevIdx]) || "" : "", wildcard: false, unseeded: false, manualSeed: "", manualSeedReason: "", forcedRank: "", results: {}, importSourceName: baseName };
+            stages.forEach((stage) => {
+              const parsed = parseStageCell(row[stage.sourceIndex], stage.mode);
+              if (parsed.status === "cancelled") stage.status = "cancelled";
+              rider.results[stage.id] = { placement: parsed.placement, points: parsed.points, status: stage.status === "cancelled" ? "cancelled" : parsed.status, penalty: 0, importNote: parsed.note };
+            });
+            riders.push(rider);
+          });
+          state.tour.events = stages.map(({ sourceIndex, mode, ...stage }) => ({ ...stage, importMode: mode }));
+          state.tour.riders = riders;
+          const entries = calculateTour();
+          state.tour.safetyNotice = `${detected.format} imported. Spreadsheet totals ignored and final ranking recalculated internally. ${completedTourEvents().length} valid event(s) → ${discardCount()} discard(s). Cancelled/invalid events do not count toward ranking or discard count.`;
+          state.tour.importReport = {
+            message: state.tour.safetyNotice,
+            format: detected.format,
+            delimiter: detected.delimiter === "\t" ? "tab" : detected.delimiter,
+            headerRow: headerRow + 1,
+            columns: {
+              rider: headers[nameIdx]?.raw || "—",
+              nationality: natIdx >= 0 ? headers[natIdx].raw : "not detected",
+              previousRank: prevIdx >= 0 ? headers[prevIdx].raw : "not detected",
+              ignoredTotals: totalIdxs.map((i) => headers[i].raw),
+              ignoredRank: rankIdx >= 0 ? headers[rankIdx].raw : "not detected",
+            },
+            stages: state.tour.events.map((ev) => ({ name: ev.name, status: ev.status, mode: ev.importMode })),
+            skippedRows,
+            duplicateNames,
+            previewRows: riders.slice(0, 8).map((r) => ({ name: r.name, nationality: r.nationality, results: state.tour.events.map((ev) => `${ev.name}: ${r.results[ev.id]?.status || "—"} ${r.results[ev.id]?.points || 0}`) })),
+            finalPreview: entries.slice(0, 8).map((e) => ({ rank: e.rank, name: e.rider.name, raw: e.raw, discarded: e.discarded.map((d) => `${d.ev.name} ${d.net}`), counted: e.counted, why: e.explanation })),
+          };
+          tourAudit("text ranking import", "CSV/TSV/paste ranking", "pasted/uploaded text", `${riders.length} riders / ${state.tour.events.length} stages`, state.tour.safetyNotice);
+        }
+        function renderTourImportReport(entries) {
+          const report = state.tour.importReport || importReportEmpty();
+          if ($("#tourImportFormat")) $("#tourImportFormat").value = report.format && report.format !== "—" ? `${report.format} · delimiter: ${report.delimiter}` : "";
+          if (!$("#tourImportReport")) return;
+          const cols = report.columns || {};
+          const stages = report.stages || [];
+          const finalPreview = report.finalPreview?.length ? report.finalPreview : (entries || []).slice(0, 8).map((e) => ({ rank: e.rank, name: e.rider.name, raw: e.raw, discarded: e.discarded.map((d) => `${d.ev.name} ${d.net}`), counted: e.counted, why: e.explanation }));
+          $("#tourImportReport").innerHTML = `
+            <div class="notice small"><strong>${esc(report.message || "Import parser ready.")}</strong></div>
+            <div class="four">
+              <div class="rank-row"><span class="pill gray">Format</span><span>${esc(report.format || "—")}<br><span class="small">Delimiter: ${esc(report.delimiter || "—")} · header row ${esc(report.headerRow || "—")}</span></span></div>
+              <div class="rank-row"><span class="pill gray">Rider</span><span>${esc(cols.rider || "—")}<br><span class="small">Nationality: ${esc(cols.nationality || "—")}</span></span></div>
+              <div class="rank-row"><span class="pill amber">Ignored</span><span>Totals: ${esc((cols.ignoredTotals || []).join(", ") || "none")}<br><span class="small">Ranking column: ${esc(cols.ignoredRank || "none")}</span></span></div>
+              <div class="rank-row"><span class="pill ${report.duplicateNames?.length ? "amber" : "green"}">Duplicates</span><span>${esc(report.duplicateNames?.length || 0)} duplicate name warning(s)<br><span class="small">${esc((report.duplicateNames || []).slice(0, 4).join(", ") || "None")}</span></span></div>
+            </div>
+            <div><h3>Detected stages</h3>${stages.map((s) => `<span class="stage-chip ${s.status === "completed" ? "counted" : s.status}">${esc(s.name)} · ${esc(s.status)} · ${esc(s.mode || "points")}</span>`).join("") || "<p class='small'>No stages detected yet.</p>"}</div>
+            <div class="two">
+              <div><h3>Skipped rows report</h3>${(report.skippedRows || []).map((r) => `<div class="rank-row"><span class="pill amber">Row ${esc(r.row)}</span><span>${esc(r.reason)}<br><span class="small">${esc(r.raw)}</span></span></div>`).join("") || "<p class='small'>No skipped rows.</p>"}</div>
+              <div><h3>Duplicate warning</h3>${(report.duplicateNames || []).map((n) => `<div class="rank-row"><span class="pill amber">Duplicate</span><span>${esc(n)}<br><span class="small">Kept as a separate rider by appending a number; verify manually before publishing.</span></span></div>`).join("") || "<p class='small'>No duplicate rider names detected.</p>"}</div>
+            </div>
+            <div><h3>Import preview</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Rider</th><th>Nationality</th><th>Parsed stage cells</th></tr></thead><tbody>${(report.previewRows || []).map((r) => `<tr><td>${esc(r.name)}</td><td>${esc(r.nationality)}</td><td>${(r.results || []).map(esc).join("<br>")}</td></tr>`).join("") || "<tr><td colspan='3'>No import preview yet.</td></tr>"}</tbody></table></div></div>
+            <div><h3>Final calculated ranking preview</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Rank</th><th>Rider</th><th>Raw</th><th>Discarded</th><th>Counted</th><th>Why this ranking?</th></tr></thead><tbody>${finalPreview.map((e) => `<tr><td>#${esc(e.rank)}</td><td>${esc(e.name)}</td><td>${esc(e.raw)}</td><td>${esc((e.discarded || []).join(", ") || "none")}</td><td><strong>${esc(e.counted)}</strong></td><td class="small">${esc(e.why)}</td></tr>`).join("") || "<tr><td colspan='6'>No calculated ranking preview yet.</td></tr>"}</tbody></table></div></div>
+          `;
         }
         function renderTour() {
           if (!$("#tourName")) return;
@@ -2577,6 +2724,7 @@
           $("#tourSeedEventNo").value = state.tour.seedEventNo;
           $("#tourManualDiscards").value = state.tour.manualDiscards;
           $("#tourSafetyNotice").textContent = state.tour.safetyNotice || `${completedTourEvents().length} completed/counting events → ${discardCount()} discard(s). Cancelled/invalid events do not count toward ranking or discard count.`;
+          renderTourImportReport(entries);
           $("#tourOverview").innerHTML = `<div class="rank-row"><span class="pill green">Official annual ranking</span><span><strong>${esc(state.tour.name)}</strong><br><span class="small">${esc(state.tour.division)} · completed events ${completedTourEvents().length} · discard rule ${discardCount()} · last recalculation ${esc(state.tour.lastCalculation?.date || "live")}</span></span><strong>${entries.length} riders</strong></div>` + state.tour.events.map((ev) => `<div class="rank-row"><span class="stage-chip ${isEventCounting(ev) ? "counted" : ev.status}">${esc(ev.name)} · ${esc(ev.status)}${ev.forceCount ? " · force count" : ""}${ev.forceRemove ? " · force remove" : ""}</span><select data-tour-event-status="${ev.id}"><option ${ev.status === "completed" ? "selected" : ""}>completed</option><option ${ev.status === "cancelled" ? "selected" : ""}>cancelled</option><option ${ev.status === "invalid" ? "selected" : ""}>invalid</option><option ${ev.status === "incomplete" ? "selected" : ""}>incomplete</option></select><button class="ghost" data-tour-force-count="${ev.id}">${ev.forceCount ? "Clear force-count" : "Force-count event"}</button><button class="ghost" data-tour-force-remove="${ev.id}">${ev.forceRemove ? "Clear force-remove" : "Force-remove event"}</button></div>`).join("");
           $("#tourStandingsRows").innerHTML = entries.map((e) => `<tr><td><span class="pill ${e.rank === 1 ? "green" : "gray"}">#${e.rank}</span></td><td><strong>${esc(e.rider.name)}</strong><br><span class="small">${esc(e.rider.nationality || "")} · prev ${esc(e.rider.previousRank || "—")}</span></td><td>${e.raw}</td><td>${e.discarded.map((d) => esc(d.ev.name + " " + d.net)).join("<br>") || "—"}</td><td><strong>${e.counted}</strong></td><td class="small">${esc(e.tieText || (e.forcedRank ? "Manual forced position" : "standard points order"))}</td><td><button class="secondary" data-tour-rider="${e.rider.id}">Why this ranking?</button></td></tr>`).join("");
           $("#tourRiderSelect").innerHTML = entries.map((e) => `<option value="${e.rider.id}">#${e.rank} ${esc(e.rider.name)}</option>`).join("");
@@ -2777,6 +2925,19 @@
           if (!requirePermission("tourAdmin", "Race Director / Head Judge ranking authority required")) return;
           parseTourImport($("#tourImportBox").value);
           save("Tour import processed");
+        };
+        $("#tourCsvFile").onchange = async () => {
+          const file = $("#tourCsvFile").files?.[0];
+          if (!file) return;
+          if (!/\.(csv|tsv|txt)$/i.test(file.name) && !/^text\//i.test(file.type || "")) {
+            $("#tourCsvFile").value = "";
+            return toast("Only text CSV, TSV, or TXT files are supported in this MVP");
+          }
+          const text = await file.text();
+          $("#tourImportBox").value = text;
+          const detected = detectDelimiter(text.split(/\r?\n/).filter((l) => l.trim().length));
+          $("#tourImportFormat").value = `${detected.format} · delimiter: ${detected.delimiter === "	" ? "tab" : detected.delimiter}`;
+          toast("Text file loaded. Click Import + recalculate to process.");
         };
         $("#addTourCorrection").onclick = () => {
           if (!requirePermission("tourAdmin", "Race Director / Head Judge ranking authority required")) return;
