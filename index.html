@@ -520,6 +520,33 @@
           grid-template-columns: repeat(3, 1fr);
         }
       }
+
+      .tour-summary,
+      .explain-box {
+        display: grid;
+        gap: 10px;
+      }
+      .stage-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 3px;
+        padding: 7px 9px;
+        border-radius: 999px;
+        color: var(--black);
+        background: #e8eef7;
+        font-size: 0.78rem;
+        font-weight: 950;
+      }
+      .stage-chip.discarded { background: var(--amber); }
+      .stage-chip.cancelled,
+      .stage-chip.invalid { color: white; background: var(--red); }
+      .stage-chip.counted { background: var(--green); }
+      .stage-chip.manual { outline: 3px solid rgba(255, 194, 77, 0.45); }
+      .wide-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .tour-rank-card { align-items: start; grid-template-columns: auto 1fr auto; }
+      .audit-meta { font-variant-numeric: tabular-nums; }
+      @media (min-width: 880px) { .wide-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
     </style>
   </head>
   <body>
@@ -555,6 +582,7 @@
             <button class="tab ghost" data-screen="heats">
               Heat Management
             </button>
+            <button class="tab ghost" data-screen="tour">Tour Rankings</button>
             <button class="tab ghost" data-screen="judge">Judge Mode</button>
           </div>
         </div>
@@ -861,6 +889,69 @@
         </section>
       </main>
 
+      <main id="tourScreen" class="stack hide">
+        <section class="panel light">
+          <div class="eyebrow">GKA-style Tour Ranking + Seeding Engine</div>
+          <h2>Annual standings, discards, seeding and audit trail</h2>
+          <p class="small">
+            Engine implements the supplied 2025 GKA/KWT-style logic: completed-event discard bands, cancelled/invalid stage exclusion, head-to-head and event-result tie breaks, progressive seeding weights, transparent explanations, and mandatory audit records for every manual correction. If an imported format cannot be mapped safely, the engine flags “Rule confirmation required by Head Judge / Race Director.”
+          </p>
+          <div class="four">
+            <div><label>Tour name</label><input id="tourName"></div>
+            <div><label>Division</label><input id="tourDivision"></div>
+            <div><label>Next event number for seeding</label><input id="tourSeedEventNo" type="number" min="1" max="20"></div>
+            <div><label>Manual discard count</label><input id="tourManualDiscards" type="number" min="0" max="10" placeholder="Auto"></div>
+          </div>
+          <div class="wide-actions">
+            <button id="loadTourSample" class="secondary">Load tour sample</button>
+            <button id="recalculateTour" class="primary">Recalculate rankings</button>
+            <button id="exportTourCsv" class="secondary">Export CSV</button>
+            <button id="printTourPdf" class="ghost">Print federation PDF</button>
+          </div>
+          <p id="tourSafetyNotice" class="notice small"></p>
+        </section>
+
+        <section class="panel">
+          <div class="eyebrow">Import messy federation spreadsheet</div>
+          <p class="small">
+            Paste CSV/TSV/table text. The parser detects rider names, nationalities, previous-year ranks, event columns, totals, DNS/DNF/“-”, cancelled stages and duplicate names. Spreadsheet totals are ignored and recalculated internally.
+          </p>
+          <textarea id="tourImportBox" placeholder="Rank,Name,NAT,Prev,Stage 1,Stage 2,Stage 3,Stage 4,Total&#10;1,Amina Hart,ESP,2,1000,870,1000,732,3602"></textarea>
+          <div class="button-row">
+            <button id="importTour" class="secondary">Import + recalculate</button>
+            <button id="addTourCorrection" class="ghost">Apply manual correction</button>
+          </div>
+        </section>
+
+        <section class="panel light">
+          <div class="eyebrow">Tour standings page</div>
+          <div id="tourOverview" class="tour-summary"></div>
+          <div class="table-wrap"><table class="data-table"><thead><tr><th>Rank</th><th>Rider</th><th>Raw</th><th>Discarded</th><th>Counted</th><th>Tie-break / status</th><th>Why?</th></tr></thead><tbody id="tourStandingsRows"></tbody></table></div>
+        </section>
+
+        <section class="panel">
+          <div class="eyebrow">Rider ranking detail page · Why this ranking?</div>
+          <div class="two"><select id="tourRiderSelect"></select><select id="tourEventSelect"></select></div>
+          <div id="tourRiderDetail" class="explain-box"></div>
+        </section>
+
+        <section class="panel light">
+          <div class="eyebrow">Seeding manager</div>
+          <p class="small">Progressive GKA-style weighting: Event 1 uses previous year 100%; Event 2 uses current event 50% and previous year 50%; Event 3 uses Event 1, Event 2 and previous year one-third each; after 3 valid events current annual ranking is used only. Wildcards and unseeded riders remain visible and manual overrides require reasons.</p>
+          <div id="seedingManager" class="grid"></div>
+        </section>
+
+        <section class="panel">
+          <div class="eyebrow">Tie-break explanation view</div>
+          <div id="tieBreakView" class="grid"></div>
+        </section>
+
+        <section class="panel">
+          <div class="eyebrow">Audit history view</div>
+          <div id="tourAuditLog" class="grid"></div>
+        </section>
+      </main>
+
       <main id="judgeScreen" class="layout hide">
         <aside class="stack">
           <section class="panel">
@@ -1159,6 +1250,7 @@
             "safety",
             "schedule",
             "dnsDnf",
+            "tourAdmin",
             "penaltyFlag",
           ]),
           "Head Judge": new Set([
@@ -1169,6 +1261,7 @@
             "correctionApprove",
             "scoreCorrection",
             "finalLock",
+            "tourAdmin",
             "penaltyFlag",
           ]),
           Judge: new Set([
@@ -1209,6 +1302,8 @@
             replacements: [],
             audit: [],
           },
+          tour: sampleTour(),
+          selectedTourRiderId: null,
           riders: [],
           selectedRiderId: null,
           selectedAttemptId: null,
@@ -1246,6 +1341,12 @@
           s.entry = { ...f.entry, ...(s.entry || {}) };
           s.entry.audit ??= [];
           s.entry.replacements ??= [];
+          s.tour = { ...sampleTour(), ...(s.tour || {}) };
+          s.tour.events ??= [];
+          s.tour.riders ??= [];
+          s.tour.corrections ??= [];
+          s.tour.audit ??= [];
+          s.selectedTourRiderId ??= null;
           s.riders ??= [];
           s.attempts ??= [];
           s.interference ??= {};
@@ -2301,6 +2402,217 @@
           if (state.settings.judgeCount % 2 === 0) state.settings.judgeCount++;
           if (state.settings.judgeCount < 3) state.settings.judgeCount = 3;
         }
+
+        function sampleTour() {
+          return {
+            name: "2025 Kite-Surf World Tour",
+            division: "Women Open Kite-Surf",
+            seedEventNo: 4,
+            manualDiscards: "",
+            safetyNotice: "",
+            events: [
+              { id: "ev1", name: "Stage 1", status: "completed", forceCount: false, forceRemove: false },
+              { id: "ev2", name: "Stage 2", status: "completed", forceCount: false, forceRemove: false },
+              { id: "ev3", name: "Stage 3", status: "completed", forceCount: false, forceRemove: false },
+              { id: "ev4", name: "Stage 4", status: "completed", forceCount: false, forceRemove: false },
+              { id: "ev5", name: "Stage 5", status: "cancelled", forceCount: false, forceRemove: false },
+            ],
+            riders: [
+              { id: "tr1", name: "Amina Hart", nationality: "ESP", previousRank: 2, wildcard: false, unseeded: false, manualSeed: "", manualSeedReason: "", forcedRank: "", results: { ev1: { placement: 1, points: 1000, status: "valid", penalty: 0 }, ev2: { placement: 3, points: 810, status: "valid", penalty: 0 }, ev3: { placement: 1, points: 1000, status: "valid", penalty: 0 }, ev4: { placement: 5, points: 610, status: "valid", penalty: 0 }, ev5: { placement: "", points: 0, status: "cancelled", penalty: 0 } } },
+              { id: "tr2", name: "Nia Stone", nationality: "FRA", previousRank: 1, wildcard: false, unseeded: false, manualSeed: "", manualSeedReason: "", forcedRank: "", results: { ev1: { placement: 2, points: 870, status: "valid", penalty: 0 }, ev2: { placement: 1, points: 1000, status: "valid", penalty: 0 }, ev3: { placement: 4, points: 690, status: "valid", penalty: 0 }, ev4: { placement: 1, points: 1000, status: "valid", penalty: 0 }, ev5: { placement: "", points: 0, status: "cancelled", penalty: 0 } } },
+              { id: "tr3", name: "Lina Moreau", nationality: "MAR", previousRank: 5, wildcard: true, unseeded: false, manualSeed: "", manualSeedReason: "", forcedRank: "", results: { ev1: { placement: 3, points: 750, status: "valid", penalty: 0 }, ev2: { placement: 2, points: 870, status: "valid", penalty: 0 }, ev3: { placement: 2, points: 870, status: "valid", penalty: 0 }, ev4: { placement: 3, points: 750, status: "valid", penalty: 0 }, ev5: { placement: "", points: 0, status: "cancelled", penalty: 0 } } },
+              { id: "tr4", name: "Maya Cruz", nationality: "BRA", previousRank: 4, wildcard: false, unseeded: false, manualSeed: "", manualSeedReason: "", forcedRank: "", results: { ev1: { placement: 4, points: 690, status: "valid", penalty: 0 }, ev2: { placement: 4, points: 690, status: "valid", penalty: 0 }, ev3: { placement: 3, points: 750, status: "valid", penalty: 0 }, ev4: { placement: 2, points: 870, status: "valid", penalty: 0 }, ev5: { placement: "", points: 0, status: "cancelled", penalty: 0 } } },
+            ],
+            corrections: [],
+            audit: [],
+            lastCalculation: null,
+          };
+        }
+        const rankingStatuses = new Set(["valid", "dns", "dnf"]);
+        function tourAudit(action, target, oldValue, newValue, reason) {
+          state.tour.audit.unshift({
+            id: "ta" + Date.now(),
+            date: new Date().toISOString(),
+            user: state.role,
+            action,
+            target,
+            oldValue: String(oldValue ?? ""),
+            newValue: String(newValue ?? ""),
+            reason: reason || "Reason required by Head Judge / Race Director",
+          });
+        }
+        function isEventCounting(ev) {
+          if (ev.forceRemove) return false;
+          if (ev.forceCount) return true;
+          return ev.status === "completed";
+        }
+        function completedTourEvents() {
+          return state.tour.events.filter(isEventCounting);
+        }
+        function discardCount() {
+          const manual = +state.tour.manualDiscards;
+          if (Number.isFinite(manual) && state.tour.manualDiscards !== "") return Math.max(0, manual);
+          const n = completedTourEvents().length;
+          if (n >= 10) return 3;
+          if (n >= 7) return 2;
+          if (n >= 4) return 1;
+          return 0;
+        }
+        function resultNet(res) {
+          if (!res || !rankingStatuses.has(String(res.status || "").toLowerCase())) return 0;
+          return Math.max(0, (+res.points || 0) - (+res.penalty || 0));
+        }
+        function riderEventRecords(rider) {
+          return state.tour.events.map((ev) => {
+            const res = rider.results?.[ev.id] || { status: ev.status === "cancelled" ? "cancelled" : "invalid result", points: 0, placement: "", penalty: 0 };
+            const eventCounts = isEventCounting(ev);
+            const validForDiscard = eventCounts && rankingStatuses.has(String(res.status || "").toLowerCase());
+            return { ev, res, eventCounts, validForDiscard, net: resultNet(res) };
+          });
+        }
+        function computeRider(rider) {
+          const records = riderEventRecords(rider);
+          const raw = records.filter((r) => r.eventCounts).reduce((sum, r) => sum + r.net, 0);
+          const discardable = records.filter((r) => r.validForDiscard).sort((a, b) => a.net - b.net || (+b.res.placement || 999) - (+a.res.placement || 999));
+          const discardedIds = new Set(discardable.slice(0, discardCount()).map((r) => r.ev.id));
+          const counted = records.filter((r) => r.eventCounts && !discardedIds.has(r.ev.id)).reduce((sum, r) => sum + r.net, 0);
+          return { rider, records, raw, discardedIds, discarded: records.filter((r) => discardedIds.has(r.ev.id)), counted, forcedRank: +rider.forcedRank || null };
+        }
+        function beatScore(a, b) {
+          let aBeats = 0, bBeats = 0;
+          completedTourEvents().forEach((ev) => {
+            const ar = a.rider.results?.[ev.id], br = b.rider.results?.[ev.id];
+            const ap = +ar?.placement, bp = +br?.placement;
+            if (Number.isFinite(ap) && Number.isFinite(bp) && rankingStatuses.has(String(ar.status || "").toLowerCase()) && rankingStatuses.has(String(br.status || "").toLowerCase())) {
+              if (ap < bp) aBeats++;
+              if (bp < ap) bBeats++;
+            }
+          });
+          return { aBeats, bBeats };
+        }
+        function compareTie(a, b) {
+          const head = beatScore(a, b);
+          if (head.aBeats !== head.bBeats) return { order: head.bBeats - head.aBeats, text: `${a.rider.name} beat ${b.rider.name} ${head.aBeats}-${head.bBeats} across counting events.` };
+          const av = a.records.filter((r) => r.validForDiscard).map((r) => +r.res.placement || 999).sort((x, y) => x - y);
+          const bv = b.records.filter((r) => r.validForDiscard).map((r) => +r.res.placement || 999).sort((x, y) => x - y);
+          for (let i = 0; i < Math.max(av.length, bv.length); i++) if ((av[i] || 999) !== (bv[i] || 999)) return { order: (av[i] || 999) - (bv[i] || 999), text: `Best results compared best-to-worst: ${a.rider.name} ${av.join("/")} vs ${b.rider.name} ${bv.join("/")}.` };
+          const latest = [...completedTourEvents()].reverse();
+          for (const ev of latest) {
+            const ap = +a.rider.results?.[ev.id]?.placement || 999, bp = +b.rider.results?.[ev.id]?.placement || 999;
+            if (ap !== bp) return { order: ap - bp, text: `Latest-event backwards tie break used at ${ev.name}: ${a.rider.name} ${ap}, ${b.rider.name} ${bp}.` };
+          }
+          return { order: 0, text: "Still tied after head-to-head, best results and latest-event backwards checks. Head Judge / Race Director manual decision required." };
+        }
+        function calculateTour() {
+          const entries = state.tour.riders.map(computeRider);
+          entries.sort((a, b) => {
+            if (a.forcedRank || b.forcedRank) return (a.forcedRank || 9999) - (b.forcedRank || 9999);
+            if (b.counted !== a.counted) return b.counted - a.counted;
+            const tie = compareTie(a, b);
+            a.tieText = b.tieText = tie.text;
+            return tie.order || a.rider.name.localeCompare(b.rider.name);
+          });
+          entries.forEach((e, i) => { e.rank = e.forcedRank || i + 1; e.explanation = rankingExplanation(e); });
+          state.tour.lastCalculation = { date: new Date().toISOString(), completedEvents: completedTourEvents().length, discards: discardCount() };
+          return entries;
+        }
+        function rankingExplanation(e) {
+          const discarded = e.discarded.map((d) => `${d.ev.name} ${d.net} pts`).join(", ") || "none";
+          const cancelled = e.records.filter((r) => !r.eventCounts).map((r) => `${r.ev.name} (${r.ev.status}${r.ev.forceRemove ? ", force removed" : ""})`).join(", ") || "none";
+          return `Raw ${e.raw}. Discarded ${discarded}. Counted total ${e.counted}. Cancelled/invalid/non-counting stages: ${cancelled}. ${e.forcedRank ? "Manual forced ranking position applied and audited. " : ""}${e.tieText || "No unresolved tie break affected this rider."}`;
+        }
+        function seedingRows(entries = calculateTour()) {
+          const valid = completedTourEvents();
+          const eventNo = +state.tour.seedEventNo || valid.length + 1;
+          return state.tour.riders.map((r) => {
+            const annual = entries.find((e) => e.rider.id === r.id);
+            let score = 9999, source = "";
+            if (+r.manualSeed > 0) { score = +r.manualSeed; source = `Manual seed override ${r.manualSeed}: ${r.manualSeedReason || "reason required"}`; }
+            else if (eventNo <= 1 || valid.length === 0) { score = +r.previousRank || 9999; source = "Event 1: previous-year ranking weighted 100%."; }
+            else if (eventNo === 2) { const first = +r.results?.[valid[0]?.id]?.placement || 9999; score = first * .5 + (+r.previousRank || 9999) * .5; source = "Event 2: current first event 50% + previous-year 50%."; }
+            else if (eventNo === 3 && valid.length < 3) { const p1 = +r.results?.[valid[0]?.id]?.placement || 9999, p2 = +r.results?.[valid[1]?.id]?.placement || 9999; score = (p1 + p2 + (+r.previousRank || 9999)) / 3; source = "Event 3: event 1, event 2 and previous year weighted one-third each."; }
+            else { score = annual?.rank || 9999; source = "After 3 valid events: current annual ranking only."; }
+            if (r.wildcard) source += " Wildcard rider remains federation-visible.";
+            if (r.unseeded) source += " Unseeded/new rider requires Race Director placement if format needs a seed.";
+            return { rider: r, score, source };
+          }).sort((a, b) => a.score - b.score || a.rider.name.localeCompare(b.rider.name)).map((s, i) => ({ ...s, seed: i + 1 }));
+        }
+        function parseTourImport(text) {
+          const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+          if (!lines.length) return toast("Paste a ranking table first");
+          const split = (l) => l.includes("\t") ? l.split("\t") : l.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map((x) => x.replace(/^"|"$/g, "").trim());
+          const rows = lines.map(split);
+          const header = rows[0].map((h) => h.toLowerCase());
+          const nameIdx = header.findIndex((h) => /name|rider|competitor/.test(h));
+          if (nameIdx < 0) { state.tour.safetyNotice = "Rule confirmation required by Head Judge / Race Director."; return toast(state.tour.safetyNotice); }
+          const natIdx = header.findIndex((h) => /nat|country/.test(h));
+          const prevIdx = header.findIndex((h) => /prev|last|rank/.test(h));
+          const totalIdx = header.findIndex((h) => /total/.test(h));
+          const eventIdxs = header.map((h, i) => ({ h, i })).filter((x) => x.i !== nameIdx && x.i !== natIdx && x.i !== prevIdx && x.i !== totalIdx && /(stage|event|round|stop|cup|\d)/.test(x.h));
+          if (!eventIdxs.length) { state.tour.safetyNotice = "Rule confirmation required by Head Judge / Race Director."; return toast(state.tour.safetyNotice); }
+          state.tour.events = eventIdxs.map((x, i) => ({ id: "imp" + i, name: x.h.replace(/\b\w/g, (m) => m.toUpperCase()), status: "completed", forceCount: false, forceRemove: false }));
+          const seen = {};
+          state.tour.riders = rows.slice(1).filter((r) => r[nameIdx]).map((r, ri) => {
+            const base = r[nameIdx].trim(); seen[base] = (seen[base] || 0) + 1;
+            const rider = { id: "ir" + Date.now() + ri, name: seen[base] > 1 ? `${base} (${seen[base]})` : base, nationality: natIdx >= 0 ? r[natIdx] : "", previousRank: prevIdx >= 0 ? +r[prevIdx] || "" : "", wildcard: false, unseeded: false, manualSeed: "", manualSeedReason: "", forcedRank: "", results: {} };
+            eventIdxs.forEach((x, ei) => {
+              const raw = String(r[x.i] || "").trim();
+              let status = "valid", points = parseFloat(raw.replace(/[^0-9.-]/g, "")) || 0;
+              if (/cancel/i.test(raw)) { status = "cancelled"; state.tour.events[ei].status = "cancelled"; }
+              else if (/dns/i.test(raw)) status = "dns";
+              else if (/dnf/i.test(raw)) status = "dnf";
+              else if (!raw || raw === "-" || /invalid/i.test(raw)) status = "invalid result";
+              rider.results[state.tour.events[ei].id] = { placement: "", points, status, penalty: 0 };
+            });
+            return rider;
+          });
+          state.tour.safetyNotice = totalIdx >= 0 ? "Spreadsheet total column detected and ignored; totals were recalculated internally." : "Imported and recalculated internally.";
+          tourAudit("import", "tour spreadsheet", "pasted rows", `${state.tour.riders.length} riders / ${state.tour.events.length} events`, state.tour.safetyNotice);
+        }
+        function renderTour() {
+          if (!$("#tourName")) return;
+          const entries = calculateTour(), seeds = seedingRows(entries);
+          $("#tourName").value = state.tour.name;
+          $("#tourDivision").value = state.tour.division;
+          $("#tourSeedEventNo").value = state.tour.seedEventNo;
+          $("#tourManualDiscards").value = state.tour.manualDiscards;
+          $("#tourSafetyNotice").textContent = state.tour.safetyNotice || `${completedTourEvents().length} completed/counting events → ${discardCount()} discard(s). Cancelled/invalid events do not count toward ranking or discard count.`;
+          $("#tourOverview").innerHTML = `<div class="rank-row"><span class="pill green">Official annual ranking</span><span><strong>${esc(state.tour.name)}</strong><br><span class="small">${esc(state.tour.division)} · completed events ${completedTourEvents().length} · discard rule ${discardCount()} · last recalculation ${esc(state.tour.lastCalculation?.date || "live")}</span></span><strong>${entries.length} riders</strong></div>` + state.tour.events.map((ev) => `<div class="rank-row"><span class="stage-chip ${isEventCounting(ev) ? "counted" : ev.status}">${esc(ev.name)} · ${esc(ev.status)}${ev.forceCount ? " · force count" : ""}${ev.forceRemove ? " · force remove" : ""}</span><select data-tour-event-status="${ev.id}"><option ${ev.status === "completed" ? "selected" : ""}>completed</option><option ${ev.status === "cancelled" ? "selected" : ""}>cancelled</option><option ${ev.status === "invalid" ? "selected" : ""}>invalid</option><option ${ev.status === "incomplete" ? "selected" : ""}>incomplete</option></select><button class="ghost" data-tour-force-count="${ev.id}">${ev.forceCount ? "Clear force-count" : "Force-count event"}</button><button class="ghost" data-tour-force-remove="${ev.id}">${ev.forceRemove ? "Clear force-remove" : "Force-remove event"}</button></div>`).join("");
+          $("#tourStandingsRows").innerHTML = entries.map((e) => `<tr><td><span class="pill ${e.rank === 1 ? "green" : "gray"}">#${e.rank}</span></td><td><strong>${esc(e.rider.name)}</strong><br><span class="small">${esc(e.rider.nationality || "")} · prev ${esc(e.rider.previousRank || "—")}</span></td><td>${e.raw}</td><td>${e.discarded.map((d) => esc(d.ev.name + " " + d.net)).join("<br>") || "—"}</td><td><strong>${e.counted}</strong></td><td class="small">${esc(e.tieText || (e.forcedRank ? "Manual forced position" : "standard points order"))}</td><td><button class="secondary" data-tour-rider="${e.rider.id}">Why this ranking?</button></td></tr>`).join("");
+          $("#tourRiderSelect").innerHTML = entries.map((e) => `<option value="${e.rider.id}">#${e.rank} ${esc(e.rider.name)}</option>`).join("");
+          $("#tourEventSelect").innerHTML = state.tour.events.map((ev) => `<option value="${ev.id}">${esc(ev.name)} · ${esc(ev.status)}</option>`).join("");
+          if (!entries.some((e) => e.rider.id === state.selectedTourRiderId)) state.selectedTourRiderId = entries[0]?.rider.id || null;
+          if (state.selectedTourRiderId) $("#tourRiderSelect").value = state.selectedTourRiderId;
+          const selected = entries.find((e) => e.rider.id === state.selectedTourRiderId) || entries[0];
+          $("#tourRiderDetail").innerHTML = selected ? `<div class="rank-row tour-rank-card"><span class="pill green">#${selected.rank}</span><span><strong>${esc(selected.rider.name)}</strong><br><span class="small">${esc(selected.explanation)}</span><br>${selected.records.map((r) => `<span class="stage-chip ${selected.discardedIds.has(r.ev.id) ? "discarded" : r.eventCounts ? "counted" : r.ev.status}">${esc(r.ev.name)} · ${esc(r.res.status)} · ${r.net} pts${selected.discardedIds.has(r.ev.id) ? " · discarded lowest valid score" : ""}</span>`).join("")}</span><strong>${selected.counted}</strong></div>` : "<p class='small'>No tour riders.</p>";
+          $("#seedingManager").innerHTML = seeds.map((s) => `<div class="seed-row"><span class="pill ${s.rider.manualSeed ? "amber" : "gray"}">Seed ${s.seed}</span><strong>${esc(s.rider.name)}</strong><span class="small">Score ${s.score.toFixed ? s.score.toFixed(2) : s.score} · ${esc(s.source)}</span></div>`).join("");
+          $("#tieBreakView").innerHTML = entries.filter((e, i, arr) => arr.some((x, j) => j !== i && x.counted === e.counted)).map((e) => `<div class="rank-row"><span class="pill amber">Tie</span><span><strong>${esc(e.rider.name)}</strong><br><span class="small">${esc(e.tieText || "No active tie after sorting.")}</span></span><strong>${e.counted}</strong></div>`).join("") || "<p class='small'>No current points ties. Tie-break order remains visible in each rider explanation.</p>";
+          $("#tourAuditLog").innerHTML = state.tour.audit.map((a) => `<div class="rank-row"><span class="pill gray">${esc(a.user)}</span><span><strong>${esc(a.action)} · ${esc(a.target)}</strong><br><span class="small audit-meta">${esc(a.date)} · old: ${esc(a.oldValue)} · new: ${esc(a.newValue)} · reason: ${esc(a.reason)}</span></span></div>`).join("") || "<p class='small'>No manual ranking actions yet.</p>";
+          $$('[data-tour-rider]').forEach((b) => b.onclick = () => { state.selectedTourRiderId = b.dataset.tourRider; renderTour(); });
+          $$('[data-tour-event-status]').forEach((el) => el.onchange = () => {
+            if (!can("tourAdmin")) return deny("Race Director / Head Judge ranking authority required");
+            const ev = state.tour.events.find((x) => x.id === el.dataset.tourEventStatus), old = ev.status;
+            ev.status = el.value;
+            tourAudit("event status changed", ev.name, old, ev.status, "Stage status manually marked for ranking engine");
+            save("Event status audited");
+          });
+          $$('[data-tour-force-count]').forEach((b) => b.onclick = () => {
+            if (!can("tourAdmin")) return deny("Race Director / Head Judge ranking authority required");
+            const ev = state.tour.events.find((x) => x.id === b.dataset.tourForceCount), old = ev.forceCount;
+            ev.forceCount = !ev.forceCount;
+            if (ev.forceCount) ev.forceRemove = false;
+            tourAudit("force-count event", ev.name, old, ev.forceCount, "Manual force-count requires ranking authority");
+            save("Force-count audited");
+          });
+          $$('[data-tour-force-remove]').forEach((b) => b.onclick = () => {
+            if (!can("tourAdmin")) return deny("Race Director / Head Judge ranking authority required");
+            const ev = state.tour.events.find((x) => x.id === b.dataset.tourForceRemove), old = ev.forceRemove;
+            ev.forceRemove = !ev.forceRemove;
+            if (ev.forceRemove) ev.forceCount = false;
+            tourAudit("force-remove event", ev.name, old, ev.forceRemove, "Manual force-remove requires ranking authority");
+            save("Force-remove audited");
+          });
+        }
         function applyRoleUi() {
           setActionState(
             $("#runAllocation"),
@@ -2372,6 +2684,10 @@
             can("resultValidate") && !!heat(),
             "Only Head Judge can validate this",
           );
+          ["loadTourSample", "recalculateTour", "importTour", "addTourCorrection"].forEach((id) => {
+            const el = $("#" + id);
+            if (el) setActionState(el, can("tourAdmin"), "Race Director / Head Judge ranking authority required");
+          });
           [
             "format",
             "discipline",
@@ -2407,7 +2723,7 @@
           $("#roleSummary").textContent =
             roleSummaries[state.role] ||
             "Manual MVP role selector; authentication comes later.";
-          ["entry", "bracket", "heats", "judge"].forEach((s) => {
+          ["entry", "bracket", "heats", "tour", "judge"].forEach((s) => {
             $("#" + s + "Screen").classList.toggle("hide", state.screen !== s);
           });
           $$(".tab").forEach((b) => {
@@ -2427,9 +2743,64 @@
           renderEntry();
           renderBracket();
           renderHeats();
+          renderTour();
           renderJudge();
           applyRoleUi();
         }
+
+        ["tourName", "tourDivision", "tourSeedEventNo", "tourManualDiscards"].forEach((id) => {
+          const el = $("#" + id);
+          if (el) el.onchange = () => {
+            const old = JSON.stringify({ name: state.tour.name, division: state.tour.division, seedEventNo: state.tour.seedEventNo, manualDiscards: state.tour.manualDiscards });
+            state.tour.name = $("#tourName").value;
+            state.tour.division = $("#tourDivision").value;
+            state.tour.seedEventNo = +$("#tourSeedEventNo").value || 1;
+            state.tour.manualDiscards = $("#tourManualDiscards").value;
+            tourAudit("tour settings changed", "ranking engine", old, JSON.stringify({ name: state.tour.name, division: state.tour.division, seedEventNo: state.tour.seedEventNo, manualDiscards: state.tour.manualDiscards }), "Ranking settings edited");
+            save("Tour settings saved");
+          };
+        });
+        $("#loadTourSample").onclick = () => {
+          if (!requirePermission("tourAdmin", "Race Director / Head Judge ranking authority required")) return;
+          const old = state.tour.name;
+          state.tour = sampleTour();
+          tourAudit("sample loaded", "tour", old, state.tour.name, "Loaded official demo scenario");
+          save("Tour sample loaded");
+        };
+        $("#recalculateTour").onclick = () => {
+          if (!requirePermission("tourAdmin", "Race Director / Head Judge ranking authority required")) return;
+          calculateTour();
+          tourAudit("recalculation", "annual ranking", "previous live standings", "recalculated standings", "Manual recalculation requested");
+          save("Tour rankings recalculated");
+        };
+        $("#importTour").onclick = () => {
+          if (!requirePermission("tourAdmin", "Race Director / Head Judge ranking authority required")) return;
+          parseTourImport($("#tourImportBox").value);
+          save("Tour import processed");
+        };
+        $("#addTourCorrection").onclick = () => {
+          if (!requirePermission("tourAdmin", "Race Director / Head Judge ranking authority required")) return;
+          const rider = state.tour.riders[0], ev = state.tour.events[0];
+          if (!rider || !ev) return toast("Load or import a tour first");
+          const old = JSON.stringify(rider.results[ev.id]);
+          rider.results[ev.id].penalty = (+rider.results[ev.id].penalty || 0) + 10;
+          tourAudit("manual points correction", `${rider.name} · ${ev.name}`, old, JSON.stringify(rider.results[ev.id]), "Demo audit-safe correction: +10 penalty. Replace with authenticated modal in backend version.");
+          save("Manual correction audited");
+        };
+        $("#exportTourCsv").onclick = () => {
+          const entries = calculateTour();
+          const headers = ["rank", "rider", "nationality", "raw", "discarded", "counted", "explanation"];
+          const csv = [headers.join(",")].concat(entries.map((e) => [e.rank, e.rider.name, e.rider.nationality, e.raw, e.discarded.map((d) => d.ev.name + " " + d.net).join("; "), e.counted, e.explanation].map((v) => `"${String(v ?? "").replace(/"/g, '""')}"`).join(","))).join("\n");
+          const blob = new Blob([csv], { type: "text/csv" });
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = `${slug(state.tour.name)}-annual-ranking.csv`;
+          a.click();
+          URL.revokeObjectURL(a.href);
+        };
+        $("#printTourPdf").onclick = () => window.print();
+        $("#tourRiderSelect").onchange = () => { state.selectedTourRiderId = $("#tourRiderSelect").value; renderTour(); };
+        $("#tourEventSelect").onchange = () => renderTour();
         $("#roleSelector").onchange = () => {
           state.role = $("#roleSelector").value;
           roleAudit(

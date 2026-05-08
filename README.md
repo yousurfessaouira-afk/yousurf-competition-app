@@ -13,5 +13,6 @@ The current GitHub Pages-compatible app is pure HTML/CSS/JS and stores event dat
 - Automatic heat progression for advancing riders
 - Beach marshal rider check-in screen
 - Speaker notes and full-screen live display mode
+- GKA-style tour ranking, annual standings, event discards, cancelled-event handling, tie-break explanations, progressive seeding, spreadsheet import, CSV/PDF export, and audit-safe manual corrections
 
 Open `index.html` directly or publish the repository with GitHub Pages.
