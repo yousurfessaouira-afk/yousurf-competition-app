@@ -479,6 +479,18 @@
       .penalty-row.rejected {
         border-left-color: var(--red);
       }
+
+      .comm-layout { display: grid; gap: 12px; }
+      .comm-card { border-left: 5px solid var(--blue); }
+      .comm-card.important { border-left-color: var(--amber); }
+      .comm-card.urgent { border-left-color: var(--red); }
+      .comm-card.safety-critical { border-left-color: var(--red); background: rgba(255, 82, 99, 0.18); outline: 2px solid rgba(255, 82, 99, 0.45); }
+      .comm-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+      .comm-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+      .comm-actions button { flex: 1 1 145px; min-height: 40px; }
+      .comm-log-row { grid-template-columns: minmax(120px, .7fr) minmax(120px, .6fr) 1fr; align-items: start; }
+      .onb-board { background: linear-gradient(135deg, rgba(248,251,255,.98), rgba(230,244,255,.95)); color: var(--black); }
+      @media (min-width: 980px) { .comm-layout { grid-template-columns: minmax(320px, .8fr) minmax(0, 1.2fr); } }
       @media (min-width: 760px) {
         .two {
           grid-template-columns: repeat(2, 1fr);
@@ -648,6 +660,7 @@
             <button class="tab active" data-screen="dashboard">Dashboard</button>
             <button class="tab ghost" data-screen="officials">Officials Management</button>
             <button class="tab ghost" data-screen="profiles">Profiles</button>
+            <button class="tab ghost" data-screen="communication">Communication Center</button>
             <button class="tab ghost" data-screen="entry">
               Entry Allocation
             </button>
@@ -696,6 +709,73 @@
             <ol id="guideSteps" class="guide-list"></ol>
           </div>
         </details>
+      </main>
+
+
+
+      <main id="communicationScreen" class="stack hide">
+        <section class="panel light">
+          <div class="eyebrow" data-i18n="Communication Center">Communication Center</div>
+          <h2 data-i18n="Official operational command center">Official operational command center</h2>
+          <p class="small" data-i18n="Structured, role-based, heat-linked communication. No open chat and no external delivery in this GitHub Pages MVP.">Structured, role-based, heat-linked communication. No open chat and no external delivery in this GitHub Pages MVP.</p>
+        </section>
+        <section class="comm-layout">
+          <div class="stack">
+            <section class="panel">
+              <div class="eyebrow" data-i18n="Structured message">Structured message</div>
+              <div class="grid">
+                <div class="two">
+                  <div><label data-i18n="Quick template">Quick template</label><select id="commTemplate"></select></div>
+                  <div><label data-i18n="Message type">Message type</label><select id="commType"></select></div>
+                </div>
+                <div class="two">
+                  <div><label data-i18n="Priority">Priority</label><select id="commPriority"><option value="normal">normal</option><option value="important">important</option><option value="urgent">urgent</option><option value="safety critical">safety critical</option></select></div>
+                  <div><label data-i18n="Recipients">Recipients</label><select id="commRecipients"><option>all officials</option><option>Race Director</option><option>Head Judge</option><option>all judges</option><option>selected judge</option><option>beach staff</option><option>heat riders</option><option>all riders</option><option>selected rider</option><option>public display / Ocean Connect later</option></select></div>
+                </div>
+                <div class="two">
+                  <div><label data-i18n="Public visibility">Public visibility</label><select id="commVisibility"><option>internal only</option><option>officials only</option><option>riders only</option><option>public safe</option><option>future Ocean Connect sync</option></select></div>
+                  <div><label data-i18n="Action required">Action required</label><select id="commActionRequired"><option value="false">No</option><option value="true">Yes</option></select></div>
+                </div>
+                <div class="four">
+                  <div><label data-i18n="Event link">Event link</label><input id="commEventLink" placeholder="Event"></div>
+                  <div><label data-i18n="Division link">Division link</label><input id="commDivisionLink" placeholder="Open"></div>
+                  <div><label data-i18n="Heat link">Heat link</label><select id="commHeatLink"></select></div>
+                  <div><label data-i18n="Rider link">Rider link</label><select id="commRiderLink"></select></div>
+                </div>
+                <div class="three">
+                  <div><label data-i18n="Penalty link">Penalty link</label><input id="commPenaltyLink" placeholder="Penalty ID"></div>
+                  <div><label data-i18n="Protest link">Protest link</label><input id="commProtestLink" placeholder="Protest ID"></div>
+                  <div><label data-i18n="ONB link">ONB link</label><input id="commOnbLink" placeholder="ONB ref"></div>
+                </div>
+                <div><label data-i18n="Title">Title</label><input id="commTitle" placeholder="Heat 12 postponed"></div>
+                <div><label data-i18n="Message">Message</label><textarea id="commBody" placeholder="Use official, concise operational wording."></textarea></div>
+                <div class="button-row">
+                  <button id="saveCommDraft" class="secondary" data-i18n="Save draft">Save draft</button>
+                  <button id="sendCommMessage" class="primary" data-i18n="Send official message">Send official message</button>
+                  <button id="publishCommOnb" class="ghost" data-i18n="Publish to ONB">Publish to ONB</button>
+                </div>
+                <p id="commPermissionHint" class="notice small"></p>
+              </div>
+            </section>
+            <section class="panel light">
+              <div class="eyebrow" data-i18n="Communication settings">Communication settings</div>
+              <div class="two">
+                <div><label data-i18n="Head Judge ONB publishing">Head Judge ONB publishing</label><select id="commHeadJudgeOnb"><option value="false">No</option><option value="true">Yes, judging decisions only</option></select></div>
+                <div><label data-i18n="Delivery mode">Delivery mode</label><input value="Local storage only · future public sync prepared" disabled></div>
+              </div>
+            </section>
+          </div>
+          <div class="stack">
+            <section class="panel"><div class="eyebrow" data-i18n="Official Notices">Official Notices</div><div id="commOfficialNotices" class="grid"></div></section>
+            <section class="panel"><div class="eyebrow" data-i18n="Role Messages">Role Messages</div><div id="commRoleMessages" class="grid"></div></section>
+            <section class="panel"><div class="eyebrow" data-i18n="Heat Messages">Heat Messages</div><div id="commHeatMessages" class="grid"></div></section>
+            <section class="panel"><div class="eyebrow" data-i18n="Pending Actions">Pending Actions</div><div id="commPendingActions" class="grid"></div></section>
+            <section class="panel"><div class="eyebrow" data-i18n="Alerts">Alerts</div><div id="commAlerts" class="grid"></div></section>
+            <section class="panel onb-board"><div class="eyebrow" data-i18n="Official Notice Board">Official Notice Board</div><div id="commOnbBoard" class="grid"></div></section>
+            <section class="panel"><div class="eyebrow" data-i18n="Communication Log">Communication Log</div><div id="commLog" class="grid"></div></section>
+            <section class="panel"><div class="eyebrow" data-i18n="Communication Audit Log">Communication Audit Log</div><div id="commAuditLog" class="grid"></div></section>
+          </div>
+        </section>
       </main>
 
       <main id="officialsScreen" class="stack hide">
@@ -1352,6 +1432,55 @@
           "video application",
           "organizer selection",
         ];
+
+        const messageTypes = [
+          { value: "schedule change", group: "official", label: "schedule change" },
+          { value: "heat call", group: "official", label: "heat call" },
+          { value: "heat postponed", group: "official", label: "heat postponed" },
+          { value: "heat abandoned", group: "official", label: "heat abandoned" },
+          { value: "heat restarted", group: "official", label: "heat restarted" },
+          { value: "event on hold", group: "official", label: "event on hold" },
+          { value: "event resumed", group: "official", label: "event resumed" },
+          { value: "official result", group: "official", label: "official result" },
+          { value: "protest decision", group: "official", label: "protest decision" },
+          { value: "penalty decision", group: "official", label: "penalty decision" },
+          { value: "safety notice", group: "official", label: "safety notice" },
+          { value: "equipment notice", group: "official", label: "equipment notice" },
+          { value: "rider briefing", group: "official", label: "rider briefing" },
+          { value: "mandatory meeting", group: "official", label: "mandatory meeting" },
+          { value: "correction request", group: "judging", label: "correction request" },
+          { value: "interference flag", group: "judging", label: "interference flag" },
+          { value: "score issue", group: "judging", label: "score issue" },
+          { value: "judging clarification", group: "judging", label: "judging clarification" },
+          { value: "format instruction", group: "judging", label: "format instruction" },
+          { value: "criteria update", group: "judging", label: "criteria update" },
+          { value: "rider missing", group: "staff", label: "rider missing" },
+          { value: "rider checked-in", group: "staff", label: "rider checked-in" },
+          { value: "lycra missing", group: "staff", label: "lycra missing" },
+          { value: "beach ready", group: "staff", label: "beach ready" },
+          { value: "rescue/safety alert", group: "staff", label: "rescue/safety alert" },
+          { value: "equipment issue", group: "staff", label: "equipment issue" },
+          { value: "operational note", group: "staff", label: "operational note" },
+          { value: "ranking recalculated", group: "system", label: "ranking recalculated" },
+          { value: "heat validated", group: "system", label: "heat validated" },
+          { value: "bracket updated", group: "system", label: "bracket updated" },
+          { value: "waiting list replacement", group: "system", label: "waiting list replacement" },
+          { value: "audit warning", group: "system", label: "audit warning" },
+        ];
+        const quickTemplates = [
+          { label: "Heat postponed", type: "heat postponed", priority: "important", title: "Heat postponed", body: "Heat is postponed. Stand by for the next official update.", recipients: "all officials", action: "true", visibility: "officials only" },
+          { label: "Heat starting in 10 minutes", type: "heat call", priority: "important", title: "Heat starting in 10 minutes", body: "Heat riders and assigned officials prepare now. Start expected in 10 minutes.", recipients: "heat riders", action: "false", visibility: "public safe" },
+          { label: "Rider missing", type: "rider missing", priority: "urgent", title: "Rider missing", body: "Rider not present at call area. Race Director decision required.", recipients: "Race Director", action: "true", visibility: "internal only" },
+          { label: "Judge correction needed", type: "correction request", priority: "important", title: "Judge correction needed", body: "Score correction review requested for linked heat/attempt.", recipients: "Head Judge", action: "true", visibility: "officials only" },
+          { label: "Penalty pending", type: "penalty decision", priority: "urgent", title: "Penalty pending", body: "Penalty call is pending validation before result publication.", recipients: "Head Judge", action: "true", visibility: "officials only" },
+          { label: "Event on hold", type: "event on hold", priority: "safety critical", title: "Event on hold", body: "Event is on hold until further official notice.", recipients: "all officials", action: "true", visibility: "public safe" },
+          { label: "Event resumed", type: "event resumed", priority: "important", title: "Event resumed", body: "Event is resumed. Follow the updated heat sequence.", recipients: "all officials", action: "false", visibility: "public safe" },
+          { label: "Official result published", type: "official result", priority: "normal", title: "Official result published", body: "Official result has been published to the notice board.", recipients: "all officials", action: "false", visibility: "public safe" },
+        ];
+        const recipientGroups = ["all officials", "Race Director", "Head Judge", "all judges", "selected judge", "beach staff", "heat riders", "all riders", "selected rider", "public display / Ocean Connect later"];
+        const publicVisibilityOptions = ["internal only", "officials only", "riders only", "public safe", "future Ocean Connect sync"];
+        const priorityLevels = ["normal", "important", "urgent", "safety critical"];
+        const messageStatuses = ["draft", "sent", "acknowledged", "resolved", "archived"];
         const roles = ["Admin", "Race Director", "Head Judge", "Judge", "Staff Viewer"];
         const profiles = [
           { id: "admin", name: "Admin", role: "Admin" },
@@ -1396,7 +1525,7 @@
         };
         const permissions = {
           Admin: new Set([
-            "event", "users", "roles", "officialsManage", "officialsAssign", "settings", "resetDemo", "viewAllProfiles", "registration", "entry", "seeding", "bracket", "heatStatus", "notice", "safety", "schedule", "dnsDnf", "tourAdmin", "auditView", "judgingConfig", "panelAssign", "resultValidate", "penaltyValidate", "scoreCorrection", "finalLock", "penaltyFlag",
+            "event", "users", "roles", "officialsManage", "officialsAssign", "settings", "resetDemo", "viewAllProfiles", "registration", "entry", "seeding", "bracket", "heatStatus", "notice", "safety", "schedule", "dnsDnf", "tourAdmin", "auditView", "judgingConfig", "panelAssign", "resultValidate", "penaltyValidate", "scoreCorrection", "finalLock", "penaltyFlag", "commSettings",
           ]),
           "Race Director": new Set([
             "event", "registration", "entry", "riders", "waitingList", "seeding", "bracket", "heatStatus", "notice", "safety", "schedule", "dnsDnf", "tourAdmin", "penaltyFlag", "auditView", "officialsManage", "officialsAssign", "viewOfficials", "viewRiders",
@@ -1432,6 +1561,140 @@
             "Access summary": "Résumé des accès",
             "Security limitation": "Limite de sécurité",
             "Reset local demo data": "Réinitialiser les données démo locales",
+            "Communication Center": "Centre de communication",
+            "Official operational command center": "Centre de commandement opérationnel officiel",
+            "Structured, role-based, heat-linked communication. No open chat and no external delivery in this GitHub Pages MVP.": "Communication structurée, par rôle et liée aux heats. Pas de chat ouvert ni d’envoi externe dans ce MVP GitHub Pages.",
+            "Structured message": "Message structuré",
+            "Quick template": "Modèle rapide",
+            "Message type": "Type de message",
+            "Priority": "Priorité",
+            "Recipients": "Destinataires",
+            "Public visibility": "Visibilité publique",
+            "Action required": "Action requise",
+            "Event link": "Lien événement",
+            "Division link": "Lien division",
+            "Heat link": "Lien heat",
+            "Rider link": "Lien rider",
+            "Penalty link": "Lien pénalité",
+            "Protest link": "Lien protestation",
+            "ONB link": "Lien ONB",
+            "Title": "Titre",
+            "Message": "Message",
+            "Save draft": "Enregistrer le brouillon",
+            "Send official message": "Envoyer le message officiel",
+            "Publish to ONB": "Publier sur ONB",
+            "Communication settings": "Paramètres de communication",
+            "Head Judge ONB publishing": "Publication ONB du Chef juge",
+            "Delivery mode": "Mode de diffusion",
+            "No": "Non",
+            "Yes": "Oui",
+            "Official Notices": "Avis officiels",
+            "Role Messages": "Messages par rôle",
+            "Heat Messages": "Messages de heat",
+            "Pending Actions": "Actions en attente",
+            "Alerts": "Alertes",
+            "Official Notice Board": "Tableau officiel d’affichage",
+            "Communication Log": "Journal des communications",
+            "Communication Audit Log": "Journal d’audit des communications",
+            "Comms": "Comms",
+            "Open Communication Center": "Ouvrir le centre de communication",
+            "No urgent communication for this role.": "Aucune communication urgente pour ce rôle.",
+            "pending actions": "actions en attente",
+            "alerts": "alertes",
+            "Allowed": "Autorisé",
+            "Blocked": "Bloqué",
+            "cannot send this structured message type": "ne peut pas envoyer ce type de message structuré",
+            "Choose template": "Choisir un modèle",
+            "No heat link": "Aucun lien de heat",
+            "No rider link": "Aucun lien de rider",
+            "Linked": "Lié",
+            "Mark as acknowledged": "Marquer comme accusé de réception",
+            "Mark as resolved": "Marquer comme résolu",
+            "Archive": "Archiver",
+            "No official notices yet.": "Aucun avis officiel pour le moment.",
+            "No role messages yet.": "Aucun message par rôle pour le moment.",
+            "No heat messages yet.": "Aucun message de heat pour le moment.",
+            "No alerts.": "Aucune alerte.",
+            "No pending actions for this role.": "Aucune action en attente pour ce rôle.",
+            "No ONB notices published yet.": "Aucun avis ONB publié pour le moment.",
+            "No communication log entries yet.": "Aucune entrée de journal de communication pour le moment.",
+            "No communication audit entries yet.": "Aucune entrée d’audit de communication pour le moment.",
+            "Message sent": "Message envoyé",
+            "Draft saved": "Brouillon enregistré",
+            "ONB notice published": "Avis ONB publié",
+            "Message acknowledged": "Message accusé de réception",
+            "Message resolved": "Message résolu",
+            "Message archived": "Message archivé",
+            "Communication settings saved": "Paramètres de communication enregistrés",
+            "Only Admin/Race Director can change Head Judge ONB publishing.": "Seul l’Admin ou le Directeur de course peut modifier la publication ONB du Chef juge.",
+            "official": "officiel",
+            "judging": "jugement",
+            "staff": "staff",
+            "system": "système",
+            "normal": "normal",
+            "important": "important",
+            "urgent": "urgent",
+            "safety critical": "sécurité critique",
+            "draft": "brouillon",
+            "sent": "envoyé",
+            "acknowledged": "accusé réception",
+            "resolved": "résolu",
+            "archived": "archivé",
+            "published": "publié",
+            "all officials": "tous les officiels",
+            "all judges": "tous les juges",
+            "selected judge": "juge sélectionné",
+            "beach staff": "staff plage",
+            "heat riders": "riders du heat",
+            "all riders": "tous les riders",
+            "selected rider": "rider sélectionné",
+            "public display / Ocean Connect later": "affichage public / Ocean Connect plus tard",
+            "internal only": "interne seulement",
+            "officials only": "officiels seulement",
+            "riders only": "riders seulement",
+            "public safe": "public autorisé",
+            "future Ocean Connect sync": "future synchronisation Ocean Connect",
+            "schedule change": "changement de programme",
+            "heat call": "appel de heat",
+            "heat postponed": "heat reporté",
+            "heat abandoned": "heat abandonné",
+            "heat restarted": "heat relancé",
+            "event on hold": "événement suspendu",
+            "event resumed": "événement repris",
+            "official result": "résultat officiel",
+            "protest decision": "décision de protestation",
+            "penalty decision": "décision de pénalité",
+            "safety notice": "avis de sécurité",
+            "equipment notice": "avis équipement",
+            "rider briefing": "briefing riders",
+            "mandatory meeting": "réunion obligatoire",
+            "correction request": "demande de correction",
+            "interference flag": "signalement d’interférence",
+            "score issue": "problème de note",
+            "judging clarification": "clarification jugement",
+            "format instruction": "instruction de format",
+            "criteria update": "mise à jour des critères",
+            "rider missing": "rider manquant",
+            "rider checked-in": "rider enregistré",
+            "lycra missing": "lycra manquant",
+            "beach ready": "plage prête",
+            "rescue/safety alert": "alerte secours/sécurité",
+            "equipment issue": "problème d’équipement",
+            "operational note": "note opérationnelle",
+            "ranking recalculated": "classement recalculé",
+            "heat validated": "heat validé",
+            "bracket updated": "tableau mis à jour",
+            "waiting list replacement": "remplacement liste d’attente",
+            "audit warning": "avertissement d’audit",
+            "Heat postponed": "Heat reporté",
+            "Heat starting in 10 minutes": "Heat dans 10 minutes",
+            "Rider missing": "Rider manquant",
+            "Judge correction needed": "Correction juge nécessaire",
+            "Penalty pending": "Pénalité en attente",
+            "Event on hold": "Événement suspendu",
+            "Event resumed": "Événement repris",
+            "Official result published": "Résultat officiel publié",
+
             "Judge name": "Nom du juge",
             "Role": "Rôle",
             "Status": "Statut",
@@ -1518,29 +1781,34 @@
             ["dashboard", "Event Setup"],
             ["officials", "Officials"],
             ["profiles", "User Roles"],
+            ["communication", "Comms"],
             ["tour", "Rankings"],
             ["entry", "Audit", "audit"],
           ],
           "Race Director": [
             ["dashboard", "Live Control"],
+            ["communication", "Comms"],
             ["heats", "Heats"],
             ["entry", "Riders", "start"],
             ["bracket", "Schedule"],
           ],
           "Head Judge": [
             ["dashboard", "Validations"],
+            ["communication", "Comms"],
             ["officials", "Judges"],
             ["judge", "Penalties"],
             ["tour", "Results"],
           ],
           Judge: [
             ["dashboard", "Dashboard"],
+            ["communication", "Comms"],
             ["heats", "My Heats"],
             ["judge", "My Scores"],
             ["profiles", "Help"],
           ],
           "Staff Viewer": [
             ["dashboard", "Dashboard"],
+            ["communication", "Comms"],
             ["heats", "Current Heat"],
             ["entry", "Call List", "start"],
             ["bracket", "Schedule"],
@@ -1555,6 +1823,7 @@
           dashboard: null,
           officials: "viewOfficials",
           profiles: null,
+          communication: null,
           entry: "registration",
           bracket: "bracket",
           heats: "activeHeatView",
@@ -1582,6 +1851,14 @@
             judgeCount: 5,
             countWaves: 2,
             countTricks: 3,
+          },
+          communication: {
+            messages: [],
+            onb: [],
+            pendingActions: [],
+            audit: [],
+            selectedMessageId: null,
+            settings: { headJudgeCanPublishJudgingOnb: false },
           },
           entry: {
             gender: "Women",
@@ -1626,7 +1903,7 @@
         }
         function migrate(s) {
           const f = fresh();
-          s.screen = ["dashboard", "officials", "profiles", "entry", "bracket", "heats", "tour", "judge"].includes(s.screen) ? s.screen : "dashboard";
+          s.screen = ["dashboard", "officials", "profiles", "communication", "entry", "bracket", "heats", "tour", "judge"].includes(s.screen) ? s.screen : "dashboard";
           s.entryTab ??= "registration";
           s.lang = ["en", "fr"].includes(s.lang) ? s.lang : "en";
           s.profile = profiles.some((p) => p.id === s.profile) ? s.profile : null;
@@ -1637,6 +1914,12 @@
           s.penalties ??= [];
           s.selectedPenaltyId ??= null;
           s.settings = { ...f.settings, ...(s.settings || {}) };
+          s.communication = { ...f.communication, ...(s.communication || {}) };
+          s.communication.messages ??= [];
+          s.communication.onb ??= [];
+          s.communication.pendingActions ??= [];
+          s.communication.audit ??= [];
+          s.communication.settings = { ...f.communication.settings, ...(s.communication.settings || {}) };
           s.entry = { ...f.entry, ...(s.entry || {}) };
           s.entry.audit ??= [];
           s.entry.replacements ??= [];
@@ -3102,6 +3385,179 @@
         }
         function heatLabel(h) { return h ? `Heat ${h.heatNumber}` : "No heat ready"; }
         function riderNamesForHeat(h) { return (h?.riders || state.riders || []).filter((r) => !r.bye && !String(r.name).includes("Empty")).map((r) => r.name).join(" · ") || "Generate heats or add riders"; }
+
+        function commType(type) { return messageTypes.find((m) => m.value === type) || messageTypes[0]; }
+        function commGroup(type) { return commType(type)?.group || "official"; }
+        function commId(prefix = "msg") { return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2, 7)}`; }
+        function visibleMessages() {
+          const msgs = state.communication.messages || [];
+          if (state.role === "Admin") return msgs;
+          return msgs.filter((m) => {
+            const targets = String(m.recipients || "").toLowerCase();
+            if (targets.includes("all officials")) return state.role !== "Staff Viewer" || m.publicVisibility !== "internal only";
+            if (targets.includes(state.role.toLowerCase())) return true;
+            if (state.role === "Judge" && targets.includes("all judges")) return true;
+            if (state.role === "Staff Viewer" && (targets.includes("beach staff") || ["public safe", "future Ocean Connect sync"].includes(m.publicVisibility))) return true;
+            return ["public safe", "future Ocean Connect sync"].includes(m.publicVisibility) && ["Race Director", "Head Judge", "Judge", "Staff Viewer"].includes(state.role);
+          });
+        }
+        function communicationAudit(action, messageId = "—", reason = "", links = {}) {
+          state.communication.audit.unshift({
+            timestamp: new Date().toISOString(),
+            role: state.role || "System",
+            action,
+            messageId,
+            linkedHeat: links.heat || "—",
+            linkedRider: links.rider || "—",
+            reason,
+          });
+        }
+        function canSendCommunication(type, publishOnb = false) {
+          const group = commGroup(type);
+          if (publishOnb) {
+            if (state.role === "Admin" || state.role === "Race Director") return true;
+            return state.role === "Head Judge" && group === "judging" && state.communication.settings.headJudgeCanPublishJudgingOnb;
+          }
+          if (state.role === "Admin") return group === "system" || group === "official";
+          if (state.role === "Race Director") return group === "official" || ["rescue/safety alert"].includes(type);
+          if (state.role === "Head Judge") return group === "judging" || ["penalty decision", "heat validated"].includes(type);
+          if (state.role === "Judge") return ["correction request", "interference flag", "score issue"].includes(type) || type === "equipment issue";
+          if (state.role === "Staff Viewer") return ["rider missing", "rider checked-in", "lycra missing", "beach ready", "operational note"].includes(type);
+          return false;
+        }
+        function communicationPermissionHint() {
+          const type = $("#commType")?.value || "heat call";
+          const group = commGroup(type);
+          const allowed = canSendCommunication(type, false);
+          if (allowed) return `${t("Allowed")}: ${roleLabel(state.role)} → ${t(type)} (${t(group)})`;
+          return `${t("Blocked")}: ${roleLabel(state.role)} ${t("cannot send this structured message type")}.`;
+        }
+        function selectedCommLinks() {
+          return {
+            event: $("#commEventLink")?.value || state.bracket.eventName || "—",
+            division: $("#commDivisionLink")?.value || state.entry.gender || "—",
+            heat: $("#commHeatLink")?.value || "—",
+            rider: $("#commRiderLink")?.value || "—",
+            penalty: $("#commPenaltyLink")?.value || "—",
+            protest: $("#commProtestLink")?.value || "—",
+            ranking: state.tour?.name || "—",
+            onb: $("#commOnbLink")?.value || "—",
+          };
+        }
+        function buildCommunicationMessage(status = "draft") {
+          const type = $("#commType")?.value || "heat call";
+          return {
+            id: commId("msg"),
+            type,
+            group: commGroup(type),
+            title: $("#commTitle")?.value.trim() || t(type),
+            body: $("#commBody")?.value.trim() || "—",
+            authorRole: state.role,
+            authorProfile: activeProfile()?.name || state.role,
+            timestamp: new Date().toISOString(),
+            sentAt: status === "sent" ? new Date().toISOString() : null,
+            status,
+            priority: $("#commPriority")?.value || "normal",
+            recipients: $("#commRecipients")?.value || "all officials",
+            publicVisibility: $("#commVisibility")?.value || "internal only",
+            links: selectedCommLinks(),
+            onbStatus: "draft",
+            acknowledgement: [],
+            actionRequired: $("#commActionRequired")?.value === "true",
+          };
+        }
+        function addPendingActionForMessage(m) {
+          if (!m.actionRequired) return;
+          const owner = m.type === "correction request" || m.type === "interference flag" ? "Head Judge" : m.type === "rider missing" ? "Race Director" : m.type === "schedule change" ? "Race Director" : m.type === "penalty decision" ? "Head Judge" : "Admin";
+          state.communication.pendingActions.unshift({ id: commId("act"), messageId: m.id, ownerRole: owner, title: m.title, status: "pending", createdAt: new Date().toISOString(), links: m.links });
+        }
+        function saveCommunication(status = "draft") {
+          const m = buildCommunicationMessage(status);
+          if (status === "sent" && !canSendCommunication(m.type, false)) {
+            communicationAudit("role-based access denied", m.id, `${state.role} cannot send ${m.type}`, m.links);
+            roleAudit("role-based access denied", m.title, `${state.role} cannot send ${m.type}`, "blocked");
+            return toast("Restricted for this role");
+          }
+          state.communication.messages.unshift(m);
+          addPendingActionForMessage(m);
+          communicationAudit(status === "sent" ? "message sent" : "message created", m.id, status, m.links);
+          save(status === "sent" ? "Message sent" : "Draft saved");
+        }
+        function publishCommunicationOnb(message = null) {
+          const m = message || buildCommunicationMessage("sent");
+          if (!canSendCommunication(m.type, true)) {
+            communicationAudit("restricted publish attempt", m.id, `${state.role} cannot publish ONB notice for ${m.type}`, m.links);
+            roleAudit("restricted publish attempt", m.title, "Only Race Director/Admin can publish official ONB notices; Head Judge requires judging-decision setting.", "blocked");
+            return toast("Restricted for this role");
+          }
+          if (!state.communication.messages.some((x) => x.id === m.id)) state.communication.messages.unshift(m);
+          m.status = "sent";
+          m.onbStatus = "published";
+          m.onbPublishedAt = new Date().toISOString();
+          const onb = { id: commId("onb"), messageId: m.id, title: m.title, message: m.body, authorRole: state.role, timestamp: m.onbPublishedAt, affected: `${m.links.event} · ${m.links.heat}`, status: "published", publicVisibility: m.publicVisibility };
+          state.communication.onb.unshift(onb);
+          communicationAudit("ONB published", m.id, "Official Notice Board publication", m.links);
+          save("ONB notice published");
+        }
+        function updateMessageStatus(id, status) {
+          const m = state.communication.messages.find((x) => x.id === id);
+          if (!m) return;
+          m.status = status;
+          if (status === "acknowledged") m.acknowledgement = [...new Set([...(m.acknowledgement || []), state.role])];
+          if (status === "resolved") (state.communication.pendingActions || []).filter((a) => a.messageId === id).forEach((a) => a.status = "resolved");
+          if (status === "archived") {
+            m.onbStatus = m.onbStatus === "published" ? "archived" : m.onbStatus;
+            (state.communication.onb || []).filter((n) => n.messageId === id).forEach((n) => n.status = "archived");
+          }
+          communicationAudit(`message ${status}`, id, `Manual local ${status}`, m.links);
+          save(`Message ${status}`);
+        }
+        function renderCommCard(m) {
+          const tone = m.priority.replace(/\s+/g, "-");
+          return `<div class="card comm-card ${esc(tone)}"><div class="comm-meta"><span class="pill ${m.priority === "normal" ? "gray" : m.priority === "important" ? "amber" : "red"}">${esc(t(m.priority))}</span><span class="pill gray">${esc(t(m.status))}</span><span class="pill gray">${esc(t(m.type))}</span><span class="pill ${m.onbStatus === "published" ? "green" : "gray"}">ONB ${esc(t(m.onbStatus))}</span></div><strong>${esc(m.title)}</strong><p class="small reason">${esc(m.body)}</p><p class="small">${esc(t("Recipients"))}: ${esc(t(m.recipients))} · ${esc(t("Public visibility"))}: ${esc(t(m.publicVisibility))}<br>${esc(t("Linked"))}: ${esc(m.links.event)} · ${esc(m.links.division)} · ${esc(m.links.heat)} · ${esc(m.links.rider)}<br>${esc(roleLabel(m.authorRole))} · ${esc(new Date(m.timestamp).toLocaleString())}</p><div class="comm-actions"><button class="secondary" data-comm-status="acknowledged" data-comm-id="${esc(m.id)}">${esc(t("Mark as acknowledged"))}</button><button class="secondary" data-comm-status="resolved" data-comm-id="${esc(m.id)}">${esc(t("Mark as resolved"))}</button><button class="ghost" data-comm-status="archived" data-comm-id="${esc(m.id)}">${esc(t("Archive"))}</button><button class="primary" data-comm-onb="${esc(m.id)}">${esc(t("Publish to ONB"))}</button></div></div>`;
+        }
+        function renderCommunicationWidget() {
+          const visible = visibleMessages();
+          const pending = (state.communication.pendingActions || []).filter((a) => a.status !== "resolved" && (a.ownerRole === state.role || state.role === "Admin"));
+          const alerts = visible.filter((m) => ["urgent", "safety critical"].includes(m.priority) && m.status !== "archived");
+          return `<section class="panel"><div class="eyebrow">${esc(t("Communication Center"))}</div>${renderStatusBar([[`${pending.length} ${t("pending actions")}`, pending.length ? "amber" : ""], [`${alerts.length} ${t("alerts")}`, alerts.length ? "amber" : "gray"], [`${(state.communication.onb || []).length} ONB`, "gray"]])}${renderQuickActions([dashboardButton(t("Open Communication Center"), "communication", "", "primary")])}<div class="grid" style="margin-top:10px">${alerts.slice(0, 2).map(renderCommCard).join("") || `<p class="small">${esc(t("No urgent communication for this role."))}</p>`}</div></section>`;
+        }
+        function renderCommunication() {
+          if (!$("#communicationScreen")) return;
+          const typeSelect = $("#commType");
+          if (typeSelect) { const current = typeSelect.value || "heat call"; typeSelect.innerHTML = messageTypes.map((m) => `<option value="${esc(m.value)}">${esc(t(m.group))} · ${esc(t(m.label))}</option>`).join(""); typeSelect.value = current; }
+          const templateSelect = $("#commTemplate");
+          if (templateSelect) { const current = templateSelect.value; templateSelect.innerHTML = `<option value="">${esc(t("Choose template"))}</option>` + quickTemplates.map((tpl, i) => `<option value="${i}">${esc(t(tpl.label))}</option>`).join(""); templateSelect.value = current; }
+          if ($("#commPriority")) { const current = $("#commPriority").value || "normal"; $("#commPriority").innerHTML = priorityLevels.map((x) => `<option value="${esc(x)}">${esc(t(x))}</option>`).join(""); $("#commPriority").value = current; }
+          if ($("#commRecipients")) { const current = $("#commRecipients").value || "all officials"; $("#commRecipients").innerHTML = recipientGroups.map((x) => `<option value="${esc(x)}">${esc(t(x))}</option>`).join(""); $("#commRecipients").value = current; }
+          if ($("#commVisibility")) { const current = $("#commVisibility").value || "internal only"; $("#commVisibility").innerHTML = publicVisibilityOptions.map((x) => `<option value="${esc(x)}">${esc(t(x))}</option>`).join(""); $("#commVisibility").value = current; }
+          if ($("#commActionRequired")) { const current = $("#commActionRequired").value || "false"; $("#commActionRequired").innerHTML = `<option value="false">${esc(t("No"))}</option><option value="true">${esc(t("Yes"))}</option>`; $("#commActionRequired").value = current; }
+          const heatOptions = [`<option value="">${esc(t("No heat link"))}</option>`].concat(heats().map((h) => `<option value="Heat ${esc(h.heatNumber)}">Heat ${esc(h.heatNumber)}</option>`));
+          if ($("#commHeatLink")) $("#commHeatLink").innerHTML = heatOptions.join("");
+          const riders = [...(state.entry.allocation || []), ...(state.riders || [])];
+          if ($("#commRiderLink")) $("#commRiderLink").innerHTML = `<option value="">${esc(t("No rider link"))}</option>` + riders.map((r) => `<option>${esc(r.name)}</option>`).join("");
+          if ($("#commEventLink")) $("#commEventLink").value ||= state.bracket.eventName;
+          if ($("#commDivisionLink")) $("#commDivisionLink").value ||= `${state.entry.gender} · ${state.entry.discipline}`;
+          if ($("#commHeadJudgeOnb")) $("#commHeadJudgeOnb").value = String(!!state.communication.settings.headJudgeCanPublishJudgingOnb);
+          if ($("#commPermissionHint")) $("#commPermissionHint").textContent = communicationPermissionHint();
+          const messages = visibleMessages();
+          const official = messages.filter((m) => m.group === "official" && m.status !== "archived");
+          const roleMsgs = messages.filter((m) => m.group !== "official" && m.status !== "archived");
+          const heatMsgs = messages.filter((m) => m.links?.heat && m.links.heat !== "—" && m.status !== "archived");
+          const alerts = messages.filter((m) => ["urgent", "safety critical"].includes(m.priority) && m.status !== "archived");
+          const pending = (state.communication.pendingActions || []).filter((a) => a.status !== "resolved" && (state.role === "Admin" || a.ownerRole === state.role));
+          $("#commOfficialNotices").innerHTML = official.map(renderCommCard).join("") || `<p class="small">${esc(t("No official notices yet."))}</p>`;
+          $("#commRoleMessages").innerHTML = roleMsgs.map(renderCommCard).join("") || `<p class="small">${esc(t("No role messages yet."))}</p>`;
+          $("#commHeatMessages").innerHTML = heatMsgs.map(renderCommCard).join("") || `<p class="small">${esc(t("No heat messages yet."))}</p>`;
+          $("#commAlerts").innerHTML = alerts.map(renderCommCard).join("") || `<p class="small">${esc(t("No alerts."))}</p>`;
+          $("#commPendingActions").innerHTML = pending.map((a) => `<div class="rank-row"><span class="pill amber">${esc(t("pending"))}</span><span><strong>${esc(a.title)}</strong><br><span class="small">${esc(roleLabel(a.ownerRole))} · ${esc(a.links?.heat || "—")} · ${esc(a.links?.rider || "—")}</span></span><button class="secondary" data-comm-status="resolved" data-comm-id="${esc(a.messageId)}">${esc(t("Mark as resolved"))}</button></div>`).join("") || `<p class="small">${esc(t("No pending actions for this role."))}</p>`;
+          $("#commOnbBoard").innerHTML = (state.communication.onb || []).map((n) => `<div class="card"><span class="pill green">${esc(t(n.status))}</span><strong>${esc(n.title)}</strong><p class="small reason">${esc(n.message)}</p><p class="small">${esc(roleLabel(n.authorRole))} · ${esc(new Date(n.timestamp).toLocaleString())} · ${esc(n.affected)} · ${esc(t(n.publicVisibility))}</p></div>`).join("") || `<p class="small">${esc(t("No ONB notices published yet."))}</p>`;
+          $("#commLog").innerHTML = messages.map((m) => `<div class="rank-row comm-log-row"><span class="pill ${m.status === "resolved" ? "green" : "gray"}">${esc(t(m.status))}</span><span>${esc(t(m.type))}<br><span class="small">${esc(t(m.priority))}</span></span><span><strong>${esc(m.title)}</strong><br><span class="small">${esc(t(m.recipients))} · ${esc(m.links?.heat || "—")} · ${esc(m.links?.rider || "—")}</span></span></div>`).join("") || `<p class="small">${esc(t("No communication log entries yet."))}</p>`;
+          $("#commAuditLog").innerHTML = (state.communication.audit || []).map((a) => `<div class="rank-row comm-log-row"><span class="pill gray">${esc(new Date(a.timestamp).toLocaleTimeString())}</span><span>${esc(roleLabel(a.role))}<br><span class="small">${esc(a.messageId)}</span></span><span><strong>${esc(t(a.action))}</strong><br><span class="small">${esc(a.linkedHeat)} · ${esc(a.linkedRider)} · ${esc(a.reason || "—")}</span></span></div>`).join("") || `<p class="small">${esc(t("No communication audit entries yet."))}</p>`;
+          $$('[data-comm-status]').forEach((b) => b.onclick = () => updateMessageStatus(b.dataset.commId, b.dataset.commStatus));
+          $$('[data-comm-onb]').forEach((b) => b.onclick = () => publishCommunicationOnb(state.communication.messages.find((m) => m.id === b.dataset.commOnb)));
+        }
+
         function go(screen, entryTab) {
           if (!canOpenScreen(screen)) return toast("Access restricted — this profile is not available for your role.");
           state.screen = screen;
@@ -3194,7 +3650,7 @@
           $("#guideTitle").textContent = t("How to use this profile") + ` · ${roleLabel(role)}`;
           $("#guideIntro").textContent = t(roleSummaries[role] || "Demo access mode — real login will be added later.");
           $("#guideSteps").innerHTML = (guides[role] || []).map((step) => `<li>${esc(t(step))}</li>`).join("");
-          $("#roleDashboard").innerHTML = renderRoleDashboard(role);
+          $("#roleDashboard").innerHTML = renderRoleDashboard(role) + renderCommunicationWidget();
           $$("[data-go-screen]").forEach((b) => (b.onclick = () => go(b.dataset.goScreen, b.dataset.goTab || null)));
           const reset = $("#dashboardResetDemo");
           if (reset) reset.onclick = () => $("#resetDemoData")?.click();
@@ -3353,6 +3809,10 @@
               "Only Judge can score rider attempts",
             ),
           );
+          setActionState($("#sendCommMessage"), canSendCommunication($("#commType")?.value || "heat call", false), "Role cannot send this structured message type.");
+          setActionState($("#publishCommOnb"), canSendCommunication($("#commType")?.value || "heat call", true), "Only Race Director/Admin can publish ONB notices; Head Judge requires judging-decision setting.");
+          if ($("#commHeadJudgeOnb")) $("#commHeadJudgeOnb").disabled = !(state.role === "Admin" || state.role === "Race Director");
+          $$('[data-comm-onb]').forEach((b) => setActionState(b, canSendCommunication(state.communication.messages.find((m) => m.id === b.dataset.commOnb)?.type || "heat call", true), "ONB publish restricted for this role."));
           $$("[data-role-zone]").forEach((el) => {
             const allowed = el.dataset.roleZone.split(/\s+/).includes(state.role.toLowerCase().replace(/\s+/g, "-"));
             el.classList.toggle("hide", !allowed);
@@ -3375,7 +3835,7 @@
           $("#roleSummary").textContent = `${activeProfile()?.name || "No profile"} · ${roleSummaries[state.role] || "Manual MVP role selector; authentication comes later."}`;
           const nav = roleNavigation[state.role] || [["dashboard", "Dashboard"]];
           if (!canOpenScreen(state.screen)) state.screen = "dashboard";
-          ["dashboard", "officials", "profiles", "entry", "bracket", "heats", "tour", "judge"].forEach((s) => {
+          ["dashboard", "officials", "profiles", "communication", "entry", "bracket", "heats", "tour", "judge"].forEach((s) => {
             $("#" + s + "Screen").classList.toggle("hide", state.screen !== s);
           });
           $$(".tab").forEach((b) => {
@@ -3402,6 +3862,7 @@
           renderDashboard();
           renderOfficials();
           renderProfiles();
+          renderCommunication();
           renderEntry();
           renderBracket();
           renderHeats();
@@ -3538,7 +3999,33 @@
           )
             return;
           updateEntrySettings();
-          runAllocation();
+  
+        ["commType", "commPriority", "commRecipients", "commVisibility", "commActionRequired"].forEach((id) => {
+          const el = $("#" + id);
+          if (el) el.onchange = () => renderCommunication();
+        });
+        if ($("#commTemplate")) $("#commTemplate").onchange = () => {
+          const tpl = quickTemplates[$("#commTemplate").value];
+          if (!tpl) return;
+          $("#commType").value = tpl.type;
+          $("#commPriority").value = tpl.priority;
+          $("#commRecipients").value = tpl.recipients;
+          $("#commVisibility").value = tpl.visibility;
+          $("#commActionRequired").value = tpl.action;
+          $("#commTitle").value = t(tpl.title);
+          $("#commBody").value = t(tpl.body);
+          renderCommunication();
+        };
+        if ($("#saveCommDraft")) $("#saveCommDraft").onclick = () => saveCommunication("draft");
+        if ($("#sendCommMessage")) $("#sendCommMessage").onclick = () => saveCommunication("sent");
+        if ($("#publishCommOnb")) $("#publishCommOnb").onclick = () => publishCommunicationOnb();
+        if ($("#commHeadJudgeOnb")) $("#commHeadJudgeOnb").onchange = () => {
+          if (!(state.role === "Admin" || state.role === "Race Director")) return deny("Only Admin/Race Director can change Head Judge ONB publishing.");
+          state.communication.settings.headJudgeCanPublishJudgingOnb = $("#commHeadJudgeOnb").value === "true";
+          communicationAudit("role permission changed", "communication-settings", `Head Judge ONB judging publication ${state.communication.settings.headJudgeCanPublishJudgingOnb}`, {});
+          save("Communication settings saved");
+        };
+        runAllocation();
           save("Allocation and seeding rebuilt");
         };
         $("#loadEntrySample").onclick = () => {
@@ -3550,7 +4037,33 @@
           )
             return;
           state.entry.registrations = sampleRegistrations();
-          runAllocation();
+  
+        ["commType", "commPriority", "commRecipients", "commVisibility", "commActionRequired"].forEach((id) => {
+          const el = $("#" + id);
+          if (el) el.onchange = () => renderCommunication();
+        });
+        if ($("#commTemplate")) $("#commTemplate").onchange = () => {
+          const tpl = quickTemplates[$("#commTemplate").value];
+          if (!tpl) return;
+          $("#commType").value = tpl.type;
+          $("#commPriority").value = tpl.priority;
+          $("#commRecipients").value = tpl.recipients;
+          $("#commVisibility").value = tpl.visibility;
+          $("#commActionRequired").value = tpl.action;
+          $("#commTitle").value = t(tpl.title);
+          $("#commBody").value = t(tpl.body);
+          renderCommunication();
+        };
+        if ($("#saveCommDraft")) $("#saveCommDraft").onclick = () => saveCommunication("draft");
+        if ($("#sendCommMessage")) $("#sendCommMessage").onclick = () => saveCommunication("sent");
+        if ($("#publishCommOnb")) $("#publishCommOnb").onclick = () => publishCommunicationOnb();
+        if ($("#commHeadJudgeOnb")) $("#commHeadJudgeOnb").onchange = () => {
+          if (!(state.role === "Admin" || state.role === "Race Director")) return deny("Only Admin/Race Director can change Head Judge ONB publishing.");
+          state.communication.settings.headJudgeCanPublishJudgingOnb = $("#commHeadJudgeOnb").value === "true";
+          communicationAudit("role permission changed", "communication-settings", `Head Judge ONB judging publication ${state.communication.settings.headJudgeCanPublishJudgingOnb}`, {});
+          save("Communication settings saved");
+        };
+        runAllocation();
           save("40-rider sample loaded");
         };
         $("#clearEntryData").onclick = () => {
@@ -3919,6 +4432,32 @@
           }
           roleAudit("judge assigned", name, "Panel assignment updated by authorized role", "active");
           save("Judge assigned");
+        };
+
+        ["commType", "commPriority", "commRecipients", "commVisibility", "commActionRequired"].forEach((id) => {
+          const el = $("#" + id);
+          if (el) el.onchange = () => renderCommunication();
+        });
+        if ($("#commTemplate")) $("#commTemplate").onchange = () => {
+          const tpl = quickTemplates[$("#commTemplate").value];
+          if (!tpl) return;
+          $("#commType").value = tpl.type;
+          $("#commPriority").value = tpl.priority;
+          $("#commRecipients").value = tpl.recipients;
+          $("#commVisibility").value = tpl.visibility;
+          $("#commActionRequired").value = tpl.action;
+          $("#commTitle").value = t(tpl.title);
+          $("#commBody").value = t(tpl.body);
+          renderCommunication();
+        };
+        if ($("#saveCommDraft")) $("#saveCommDraft").onclick = () => saveCommunication("draft");
+        if ($("#sendCommMessage")) $("#sendCommMessage").onclick = () => saveCommunication("sent");
+        if ($("#publishCommOnb")) $("#publishCommOnb").onclick = () => publishCommunicationOnb();
+        if ($("#commHeadJudgeOnb")) $("#commHeadJudgeOnb").onchange = () => {
+          if (!(state.role === "Admin" || state.role === "Race Director")) return deny("Only Admin/Race Director can change Head Judge ONB publishing.");
+          state.communication.settings.headJudgeCanPublishJudgingOnb = $("#commHeadJudgeOnb").value === "true";
+          communicationAudit("role permission changed", "communication-settings", `Head Judge ONB judging publication ${state.communication.settings.headJudgeCanPublishJudgingOnb}`, {});
+          save("Communication settings saved");
         };
         runAllocation();
         save();
